@@ -17,19 +17,31 @@ import {
     ChevronRight
 } from 'lucide-react'
 
-const navItems = [
-    { name: 'Home', href: '/home', icon: Home },
-    { name: 'Phase 0 – Ideation', href: '/phase-0', icon: Lightbulb },
-    { name: 'Phase 1 – Discovery', href: '/phase-1', icon: Compass },
-    { name: 'Phase 2 – Prioritization', href: '/phase-2', icon: ListTodo },
-    { name: 'Phase 3 – Design', href: '/phase-3', icon: PenTool },
-    { name: 'Phase 4 – Dev & Testing', href: '/phase-4', icon: Code },
-    { name: 'Phase 5 – Deployment', href: '/phase-5', icon: Rocket },
-]
-
-const supportDocs = [
-    { name: 'SDLC Guide', href: '#', icon: FileText },
-    { name: 'FAQ & Help', href: '#', icon: HelpCircle },
+const sidebarSections = [
+    {
+        title: 'General',
+        items: [
+            { name: 'Rollout', href: '/home', icon: Home },
+        ]
+    },
+    {
+        title: 'SDLC Phases',
+        items: [
+            { name: 'Phase 0 – Ideation', href: '/phase-0', icon: Lightbulb },
+            { name: 'Phase 1 – Discovery', href: '/phase-1', icon: Compass },
+            { name: 'Phase 2 – Prioritization', href: '/phase-2', icon: ListTodo },
+            { name: 'Phase 3 – Design', href: '/phase-3', icon: PenTool },
+            { name: 'Phase 4 – Dev & Testing', href: '/phase-4', icon: Code },
+            { name: 'Phase 5 – Deployment', href: '/phase-5', icon: Rocket },
+        ]
+    },
+    {
+        title: 'Support Documents',
+        items: [
+            { name: 'SDLC Guide', href: '#', icon: FileText },
+            { name: 'FAQ & Help', href: '#', icon: HelpCircle },
+        ]
+    }
 ]
 
 export function Sidebar({
@@ -85,73 +97,53 @@ export function Sidebar({
             </div>
 
             {/* Main Navigation */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden hide-scrollbar py-6 flex flex-col gap-1.5 px-3">
-                {navItems.map((item) => {
-                    const isActive = pathname === item.href
+            <div className="flex-1 overflow-y-auto overflow-x-hidden hide-scrollbar py-6 flex flex-col px-3">
+                {sidebarSections.map((section, idx) => (
+                    <div key={section.title} className={idx > 0 ? "mt-6" : ""}>
+                        {/* Section Header */}
+                        <div className={`mb-2 transition-all duration-300 overflow-hidden shrink-0 ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-4 opacity-100 px-3'
+                            }`}>
+                            <h3 className="text-[13px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                                {section.title}
+                            </h3>
+                        </div>
+                        {isCollapsed && idx > 0 && <div className="h-px bg-slate-200 mt-2 mb-4 mx-3 shrink-0" />}
 
-                    return (
-                        <Link
-                            key={item.name}
-                            href={item.href}
-                            className={`group flex items-center relative rounded-md transition-all duration-200 py-2 min-h-[40px] ${isActive
-                                ? 'bg-slate-100 text-slate-900 font-semibold'
-                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium'
-                                } ${isCollapsed ? 'px-0 justify-center' : 'px-3 gap-3'}`}
-                            title={isCollapsed ? item.name : undefined}
-                        >
-                            {/* Active Left Indicator Bar */}
-                            {isActive && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#0b4030] rounded-r-full" />
-                            )}
+                        {/* Section Items */}
+                        <div className="flex flex-col gap-1.5">
+                            {section.items.map((item) => {
+                                const isActive = pathname === item.href
 
-                            {/* Icon */}
-                            <item.icon className={`shrink-0 transition-colors ${isActive ? 'text-[#0b4030] w-5 h-5' : 'text-slate-400 group-hover:text-slate-600 w-[18px] h-[18px]'
-                                }`} />
+                                return (
+                                    <Link
+                                        key={item.name}
+                                        href={item.href}
+                                        className={`group flex items-center relative rounded-md transition-all duration-200 py-2 min-h-[40px] shrink-0 ${isActive
+                                            ? 'bg-slate-100 text-slate-900 font-semibold'
+                                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium'
+                                            } ${isCollapsed ? 'px-0 justify-center' : 'px-3 gap-3'}`}
+                                        title={isCollapsed ? item.name : undefined}
+                                    >
+                                        {/* Active Left Indicator Bar */}
+                                        {isActive && (
+                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#0b4030] rounded-r-full" />
+                                        )}
 
-                            {/* Label */}
-                            <span className={`text-[15px] tracking-tight whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
-                                }`}>
-                                {item.name}
-                            </span>
-                        </Link>
-                    )
-                })}
+                                        {/* Icon */}
+                                        <item.icon className={`shrink-0 transition-colors ${isActive ? 'text-[#0b4030] w-5 h-5' : 'text-slate-400 group-hover:text-slate-600 w-[18px] h-[18px]'
+                                            }`} />
 
-                {/* Support Section Header */}
-                <div className={`mt-8 mb-2 transition-all duration-300 overflow-hidden shrink-0 ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-4 opacity-100 px-3'
-                    }`}>
-                    <h3 className="text-[13px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
-                        Support Documents
-                    </h3>
-                </div>
-                {isCollapsed && <div className="h-px bg-slate-200 mt-6 mb-4 mx-3 shrink-0" />}
-
-                {/* Support Links */}
-                {supportDocs.map((item) => {
-                    const isActive = pathname === item.href
-
-                    return (
-                        <Link
-                            key={item.name}
-                            href={item.href}
-                            className={`group flex items-center relative rounded-md transition-all duration-200 py-2 min-h-[40px] shrink-0 ${isActive
-                                ? 'bg-slate-100 text-slate-900 font-semibold'
-                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium'
-                                } ${isCollapsed ? 'px-0 justify-center' : 'px-3 gap-3'}`}
-                            title={isCollapsed ? item.name : undefined}
-                        >
-                            {isActive && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#0b4030] rounded-r-full" />
-                            )}
-                            <item.icon className={`shrink-0 transition-colors ${isActive ? 'text-[#0b4030] w-5 h-5' : 'text-slate-400 group-hover:text-slate-600 w-[18px] h-[18px]'
-                                }`} />
-                            <span className={`text-[15px] tracking-tight whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
-                                }`}>
-                                {item.name}
-                            </span>
-                        </Link>
-                    )
-                })}
+                                        {/* Label */}
+                                        <span className={`text-[15px] tracking-tight whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
+                                            }`}>
+                                            {item.name}
+                                        </span>
+                                    </Link>
+                                )
+                            })}
+                        </div>
+                    </div>
+                ))}
             </div>
 
             {/* Footer Section */}
