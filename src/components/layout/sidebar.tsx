@@ -109,7 +109,7 @@ export function Sidebar({
                                 }`} />
 
                             {/* Label */}
-                            <span className={`text-[13px] tracking-tight whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
+                            <span className={`text-[15px] tracking-tight whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
                                 }`}>
                                 {item.name}
                             </span>
@@ -120,7 +120,7 @@ export function Sidebar({
                 {/* Support Section Header */}
                 <div className={`mt-8 mb-2 transition-all duration-300 overflow-hidden shrink-0 ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-4 opacity-100 px-3'
                     }`}>
-                    <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                    <h3 className="text-[13px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
                         Support Documents
                     </h3>
                 </div>
@@ -145,7 +145,7 @@ export function Sidebar({
                             )}
                             <item.icon className={`shrink-0 transition-colors ${isActive ? 'text-[#0b4030] w-5 h-5' : 'text-slate-400 group-hover:text-slate-600 w-[18px] h-[18px]'
                                 }`} />
-                            <span className={`text-[13px] tracking-tight whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
+                            <span className={`text-[15px] tracking-tight whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
                                 }`}>
                                 {item.name}
                             </span>
@@ -159,7 +159,7 @@ export function Sidebar({
                 <div className={`p-4 flex items-center justify-center transition-all duration-300 overflow-hidden whitespace-nowrap ${isCollapsed ? 'h-16 pt-[18px]' : 'h-14 gap-2.5'
                     }`}>
                     {!isCollapsed && (
-                        <span className="text-[11px] font-medium text-slate-500">Powered by</span>
+                        <span className="text-[13px] font-medium text-slate-500">Powered by</span>
                     )}
                     <Image
                         src="/EPMO-Logo.png"
