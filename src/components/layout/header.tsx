@@ -86,13 +86,13 @@ export function Header({ user }: { user: any }) {
                                         setTeamOpen(false)
                                         setProfileOpen(false)
                                     }}
-                                    className="flex items-center justify-between gap-2 px-3 py-1.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-sm font-medium text-slate-700 rounded-lg transition-all shadow-sm w-[200px]"
+                                    className="flex items-center justify-between gap-2 px-3 py-1.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-sm font-medium text-slate-700 rounded-lg transition-all shadow-sm w-[230px]"
                                 >
                                     <span className="truncate">{workstream}</span>
                                     <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${workstreamOpen ? 'rotate-180' : ''}`} />
                                 </button>
                                 {workstreamOpen && (
-                                    <div className="absolute left-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50">
+                                    <div className="absolute left-0 mt-2 w-[330px] bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50">
                                         <button
                                             onClick={() => { setWorkstream('All Workstreams'); setTeam('All Teams'); setWorkstreamOpen(false); }}
                                             className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center justify-between"
@@ -122,13 +122,13 @@ export function Header({ user }: { user: any }) {
                                         setWorkstreamOpen(false)
                                         setProfileOpen(false)
                                     }}
-                                    className="flex items-center justify-between gap-2 px-3 py-1.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-sm font-medium text-slate-700 rounded-lg transition-all shadow-sm w-[200px]"
+                                    className="flex items-center justify-between gap-2 px-3 py-1.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-sm font-medium text-slate-700 rounded-lg transition-all shadow-sm w-[230px]"
                                 >
                                     <span className="truncate">{team}</span>
                                     <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${teamOpen ? 'rotate-180' : ''}`} />
                                 </button>
                                 {teamOpen && (
-                                    <div className="absolute left-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50 max-h-64 overflow-y-auto">
+                                    <div className="absolute left-0 mt-2 w-[330px] bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50 max-h-64 overflow-y-auto">
                                         <button
                                             onClick={() => { setTeam('All Teams'); setTeamOpen(false); }}
                                             className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center justify-between"

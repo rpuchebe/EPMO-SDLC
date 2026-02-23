@@ -21,7 +21,7 @@ const sidebarSections = [
     {
         title: 'General',
         items: [
-            { name: 'Rollout', href: '/home', icon: Home },
+            { name: 'Home', href: '/home', icon: Home },
         ]
     },
     {
@@ -99,7 +99,7 @@ export function Sidebar({
             {/* Main Navigation */}
             <div className="flex-1 overflow-y-auto overflow-x-hidden hide-scrollbar py-6 flex flex-col px-3">
                 {sidebarSections.map((section, idx) => (
-                    <div key={section.title} className={idx > 0 ? "mt-6" : ""}>
+                    <div key={section.title} className={idx > 0 ? "mt-10" : ""}>
                         {/* Section Header */}
                         <div className={`mb-2 transition-all duration-300 overflow-hidden shrink-0 ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-4 opacity-100 px-3'
                             }`}>
