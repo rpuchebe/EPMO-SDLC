@@ -124,7 +124,7 @@ export function Sidebar({
                     const isSectionExpanded = section.isExpandable ? expandedSections[section.title] : true
 
                     return (
-                        <div key={section.title} className={idx > 0 ? "mt-8" : ""}>
+                        <div key={section.title}>
                             {/* Section Header */}
                             {section.isExpandable ? (
                                 <button
