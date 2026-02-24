@@ -132,15 +132,15 @@ export function Sidebar({
                                     className={`w-full flex items-center justify-between mb-2 transition-all duration-300 overflow-hidden shrink-0 group ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-6 opacity-100 px-3 hover:bg-slate-50 rounded-md py-4'
                                         }`}
                                 >
-                                    <h3 className="text-[13px] font-semibold text-slate-400 group-hover:text-slate-600 uppercase tracking-wider whitespace-nowrap transition-colors">
+                                    <h3 className="text-[12px] font-semibold text-slate-500 group-hover:text-slate-800 uppercase tracking-wider whitespace-nowrap transition-colors">
                                         {section.title}
                                     </h3>
-                                    <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform duration-200 ${!isSectionExpanded ? '-rotate-90' : ''}`} />
+                                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform duration-200 ${!isSectionExpanded ? '-rotate-90' : ''}`} />
                                 </button>
                             ) : (
                                 <div className={`mb-2 transition-all duration-300 overflow-hidden shrink-0 ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-4 opacity-100 px-3'
                                     }`}>
-                                    <h3 className="text-[13px] font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                                    <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">
                                         {section.title}
                                     </h3>
                                 </div>
@@ -158,23 +158,18 @@ export function Sidebar({
                                         <Link
                                             key={item.name}
                                             href={item.href}
-                                            className={`group flex items-center relative rounded-md transition-all duration-200 py-2 min-h-[40px] shrink-0 ${isActive
-                                                ? 'bg-slate-100 text-slate-900 font-semibold'
-                                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium'
-                                                } ${isCollapsed ? 'px-0 justify-center' : 'px-3 gap-3'}`}
+                                            className={`group flex items-center relative rounded-xl transition-all duration-200 py-2.5 min-h-[40px] shrink-0 my-0.5 ${isActive
+                                                ? 'bg-slate-900 text-white font-medium shadow-sm'
+                                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium'
+                                                } ${isCollapsed ? 'px-0 justify-center mx-2' : 'px-4 gap-3 mx-2'}`}
                                             title={isCollapsed ? item.name : undefined}
                                         >
-                                            {/* Active Left Indicator Bar */}
-                                            {isActive && (
-                                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#0b4030] rounded-r-full" />
-                                            )}
-
                                             {/* Icon */}
-                                            <item.icon className={`shrink-0 transition-colors ${isActive ? 'text-[#0b4030] w-5 h-5' : 'text-slate-400 group-hover:text-slate-600 w-[18px] h-[18px]'
+                                            <item.icon className={`shrink-0 transition-colors ${isActive ? 'text-white w-[18px] h-[18px]' : 'text-slate-500 group-hover:text-slate-700 w-[18px] h-[18px]'
                                                 }`} />
 
                                             {/* Label */}
-                                            <span className={`text-[15px] tracking-tight whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
+                                            <span className={`text-[14px] tracking-wide whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
                                                 }`}>
                                                 {item.name}
                                             </span>
