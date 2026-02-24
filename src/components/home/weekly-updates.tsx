@@ -52,16 +52,21 @@ function WeeklyUpdateItem({ item, defaultExpandedColor, dotColor, forceExpanded 
             if (error) throw error
             setEditing(false)
             router.refresh()
-        } catch (err) {
-            console.error('Failed to save:', err)
+        } catch (err: any) {
+            alert('Error saving: ' + (err.message || err))
         } finally {
             setSaving(false)
         }
     }
 
+    const [confirmingDelete, setConfirmingDelete] = useState(false)
+
     const handleDelete = async (e: React.MouseEvent) => {
         e.stopPropagation()
-        if (!confirm('¿Eliminar este item?')) return
+        if (!confirmingDelete) {
+            setConfirmingDelete(true)
+            return
+        }
         try {
             const { error } = await supabase
                 .from('weekly_update_items')
@@ -70,8 +75,9 @@ function WeeklyUpdateItem({ item, defaultExpandedColor, dotColor, forceExpanded 
             if (error) throw error
             if (onDelete) onDelete(item.id)
             router.refresh()
-        } catch (err) {
-            console.error('Failed to delete:', err)
+        } catch (err: any) {
+            alert('Error deleting: ' + (err.message || err))
+            setConfirmingDelete(false)
         }
     }
 
@@ -147,7 +153,12 @@ function WeeklyUpdateItem({ item, defaultExpandedColor, dotColor, forceExpanded 
                                 <button onClick={startEdit} className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" title="Edit">
                                     <Pencil className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={handleDelete} className="p-1 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors" title="Delete">
+                                <button
+                                    onClick={handleDelete}
+                                    onMouseLeave={() => setConfirmingDelete(false)}
+                                    className={`p-1 rounded transition-all ${confirmingDelete ? 'text-red-600 bg-red-100 scale-110' : 'text-slate-400 hover:text-red-600 hover:bg-red-50'}`}
+                                    title={confirmingDelete ? 'Click again to confirm' : 'Delete'}
+                                >
                                     <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                             </div>
