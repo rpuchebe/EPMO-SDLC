@@ -148,7 +148,7 @@ export async function POST(request: Request) {
         await supabaseAdmin.from('bpi_sync_log').insert({
             tickets_synced: 0,
             status: `error: ${message}`,
-        }).catch(() => { })
+        });
 
         return NextResponse.json({ error: message }, { status: 500 })
     }

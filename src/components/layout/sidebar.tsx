@@ -111,7 +111,7 @@ export function Sidebar({
                 {/* Collapse Toggle Button */}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className={`absolute right-3 top-5 bg-white border border-slate-200 text-slate-500 rounded-full p-0.5 hover:bg-slate-50 hover:text-slate-800 transition-colors shadow-sm hidden md:flex items-center justify-center z-50 group-hover:opacity-100 ${isCollapsed ? 'opacity-100' : 'opacity-0'
+                    className={`absolute top-5 bg-white border border-slate-200 text-slate-500 rounded-full p-0.5 hover:bg-slate-50 hover:text-slate-800 transition-colors shadow-sm hidden md:flex items-center justify-center z-50 group-hover:opacity-100 ${isCollapsed ? 'right-[-12px] opacity-100' : 'right-3 opacity-0'
                         }`}
                 >
                     {isCollapsed ? (
@@ -126,77 +126,109 @@ export function Sidebar({
             <div className="flex-1 overflow-y-auto overflow-x-hidden hide-scrollbar py-6 flex flex-col px-3">
                 {sidebarSections.map((section, idx) => {
                     const isSectionExpanded = section.isExpandable ? expandedSections[section.title] : true
+                    const isSectionActive = section.items.some(item => pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/home'))
 
                     return (
-                        <div key={section.title}>
-                            {/* Section Header */}
-                            {section.isExpandable ? (
-                                <button
-                                    onClick={() => toggleSection(section.title)}
-                                    className={`w-full flex items-center justify-between mb-0.5 transition-all duration-300 overflow-hidden shrink-0 group ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-10 opacity-100 px-3 hover:bg-slate-50/80 rounded-lg py-2 mx-1'
-                                        }`}
-                                >
-                                    <div className="flex items-center gap-2.5">
-                                        {section.icon && (
-                                            <section.icon className="w-[18px] h-[18px] text-slate-500 group-hover:text-slate-800 transition-colors" />
-                                        )}
-                                        <h3 className="text-[14px] font-semibold text-slate-800 transition-colors">
-                                            {section.title}
-                                        </h3>
+                        <div key={section.title} className={isCollapsed ? "relative group/section flex flex-col items-center w-full" : ""}>
+                            {/* COLLAPSED STATE */}
+                            {isCollapsed ? (
+                                <>
+                                    <div
+                                        className={`w-10 h-10 mb-2 rounded-[14px] flex items-center justify-center transition-all duration-200 cursor-pointer ${isSectionActive
+                                            ? 'bg-slate-900 text-white shadow-sm'
+                                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'
+                                            }`}
+                                    >
+                                        {section.icon && <section.icon className="w-5 h-5 pointer-events-none" />}
                                     </div>
-                                    <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform duration-200 ${!isSectionExpanded ? '-rotate-90' : ''}`} />
-                                </button>
+
+                                    {/* Flyout Menu */}
+                                    <div className="absolute left-[52px] top-0 hidden group-hover/section:flex flex-col bg-white border border-slate-200 shadow-sm rounded-xl min-w-[200px] py-1.5 z-50">
+                                        <div className="px-3 py-2 border-b border-slate-100 mb-1">
+                                            <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">{section.title}</span>
+                                        </div>
+                                        {section.items.map(item => {
+                                            const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/home')
+                                            return (
+                                                <Link
+                                                    key={item.name}
+                                                    href={item.href}
+                                                    className={`mx-1.5 px-3 py-2 text-[14px] rounded-lg transition-colors my-0.5 ${isActive
+                                                        ? 'bg-slate-100/80 text-slate-900 font-semibold'
+                                                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                                        }`}
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            )
+                                        })}
+                                    </div>
+
+                                    {/* Divider */}
+                                    {idx < sidebarSections.length - 1 && <div className="w-8 h-px bg-slate-200 my-2 shrink-0" />}
+                                </>
                             ) : (
-                                <div className={`flex items-center gap-2.5 mb-1 transition-all duration-300 overflow-hidden shrink-0 ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-10 opacity-100 px-3 mx-1'
-                                    }`}>
-                                    {section.icon && (
-                                        <section.icon className="w-[18px] h-[18px] text-slate-500" />
-                                    )}
-                                    <h3 className="text-[14px] font-semibold text-slate-500">
-                                        {section.title}
-                                    </h3>
-                                </div>
-                            )}
-
-                            {isCollapsed && idx > 0 && <div className="h-px bg-slate-200 mt-2 mb-4 mx-3 shrink-0" />}
-
-                            <div className={`flex flex-col gap-0.5 transition-all duration-300 overflow-hidden ${(!isSectionExpanded && !isCollapsed) ? 'h-0 opacity-0' : 'opacity-100'}`}>
-                                {section.items.map((item) => {
-                                    const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/home')
-
-                                    return (
-                                        <Link
-                                            key={item.name}
-                                            href={item.href}
-                                            className={`group flex items-center relative rounded-xl transition-all duration-200 py-2.5 min-h-[38px] shrink-0 ${isActive
-                                                ? 'bg-slate-100/80 text-slate-900 font-semibold shadow-sm'
-                                                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium'
-                                                } ${isCollapsed ? 'px-0 justify-center mx-2' : 'pl-[42px] pr-4 mx-1'}`}
-                                            title={isCollapsed ? item.name : undefined}
+                                <>
+                                    {/* EXPANDED STATE */}
+                                    {/* Section Header */}
+                                    {section.isExpandable ? (
+                                        <button
+                                            onClick={() => toggleSection(section.title)}
+                                            className="w-full flex items-center justify-between mb-0.5 transition-all duration-300 overflow-hidden shrink-0 group h-10 px-3 hover:bg-slate-50/80 rounded-lg py-2 mx-1"
                                         >
-                                            {/* In collapsed state, show initials */}
-                                            {isCollapsed && (
-                                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold ${isActive ? 'bg-slate-200 text-slate-900' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700'}`}>
-                                                    {item.name.charAt(0)}
-                                                </div>
+                                            <div className="flex items-center gap-2.5">
+                                                {section.icon && (
+                                                    <section.icon className="w-[18px] h-[18px] text-slate-500 group-hover:text-slate-800 transition-colors" />
+                                                )}
+                                                <h3 className="text-[14px] font-semibold text-slate-800 transition-colors">
+                                                    {section.title}
+                                                </h3>
+                                            </div>
+                                            <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform duration-200 ${!isSectionExpanded ? '-rotate-90' : ''}`} />
+                                        </button>
+                                    ) : (
+                                        <div className="flex items-center gap-2.5 mb-1 transition-all duration-300 overflow-hidden shrink-0 h-10 px-3 mx-1">
+                                            {section.icon && (
+                                                <section.icon className="w-[18px] h-[18px] text-slate-500" />
                                             )}
+                                            <h3 className="text-[14px] font-semibold text-slate-500">
+                                                {section.title}
+                                            </h3>
+                                        </div>
+                                    )}
 
-                                            {/* Label */}
-                                            <span className={`text-[14px] tracking-wide whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
-                                                }`}>
-                                                {item.name}
-                                            </span>
-                                        </Link>
-                                    )
-                                })}
-                            </div>
+                                    {/* Section Items */}
+                                    <div className={`flex flex-col gap-0.5 transition-all duration-300 overflow-hidden ${!isSectionExpanded ? 'h-0 opacity-0' : 'opacity-100'}`}>
+                                        {section.items.map((item) => {
+                                            const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/home')
+
+                                            return (
+                                                <Link
+                                                    key={item.name}
+                                                    href={item.href}
+                                                    className={`group flex items-center relative rounded-xl transition-all duration-200 py-2.5 min-h-[38px] shrink-0 ${isActive
+                                                        ? 'bg-slate-100/80 text-slate-900 font-semibold shadow-sm'
+                                                        : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium'
+                                                        } pl-[42px] pr-4 mx-1`}
+                                                >
+                                                    {/* Label */}
+                                                    <span className="text-[14px] tracking-wide whitespace-nowrap transition-opacity duration-300 opacity-100 block">
+                                                        {item.name}
+                                                    </span>
+                                                </Link>
+                                            )
+                                        })}
+                                    </div>
+                                </>
+                            )
+                            }
                         </div>
                     )
                 })}
             </div>
 
             {/* Footer Section */}
-            <div className="border-t border-slate-200 bg-white shrink-0">
+            < div className="border-t border-slate-200 bg-white shrink-0" >
                 <div className={`p-4 flex items-center justify-center transition-all duration-300 overflow-hidden whitespace-nowrap ${isCollapsed ? 'h-16 pt-[18px]' : 'h-14 gap-2.5'
                     }`}>
                     {!isCollapsed && (
@@ -211,8 +243,8 @@ export function Sidebar({
                             }`}
                     />
                 </div>
-            </div>
+            </div >
 
-        </div>
+        </div >
     )
 }
