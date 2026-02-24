@@ -187,7 +187,7 @@ export function AddUpdateModal({ updates, defaultWeeklyUpdateId }: { updates: We
                 section: item.section,
                 title: item.title,
                 description: item.description,
-                badges: item.badges.length > 0 ? JSON.stringify(item.badges) : null,
+                badges: item.badges.length > 0 ? item.badges : null,
                 order_index: startingIndex + idx
             }))
 

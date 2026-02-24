@@ -21,15 +21,10 @@ export function DashboardHeader({ lastSync, onRefresh, isRefreshing }: Dashboard
         : 'Never'
 
     return (
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
-            <div>
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-                    Phase 0 – Ideation Dashboard
-                </h1>
-                <p className="text-sm text-slate-500 mt-1 max-w-xl leading-relaxed">
-                    Executive overview of Business Product Ideation pipeline, ROI impact, and workstream distribution.
-                </p>
-            </div>
+        <div className="flex items-center justify-between mb-8">
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                Dashboard
+            </h1>
             <div className="flex items-center gap-4 shrink-0">
                 <span className="text-xs text-slate-400">
                     Last updated: {formattedDate}

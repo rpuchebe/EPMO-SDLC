@@ -1,12 +1,12 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { DashboardHeader } from '@/components/phase0/dashboard-header'
 import { KpiCards } from '@/components/phase0/kpi-cards'
 import { TimelineChart } from '@/components/phase0/timeline-chart'
 import { StatusDistribution } from '@/components/phase0/status-distribution'
 import { CollaboratorsReport } from '@/components/phase0/collaborators-report'
-import { GlobalFilters } from '@/components/phase0/global-filters'
 import { Loader2 } from 'lucide-react'
 
 interface KPIs {
@@ -50,23 +50,19 @@ interface DashboardData {
 const emptyKpis: KPIs = { total: 0, inProgress: 0, discovery: 0, movedToWorkstream: 0, done: 0, avgRoi: 0 }
 
 export default function Phase0Page() {
+    const searchParams = useSearchParams()
+    const selectedWorkstream = searchParams?.get('workstream') || null
+
     const [data, setData] = useState<DashboardData | null>(null)
     const [loading, setLoading] = useState(true)
     const [refreshing, setRefreshing] = useState(false)
     const [error, setError] = useState<string | null>(null)
-
-    // Filters
-    const [selectedWorkstream, setSelectedWorkstream] = useState<string | null>(null)
-    const [dateFrom, setDateFrom] = useState('')
-    const [dateTo, setDateTo] = useState('')
 
     const fetchData = useCallback(async () => {
         try {
             setError(null)
             const params = new URLSearchParams()
             if (selectedWorkstream) params.set('workstream', selectedWorkstream)
-            if (dateFrom) params.set('dateFrom', dateFrom)
-            if (dateTo) params.set('dateTo', dateTo)
 
             const res = await fetch(`/api/phase0?${params}`)
             if (!res.ok) throw new Error('Failed to fetch dashboard data')
@@ -77,7 +73,7 @@ export default function Phase0Page() {
         } finally {
             setLoading(false)
         }
-    }, [selectedWorkstream, dateFrom, dateTo])
+    }, [selectedWorkstream])
 
     useEffect(() => {
         fetchData()
@@ -127,7 +123,6 @@ export default function Phase0Page() {
     const timeline = data?.timeline || []
     const statusDistribution = data?.statusDistribution || []
     const collaborators = data?.collaborators || []
-    const workstreams = data?.workstreams || []
     const lastSync = data?.lastSync || null
 
     return (
@@ -146,17 +141,6 @@ export default function Phase0Page() {
                 </div>
             )}
 
-            {/* Global Filters */}
-            <GlobalFilters
-                workstreams={workstreams}
-                selectedWorkstream={selectedWorkstream}
-                onWorkstreamChange={setSelectedWorkstream}
-                dateFrom={dateFrom}
-                dateTo={dateTo}
-                onDateFromChange={setDateFrom}
-                onDateToChange={setDateTo}
-            />
-
             {/* KPI Cards */}
             <KpiCards kpis={kpis} />
 
@@ -173,13 +157,7 @@ export default function Phase0Page() {
 
                 {/* Right Column – 4 cols */}
                 <div className="lg:col-span-4">
-                    <CollaboratorsReport
-                        data={collaborators}
-                        onCollaboratorClick={(name) => {
-                            // Optional: filter by collaborator
-                            console.log('Filter by collaborator:', name)
-                        }}
-                    />
+                    <CollaboratorsReport data={collaborators} />
                 </div>
             </div>
         </div>

@@ -28,6 +28,28 @@ interface SyncLogRow {
     synced_at: string
 }
 
+const EMPTY_RESPONSE = {
+    kpis: { total: 0, inProgress: 0, discovery: 0, movedToWorkstream: 0, done: 0, avgRoi: 0 },
+    timeline: [],
+    statusDistribution: [],
+    collaborators: [],
+    workstreams: [],
+    lastSync: null,
+    _notice: 'No data yet. Run the Jira sync or apply the database migration first.',
+}
+
+async function safeQuery<T>(promise: Promise<{ data: T | null; error: { message: string } | null }>): Promise<T> {
+    const { data, error } = await promise
+    if (error) {
+        // Table doesn't exist yet — return empty
+        if (error.message?.includes('does not exist') || error.message?.includes('relation')) {
+            return [] as unknown as T
+        }
+        throw new Error(error.message)
+    }
+    return data ?? ([] as unknown as T)
+}
+
 export async function GET(request: NextRequest) {
     const supabase = await createClient()
     const { searchParams } = new URL(request.url)
@@ -43,10 +65,13 @@ export async function GET(request: NextRequest) {
         if (dateFrom) ticketQuery = ticketQuery.gte('created_at', dateFrom)
         if (dateTo) ticketQuery = ticketQuery.lte('created_at', dateTo)
 
-        const { data: tickets, error: ticketErr } = await ticketQuery
-        if (ticketErr) throw ticketErr
-
-        const typedTickets = (tickets || []) as TicketRow[]
+        let typedTickets: TicketRow[]
+        try {
+            typedTickets = await safeQuery<TicketRow[]>(ticketQuery)
+        } catch {
+            // Table doesn't exist — return empty dashboard
+            return NextResponse.json(EMPTY_RESPONSE)
+        }
 
         // ── KPIs ──
         const total = typedTickets.length
@@ -62,10 +87,7 @@ export async function GET(request: NextRequest) {
         if (dateFrom) timelineQuery = timelineQuery.gte('count_date', dateFrom)
         if (dateTo) timelineQuery = timelineQuery.lte('count_date', dateTo)
 
-        const { data: dailyCounts, error: timelineErr } = await timelineQuery
-        if (timelineErr) throw timelineErr
-
-        const typedCounts = (dailyCounts || []) as DailyCountRow[]
+        const typedCounts = await safeQuery<DailyCountRow[]>(timelineQuery)
 
         // ── Status Distribution ──
         const statusMap: Record<string, { count: number; roiSum: number; roiCount: number }> = {}
@@ -79,28 +101,21 @@ export async function GET(request: NextRequest) {
         }
 
         // Fetch status history for time-in-status calculation
-        const ticketKeys = typedTickets.map(() => '')  // we'll use ticket_id
         let historyQuery = supabase.from('bpi_status_history').select('*')
         if (workstreamFilter) {
-            // Only get history for filtered tickets
-            const { data: filteredTickets } = await supabase
-                .from('bpi_tickets')
-                .select('jira_key')
-                .eq('workstream', workstreamFilter)
-            if (filteredTickets) {
-                const keys = filteredTickets.map((t: { jira_key: string }) => t.jira_key)
-                if (keys.length > 0) {
-                    historyQuery = historyQuery.in('jira_key', keys)
-                }
+            const filteredTickets = await safeQuery<{ jira_key: string }[]>(
+                supabase.from('bpi_tickets').select('jira_key').eq('workstream', workstreamFilter)
+            )
+            if (filteredTickets.length > 0) {
+                const keys = filteredTickets.map((t) => t.jira_key)
+                historyQuery = historyQuery.in('jira_key', keys)
             }
         }
 
-        const { data: statusHistory } = await historyQuery
-        const typedHistory = (statusHistory || []) as StatusHistoryRow[]
+        const typedHistory = await safeQuery<StatusHistoryRow[]>(historyQuery)
 
         // Calculate avg time in each status
         const statusTimeMap: Record<string, number[]> = {}
-        // Group history by jira_key
         const historyByKey: Record<string, StatusHistoryRow[]> = {}
         for (const h of typedHistory) {
             if (!historyByKey[h.jira_key]) historyByKey[h.jira_key] = []
@@ -173,13 +188,15 @@ export async function GET(request: NextRequest) {
         const workstreams = [...new Set(typedTickets.map((t) => t.workstream).filter(Boolean))] as string[]
 
         // ── Last sync ──
-        const { data: syncLog } = await supabase
-            .from('bpi_sync_log')
-            .select('synced_at')
-            .order('synced_at', { ascending: false })
-            .limit(1)
-
-        const lastSync = (syncLog as SyncLogRow[] | null)?.[0]?.synced_at || null
+        let lastSync: string | null = null
+        try {
+            const syncLog = await safeQuery<SyncLogRow[]>(
+                supabase.from('bpi_sync_log').select('synced_at').order('synced_at', { ascending: false }).limit(1)
+            )
+            lastSync = syncLog?.[0]?.synced_at || null
+        } catch {
+            // sync_log table may not exist
+        }
 
         return NextResponse.json({
             kpis: {
@@ -197,8 +214,12 @@ export async function GET(request: NextRequest) {
             lastSync,
         })
     } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : 'Unknown error'
+        const message = err instanceof Error ? err.message : (typeof err === 'object' && err !== null && 'message' in err) ? String((err as { message: string }).message) : 'Unknown error'
         console.error('Phase0 API error:', message)
-        return NextResponse.json({ error: message }, { status: 500 })
+        // Return empty data with error message rather than 500
+        return NextResponse.json({
+            ...EMPTY_RESPONSE,
+            _error: message,
+        })
     }
 }

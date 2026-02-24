@@ -1,9 +1,9 @@
 'use client'
 
 import { Bell, GraduationCap, ChevronDown, User, LogOut, Settings, Check, X, Search } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 // Custom hook to handle clicks outside of a component
 function useOnClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
@@ -43,7 +43,20 @@ export function Header({ user }: { user: any }) {
 
     const router = useRouter()
     const pathname = usePathname()
+    const searchParams = useSearchParams()
     const supabase = createClient()
+
+    // Push workstream filter to URL so child pages can read it
+    const pushWorkstreamToUrl = useCallback((ws: string) => {
+        const params = new URLSearchParams(searchParams?.toString() || '')
+        if (ws === 'All Workstreams') {
+            params.delete('workstream')
+        } else {
+            params.set('workstream', ws)
+        }
+        const query = params.toString()
+        router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+    }, [pathname, searchParams, router])
 
     useOnClickOutside(profileRef, () => setProfileOpen(false))
     useOnClickOutside(workstreamRef, () => setWorkstreamOpen(false))
@@ -125,6 +138,7 @@ export function Header({ user }: { user: any }) {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setWorkstream('All Workstreams');
+                                                        pushWorkstreamToUrl('All Workstreams');
                                                         setTeam('All Teams');
                                                         setWorkstreamOpen(false);
                                                     }}
@@ -139,7 +153,7 @@ export function Header({ user }: { user: any }) {
                                     {workstreamOpen && (
                                         <div className="absolute left-0 mt-2 w-[240px] sm:w-[300px] lg:w-[360px] bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50">
                                             <button
-                                                onClick={() => { setWorkstream('All Workstreams'); setTeam('All Teams'); setWorkstreamOpen(false); }}
+                                                onClick={() => { setWorkstream('All Workstreams'); pushWorkstreamToUrl('All Workstreams'); setTeam('All Teams'); setWorkstreamOpen(false); }}
                                                 className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center justify-between"
                                             >
                                                 All Workstreams
@@ -148,7 +162,7 @@ export function Header({ user }: { user: any }) {
                                             {dbWorkstreams.map(ws => (
                                                 <button
                                                     key={ws.id}
-                                                    onClick={() => { setWorkstream(ws.name); setTeam('All Teams'); setWorkstreamOpen(false); }}
+                                                    onClick={() => { setWorkstream(ws.name); pushWorkstreamToUrl(ws.name); setTeam('All Teams'); setWorkstreamOpen(false); }}
                                                     className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center justify-between"
                                                 >
                                                     <span className="truncate">{ws.name}</span>
