@@ -80,7 +80,7 @@ export function Sidebar({
     }
 
     return (
-        <div className="flex flex-col h-full bg-white border-r border-slate-200 w-full overflow-hidden absolute inset-0 z-40">
+        <div className={`flex flex-col h-full bg-white border-r border-slate-200 w-full absolute inset-0 z-40 ${isCollapsed ? 'overflow-visible' : 'overflow-hidden'}`}>
 
             {/* Header / Logo Section */}
             <div className="h-16 flex items-center shrink-0 border-b border-slate-200 relative group px-4">
@@ -123,7 +123,7 @@ export function Sidebar({
             </div>
 
             {/* Main Navigation */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden hide-scrollbar py-6 flex flex-col px-3">
+            <div className={`flex-1 hide-scrollbar py-6 flex flex-col px-3 ${isCollapsed ? 'overflow-visible' : 'overflow-y-auto overflow-x-hidden'}`}>
                 {sidebarSections.map((section, idx) => {
                     const isSectionExpanded = section.isExpandable ? expandedSections[section.title] : true
                     const isSectionActive = section.items.some(item => pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/home'))
