@@ -17,7 +17,8 @@ import {
     ChevronLeft,
     ChevronRight,
     LayoutDashboard,
-    ChevronDown
+    ChevronDown,
+    Server
 } from 'lucide-react'
 
 const sidebarSections = [
@@ -41,6 +42,13 @@ const sidebarSections = [
         ]
     },
     {
+        title: 'Stability & Scalability',
+        isExpandable: true,
+        items: [
+            { name: 'Overview', href: '/stability-overview', icon: Server },
+        ]
+    },
+    {
         title: 'Support Documents',
         items: [
             { name: 'SDLC Guide', href: '#', icon: FileText },
@@ -59,7 +67,8 @@ export function Sidebar({
     const pathname = usePathname()
 
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-        'SDLC Phases': true
+        'SDLC Phases': true,
+        'Stability & Scalability': true
     })
 
     const toggleSection = (title: string) => {
