@@ -13,6 +13,7 @@ interface ParsedItem {
     section: Section
     title: string
     description: string
+    badges: string[]
 }
 
 interface WeekOption {
@@ -67,7 +68,8 @@ export function AddUpdateModal({ updates, defaultWeeklyUpdateId }: { updates: We
                     id: Math.random().toString(36).substring(7),
                     section: currentSection,
                     title,
-                    description
+                    description,
+                    badges: []
                 })
             }
             currentItemText = ''
@@ -145,6 +147,15 @@ export function AddUpdateModal({ updates, defaultWeeklyUpdateId }: { updates: We
         setParsedItems(items => items.map(i => i.id === id ? { ...i, [field]: value } : i))
     }
 
+    const addBadge = (id: string, badge: string) => {
+        if (!badge.trim()) return
+        setParsedItems(items => items.map(i => i.id === id ? { ...i, badges: [...i.badges, badge.trim()] } : i))
+    }
+
+    const removeBadge = (id: string, badgeIndex: number) => {
+        setParsedItems(items => items.map(i => i.id === id ? { ...i, badges: i.badges.filter((_, idx) => idx !== badgeIndex) } : i))
+    }
+
     const validateItems = () => {
         if (parsedItems.length === 0) return 'No items to save.'
         if (parsedItems.some(item => !item.title)) return 'Some items are missing a title.'
@@ -176,6 +187,7 @@ export function AddUpdateModal({ updates, defaultWeeklyUpdateId }: { updates: We
                 section: item.section,
                 title: item.title,
                 description: item.description,
+                badges: item.badges.length > 0 ? JSON.stringify(item.badges) : null,
                 order_index: startingIndex + idx
             }))
 
@@ -207,7 +219,7 @@ export function AddUpdateModal({ updates, defaultWeeklyUpdateId }: { updates: We
             </Dialog.Trigger>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 transition-opacity" />
-                <Dialog.Content className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] gap-0 border bg-white shadow-xl sm:rounded-2xl duration-200 overflow-hidden max-h-[90vh] flex flex-col">
+                <Dialog.Content className="fixed left-[50%] top-[50%] z-50 w-full max-w-4xl translate-x-[-50%] translate-y-[-50%] gap-0 border bg-white shadow-xl sm:rounded-2xl duration-200 overflow-y-auto max-h-[90vh] flex flex-col">
 
                     {/* Header */}
                     <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
@@ -252,9 +264,9 @@ export function AddUpdateModal({ updates, defaultWeeklyUpdateId }: { updates: We
                         <div className="w-full md:w-1/2 p-6 flex flex-col bg-white overflow-hidden">
                             <div className="mb-4">
                                 <h3 className="text-sm font-semibold text-slate-800 flex items-center gap-2 mb-1">
-                                    Preview & Edit <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-xs">{parsedItems.length} items</span>
+                                    Preview <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full text-xs">{parsedItems.length} items</span>
                                 </h3>
-                                <p className="text-xs text-slate-500">Review the parsed entries before saving. You can edit the title, description, or section.</p>
+                                <p className="text-xs text-slate-500">Review parsed entries. You can change the section, add badges, or remove items.</p>
                             </div>
 
                             <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar">
@@ -285,19 +297,32 @@ export function AddUpdateModal({ updates, defaultWeeklyUpdateId }: { updates: We
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
                                             </div>
-                                            <input
-                                                type="text"
-                                                value={item.title}
-                                                onChange={(e) => updateItem(item.id, 'title', e.target.value)}
-                                                className="w-full text-sm font-medium text-slate-900 bg-transparent border-b border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-0 outline-none mb-1 px-1 py-0.5 transition-colors"
-                                                placeholder="Title"
-                                            />
-                                            <textarea
-                                                value={item.description}
-                                                onChange={(e) => updateItem(item.id, 'description', e.target.value)}
-                                                className="w-full text-sm text-slate-500 bg-transparent border border-transparent hover:border-slate-200 focus:border-blue-500 focus:ring-0 outline-none rounded px-1 py-1 transition-colors resize-none min-h-[60px]"
-                                                placeholder="Description (optional)"
-                                            />
+                                            <p className="text-sm font-medium text-slate-900 px-1 py-0.5 mb-0.5">{item.title}</p>
+                                            {item.description && (
+                                                <p className="text-sm text-slate-500 px-1 py-0.5 line-clamp-2">{item.description}</p>
+                                            )}
+                                            {/* Badges */}
+                                            <div className="flex flex-wrap items-center gap-1.5 mt-2 px-1">
+                                                {item.badges.map((badge, idx) => (
+                                                    <span key={idx} className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-700">
+                                                        {badge}
+                                                        <button onClick={() => removeBadge(item.id, idx)} className="hover:text-red-500 transition-colors">
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                    </span>
+                                                ))}
+                                                <input
+                                                    type="text"
+                                                    placeholder="+ badge"
+                                                    className="text-[11px] text-slate-500 bg-transparent border border-dashed border-slate-200 rounded-full px-2 py-0.5 w-20 focus:w-28 focus:border-blue-400 outline-none transition-all"
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            addBadge(item.id, (e.target as HTMLInputElement).value)
+                                                                ; (e.target as HTMLInputElement).value = ''
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
                                         </div>
                                     ))
                                 )}
