@@ -2,13 +2,16 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 
 interface TicketRow {
+    jira_key: string
+    summary: string
     status: string
     status_category: string
     workstream: string | null
     roi_score: number | null
     created_at: string
-    assignee_display_name: string | null
-    assignee_avatar_url: string | null
+    reporter_display_name: string | null
+    reporter_avatar_url: string | null
+    status_durations: Record<string, number> | null
 }
 
 interface StatusHistoryRow {
@@ -38,8 +41,8 @@ const EMPTY_RESPONSE = {
     _notice: 'No data yet. Run the Jira sync or apply the database migration first.',
 }
 
-async function safeQuery<T>(promise: Promise<{ data: T | null; error: { message: string } | null }>): Promise<T> {
-    const { data, error } = await promise
+async function safeQuery<T>(result: { data: unknown | null; error: { message: string } | null }): Promise<T> {
+    const { data, error } = result
     if (error) {
         // Table doesn't exist yet — return empty
         if (error.message?.includes('does not exist') || error.message?.includes('relation')) {
@@ -47,7 +50,7 @@ async function safeQuery<T>(promise: Promise<{ data: T | null; error: { message:
         }
         throw new Error(error.message)
     }
-    return data ?? ([] as unknown as T)
+    return (data as T) || ([] as unknown as T)
 }
 
 export async function GET(request: NextRequest) {
@@ -59,7 +62,7 @@ export async function GET(request: NextRequest) {
     const dateTo = searchParams.get('dateTo')
 
     try {
-        // ── Fetch tickets ──
+        // ── Fetch tickets (filtered for KPIs, reports) ──
         let ticketQuery = supabase.from('bpi_tickets').select('*')
         if (workstreamFilter) ticketQuery = ticketQuery.eq('workstream', workstreamFilter)
         if (dateFrom) ticketQuery = ticketQuery.gte('created_at', dateFrom)
@@ -67,10 +70,23 @@ export async function GET(request: NextRequest) {
 
         let typedTickets: TicketRow[]
         try {
-            typedTickets = await safeQuery<TicketRow[]>(ticketQuery)
+            typedTickets = await safeQuery<TicketRow[]>(await ticketQuery)
         } catch {
             // Table doesn't exist — return empty dashboard
             return NextResponse.json(EMPTY_RESPONSE)
+        }
+
+        // ── Fetch ALL tickets (unfiltered) for timeline reference line ──
+        let allTickets: TicketRow[] = typedTickets
+        if (workstreamFilter) {
+            let allQuery = supabase.from('bpi_tickets').select('*')
+            if (dateFrom) allQuery = allQuery.gte('created_at', dateFrom)
+            if (dateTo) allQuery = allQuery.lte('created_at', dateTo)
+            try {
+                allTickets = await safeQuery<TicketRow[]>(await allQuery)
+            } catch {
+                allTickets = typedTickets
+            }
         }
 
         // ── KPIs ──
@@ -78,16 +94,27 @@ export async function GET(request: NextRequest) {
         const inProgress = typedTickets.filter((t) => t.status_category === 'In Progress').length
         const discovery = typedTickets.filter((t) => t.status === 'Discovery').length
         const movedToWorkstream = typedTickets.filter((t) => t.status === 'Moved to Workstream').length
-        const done = typedTickets.filter((t) => t.status_category === 'Done').length
+        const done = typedTickets.filter((t) => t.status_category === 'Done' && t.status.toLowerCase() !== "won't do" && t.status.toLowerCase() !== 'wont do').length
+        const wontDo = typedTickets.filter((t) => t.status.toLowerCase() === "won't do" || t.status.toLowerCase() === 'wont do').length
         const roiValues = typedTickets.filter((t) => t.roi_score !== null).map((t) => t.roi_score as number)
         const avgRoi = roiValues.length > 0 ? roiValues.reduce((a, b) => a + b, 0) / roiValues.length : 0
 
-        // ── Timeline data ──
-        let timelineQuery = supabase.from('bpi_daily_counts').select('*').order('count_date', { ascending: true })
-        if (dateFrom) timelineQuery = timelineQuery.gte('count_date', dateFrom)
-        if (dateTo) timelineQuery = timelineQuery.lte('count_date', dateTo)
+        // ── Timeline data (from ALL tickets so the "all workstreams" line always shows) ──
+        const dailyMap: Record<string, Record<string, number>> = {}
+        for (const t of allTickets) {
+            const date = t.created_at.substring(0, 10) // YYYY-MM-DD
+            const ws = t.workstream || '_all'
+            if (!dailyMap[date]) dailyMap[date] = {}
+            dailyMap[date][ws] = (dailyMap[date][ws] || 0) + 1
+        }
 
-        const typedCounts = await safeQuery<DailyCountRow[]>(timelineQuery)
+        const typedCounts: DailyCountRow[] = []
+        for (const [date, wsMap] of Object.entries(dailyMap)) {
+            for (const [ws, count] of Object.entries(wsMap)) {
+                typedCounts.push({ count_date: date, workstream: ws, ticket_count: count })
+            }
+        }
+        typedCounts.sort((a, b) => a.count_date.localeCompare(b.count_date))
 
         // ── Status Distribution ──
         const statusMap: Record<string, { count: number; roiSum: number; roiCount: number }> = {}
@@ -100,53 +127,33 @@ export async function GET(request: NextRequest) {
             }
         }
 
-        // Fetch status history for time-in-status calculation
-        let historyQuery = supabase.from('bpi_status_history').select('*')
-        if (workstreamFilter) {
-            const filteredTickets = await safeQuery<{ jira_key: string }[]>(
-                supabase.from('bpi_tickets').select('jira_key').eq('workstream', workstreamFilter)
-            )
-            if (filteredTickets.length > 0) {
-                const keys = filteredTickets.map((t) => t.jira_key)
-                historyQuery = historyQuery.in('jira_key', keys)
-            }
-        }
-
-        const typedHistory = await safeQuery<StatusHistoryRow[]>(historyQuery)
-
-        // Calculate avg time in each status
+        // Calculate avg time in each status from status_durations JSONB field (values in seconds)
         const statusTimeMap: Record<string, number[]> = {}
-        const historyByKey: Record<string, StatusHistoryRow[]> = {}
-        for (const h of typedHistory) {
-            if (!historyByKey[h.jira_key]) historyByKey[h.jira_key] = []
-            historyByKey[h.jira_key].push(h)
-        }
-
-        for (const key of Object.keys(historyByKey)) {
-            const transitions = historyByKey[key].sort(
-                (a, b) => new Date(a.transitioned_at).getTime() - new Date(b.transitioned_at).getTime()
-            )
-            for (let i = 0; i < transitions.length; i++) {
-                const status = transitions[i].from_status
-                if (!status) continue
-                const start = new Date(i > 0 ? transitions[i - 1].transitioned_at : transitions[i].transitioned_at)
-                const end = new Date(transitions[i].transitioned_at)
-                const days = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-                if (days >= 0) {
-                    if (!statusTimeMap[status]) statusTimeMap[status] = []
-                    statusTimeMap[status].push(days)
-                }
+        for (const t of typedTickets) {
+            if (!t.status_durations) continue
+            for (const [status, seconds] of Object.entries(t.status_durations)) {
+                if (seconds <= 0) continue
+                const days = seconds / 86400 // convert seconds to days
+                if (!statusTimeMap[status]) statusTimeMap[status] = []
+                statusTimeMap[status].push(days)
             }
         }
 
-        const statusDistribution = Object.entries(statusMap).map(([status, data]) => ({
-            status,
-            count: data.count,
-            avgRoi: data.roiCount > 0 ? Math.round((data.roiSum / data.roiCount) * 10) / 10 : null,
-            avgDaysInStatus: statusTimeMap[status]
-                ? Math.round((statusTimeMap[status].reduce((a, b) => a + b, 0) / statusTimeMap[status].length) * 10) / 10
-                : null,
-        }))
+        const statusDistribution = Object.entries(statusMap).map(([status, data]) => {
+            // Case-insensitive match for status_durations keys
+            const timeKey = Object.keys(statusTimeMap).find(
+                (k) => k.toLowerCase() === status.toLowerCase()
+            )
+            const times = timeKey ? statusTimeMap[timeKey] : null
+            return {
+                status,
+                count: data.count,
+                avgRoi: data.roiCount > 0 ? Math.round((data.roiSum / data.roiCount) * 10) / 10 : null,
+                avgDaysInStatus: times
+                    ? Math.round((times.reduce((a, b) => a + b, 0) / times.length) * 10) / 10
+                    : null,
+            }
+        })
 
         // ── Collaborators ──
         const collabMap: Record<string, {
@@ -158,11 +165,11 @@ export async function GET(request: NextRequest) {
         }> = {}
 
         for (const t of typedTickets) {
-            const name = t.assignee_display_name || 'Unassigned'
+            const name = t.reporter_display_name || 'Unknown'
             if (!collabMap[name]) {
                 collabMap[name] = {
                     name,
-                    avatar: t.assignee_avatar_url,
+                    avatar: t.reporter_avatar_url,
                     ticketCount: 0,
                     roiSum: 0,
                     roiCount: 0,
@@ -191,7 +198,7 @@ export async function GET(request: NextRequest) {
         let lastSync: string | null = null
         try {
             const syncLog = await safeQuery<SyncLogRow[]>(
-                supabase.from('bpi_sync_log').select('synced_at').order('synced_at', { ascending: false }).limit(1)
+                await supabase.from('sync_log').select('synced_at').order('synced_at', { ascending: false }).limit(1)
             )
             lastSync = syncLog?.[0]?.synced_at || null
         } catch {
@@ -205,8 +212,20 @@ export async function GET(request: NextRequest) {
                 discovery,
                 movedToWorkstream,
                 done,
+                wontDo,
                 avgRoi: Math.round(avgRoi * 10) / 10,
             },
+            tickets: typedTickets.map((t) => ({
+                jira_key: t.jira_key,
+                summary: t.summary,
+                status: t.status,
+                status_category: t.status_category,
+                workstream: t.workstream,
+                roi_score: t.roi_score,
+                created_at: t.created_at,
+                reporter_display_name: t.reporter_display_name,
+                reporter_avatar_url: t.reporter_avatar_url,
+            })),
             timeline: typedCounts,
             statusDistribution,
             collaborators,

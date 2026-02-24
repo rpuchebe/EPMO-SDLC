@@ -27,13 +27,13 @@ export function DashboardHeader({ lastSync }: DashboardHeaderProps) {
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-                        Dashboard
+                        Dashboard - Discovery
                     </h1>
                     <button
                         onClick={() => setInfoOpen(true)}
                         className="text-slate-400 hover:text-indigo-600 hover:bg-indigo-50
                                    p-1.5 rounded-lg transition-all duration-200"
-                        title="About Phase 0"
+                        title="About Phase 1"
                     >
                         <Info className="w-4.5 h-4.5" />
                     </button>

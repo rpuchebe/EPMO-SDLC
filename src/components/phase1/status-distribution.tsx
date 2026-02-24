@@ -17,31 +17,22 @@ interface StatusDistributionProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-    'Backlog': '#94a3b8',
-    'To Do': '#64748b',
-    'Open': '#64748b',
-    'Discovery': '#38bdf8',
-    'In Progress': '#f59e0b',
-    'In Review': '#a78bfa',
-    'Moved to Workstream': '#8b5cf6',
-    'Done': '#10b981',
-    'Closed': '#6b7280',
+    'Needs more information': '#f59e0b', // Amber
+    'Discovery': '#38bdf8', // Sky
+    'Internal audit': '#a78bfa', // Violet
+    'Backlog': '#64748b', // Slate
+    'Done': '#10b981', // Emerald
 }
 
 function getBarColor(status: string): string {
-    return STATUS_COLORS[status] || '#6366f1'
+    return STATUS_COLORS[status] || '#6366f1' // Indigo default
 }
 
 const STATUS_ORDER = [
-    'Open',
-    'In Progress',
-    'Needs More Info',
-    'Backlog',
-    'Internal Audit',
-    'Ready for Discovery',
+    'Needs more information',
     'Discovery',
-    'Pending Prioritization',
-    'In Development',
+    'Internal audit',
+    'Backlog',
     'Done',
 ]
 
@@ -67,11 +58,11 @@ export function StatusDistribution({ data, onStatusClick }: StatusDistributionPr
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <div className="mb-6">
                 <h3 className="text-sm font-semibold text-slate-900">Ticket Distribution by Status</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Current ticket spread with ROI and duration metrics</p>
+                <p className="text-xs text-slate-400 mt-0.5">Current ticket spread and average duration metrics</p>
             </div>
 
             <ResponsiveContainer width="100%" height={320}>
-                <BarChart data={sortedData} margin={{ top: 5, right: 10, left: -10, bottom: 60 }}>
+                <BarChart data={sortedData} margin={{ top: 5, right: 10, left: -10, bottom: 40 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                     <XAxis
                         dataKey="status"
@@ -125,18 +116,24 @@ function CustomXAxisTick({ x, y, payload, data }: {
     if (!payload || x === undefined || y === undefined) return null
     const item = data.find((d) => d.status === payload.value)
 
+    // Attempt to format multi-line label if it's too long
+    const words = payload.value.split(' ')
+    const lines = words.length > 2 ? [`${words[0]} ${words[1]}`, words.slice(2).join(' ')] : [payload.value]
+
     return (
         <g transform={`translate(${x},${y})`}>
-            <text x={0} y={0} dy={12} textAnchor="middle" fill="#334155" fontSize={11} fontWeight={600}>
-                {payload.value}
-            </text>
-            <text x={0} y={0} dy={26} textAnchor="middle" fill="#8b5cf6" fontSize={10}>
-                ROI: {item?.avgRoi !== null && item?.avgRoi !== undefined ? item.avgRoi : '—'}
-            </text>
-            <text x={0} y={0} dy={40} textAnchor="middle" fill="#94a3b8" fontSize={10}>
+            {lines.map((line, i) => (
+                <text key={i} x={0} y={0} dy={12 + i * 12} textAnchor="middle" fill="#334155" fontSize={10} fontWeight={600}>
+                    {line}
+                </text>
+            ))}
+            <text x={0} y={0} dy={12 + lines.length * 12 + 8} textAnchor="middle" fill="#94a3b8" fontSize={10}>
                 {item?.avgDaysInStatus !== null && item?.avgDaysInStatus !== undefined
                     ? `${item.avgDaysInStatus}d avg`
                     : '— avg'}
+                {item?.avgRoi !== null && item?.avgRoi !== undefined
+                    ? ` • ${item.avgRoi} ROI`
+                    : ' • — ROI'}
             </text>
         </g>
     )

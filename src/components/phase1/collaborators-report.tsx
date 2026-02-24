@@ -1,12 +1,12 @@
 'use client'
 
-import { TrendingUp, User } from 'lucide-react'
+import { User } from 'lucide-react'
 
 interface Collaborator {
     name: string
     avatar: string | null
     ticketCount: number
-    avgRoi: number | null
+    avgRoi?: number | null
 }
 
 interface CollaboratorsReportProps {
@@ -26,7 +26,7 @@ export function CollaboratorsReport({ data, onCollaboratorClick }: Collaborators
 
             <div className="space-y-1 max-h-[750px] overflow-y-auto pr-1 hide-scrollbar">
                 {data.length === 0 && (
-                    <p className="text-sm text-slate-400 text-center py-8">No collaborators found</p>
+                    <p className="text-sm text-slate-400 text-center py-8">No reporters found</p>
                 )}
 
                 {data.map((collaborator, index) => (
@@ -66,10 +66,9 @@ export function CollaboratorsReport({ data, onCollaboratorClick }: Collaborators
                                 <span className="text-xs text-slate-500">
                                     {collaborator.ticketCount} ticket{collaborator.ticketCount !== 1 ? 's' : ''}
                                 </span>
-                                {collaborator.avgRoi !== null && (
-                                    <span className="inline-flex items-center gap-1 text-xs text-violet-600 font-medium">
-                                        <TrendingUp className="w-3 h-3" />
-                                        ROI {collaborator.avgRoi}
+                                {collaborator.avgRoi !== undefined && collaborator.avgRoi !== null && (
+                                    <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+                                        ROI: {collaborator.avgRoi}
                                     </span>
                                 )}
                             </div>

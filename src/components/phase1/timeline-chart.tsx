@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import {
-    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area
+    LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts'
 
 type Granularity = 'daily' | 'weekly' | 'monthly' | 'quarterly'
@@ -10,37 +10,39 @@ type Granularity = 'daily' | 'weekly' | 'monthly' | 'quarterly'
 interface DailyCount {
     count_date: string
     workstream: string
+    ticket_type: string
     ticket_count: number
 }
 
 interface TimelineChartProps {
     data: DailyCount[]
-    selectedWorkstream: string | null
     onPeriodClick?: (period: string, granularity: Granularity) => void
 }
 
 function aggregateByGranularity(
     data: DailyCount[],
-    granularity: Granularity,
-    workstream: string | null
+    granularity: Granularity
 ) {
-    const allMap: Record<string, number> = {}
-    const wsMap: Record<string, number> = {}
+    const discoveryMap: Record<string, number> = {}
+    const maintenanceMap: Record<string, number> = {}
 
     for (const d of data) {
         const key = getGranularityKey(d.count_date, granularity)
-        allMap[key] = (allMap[key] || 0) + d.ticket_count
-        if (workstream && d.workstream === workstream) {
-            wsMap[key] = (wsMap[key] || 0) + d.ticket_count
+        const type = d.ticket_type || 'Unknown'
+
+        if (type.toLowerCase().includes('discovery')) {
+            discoveryMap[key] = (discoveryMap[key] || 0) + d.ticket_count
+        } else if (type.toLowerCase().includes('maintenance') || type.toLowerCase().includes('rtb')) {
+            maintenanceMap[key] = (maintenanceMap[key] || 0) + d.ticket_count
         }
     }
 
-    const keys = [...new Set([...Object.keys(allMap), ...Object.keys(wsMap)])].sort()
+    const keys = [...new Set([...Object.keys(discoveryMap), ...Object.keys(maintenanceMap)])].sort()
 
     return keys.map((key) => ({
         period: key,
-        all: allMap[key] || 0,
-        selected: workstream ? (wsMap[key] || 0) : (allMap[key] || 0),
+        discovery: discoveryMap[key] || 0,
+        maintenance: maintenanceMap[key] || 0,
     }))
 }
 
@@ -96,13 +98,12 @@ const granularities: { label: string; value: Granularity }[] = [
 
 export { type Granularity }
 
-export function TimelineChart({ data, selectedWorkstream, onPeriodClick }: TimelineChartProps) {
+export function TimelineChart({ data, onPeriodClick }: TimelineChartProps) {
     const [granularity, setGranularity] = useState<Granularity>('weekly')
 
-    const chartData = useMemo(
-        () => aggregateByGranularity(data, granularity, selectedWorkstream),
-        [data, granularity, selectedWorkstream]
-    )
+    const chartData = useMemo(() => {
+        return aggregateByGranularity(data, granularity)
+    }, [data, granularity])
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleDotClick = (_: any, payload: any) => {
@@ -116,7 +117,16 @@ export function TimelineChart({ data, selectedWorkstream, onPeriodClick }: Timel
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h3 className="text-sm font-semibold text-slate-900">Ticket Creation Timeline</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Click on a data point to see tickets</p>
+                    <div className="flex items-center gap-4 mt-1">
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-blue-500" />
+                            <span className="text-xs text-slate-500">Discovery Items</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-orange-500" />
+                            <span className="text-xs text-slate-500">Maintenance (RTB)</span>
+                        </div>
+                    </div>
                 </div>
                 <div className="flex bg-slate-100 rounded-lg p-0.5">
                     {granularities.map((g) => (
@@ -139,12 +149,6 @@ export function TimelineChart({ data, selectedWorkstream, onPeriodClick }: Timel
                     data={chartData}
                     margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
                 >
-                    <defs>
-                        <linearGradient id="colorAll" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1} />
-                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                        </linearGradient>
-                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                     <XAxis
                         dataKey="period"
@@ -171,34 +175,31 @@ export function TimelineChart({ data, selectedWorkstream, onPeriodClick }: Timel
                         labelFormatter={(v) => formatPeriodLabel(v as string, granularity)}
                         formatter={(value: number | undefined, name: string | undefined) => [
                             value ?? 0,
-                            name === 'all' ? 'All Workstreams' : 'Selected Workstream',
+                            name === 'discovery' ? 'Discovery' : 'Maintenance (RTB)',
                         ]}
                     />
-                    <Area
-                        type="monotone"
-                        dataKey="all"
-                        stroke="transparent"
-                        fill="url(#colorAll)"
-                    />
+
+                    {/* Discovery Line (Blue) */}
                     <Line
                         type="monotone"
-                        dataKey="all"
-                        stroke="#cbd5e1"
-                        strokeWidth={2}
-                        strokeDasharray="6 4"
-                        dot={false}
-                        activeDot={{ r: 4, strokeWidth: 1, stroke: '#cbd5e1', fill: '#fff' }}
-                        name="all"
+                        dataKey="discovery"
+                        stroke="#3b82f6"
+                        strokeWidth={2.5}
+                        dot={{ fill: '#3b82f6', r: 3, strokeWidth: 0 }}
+                        activeDot={{ fill: '#3b82f6', r: 5, strokeWidth: 2, stroke: '#fff', onClick: handleDotClick, cursor: 'pointer' }}
+                        name="discovery"
                         animationDuration={800}
                     />
+
+                    {/* Maintenance Line (Orange) */}
                     <Line
                         type="monotone"
-                        dataKey="selected"
-                        stroke="#6366f1"
+                        dataKey="maintenance"
+                        stroke="#f97316"
                         strokeWidth={2.5}
-                        dot={{ fill: '#6366f1', r: 3, strokeWidth: 0 }}
-                        activeDot={{ fill: '#6366f1', r: 5, strokeWidth: 2, stroke: '#fff', onClick: handleDotClick, cursor: 'pointer' }}
-                        name="selected"
+                        dot={{ fill: '#f97316', r: 3, strokeWidth: 0 }}
+                        activeDot={{ fill: '#f97316', r: 5, strokeWidth: 2, stroke: '#fff', onClick: handleDotClick, cursor: 'pointer' }}
+                        name="maintenance"
                         animationDuration={800}
                     />
                 </LineChart>

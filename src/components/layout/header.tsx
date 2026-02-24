@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, GraduationCap, ChevronDown, User, LogOut, Settings, Check, X, Search } from 'lucide-react'
+import { Bell, GraduationCap, ChevronDown, User, LogOut, Settings, Check, X, Search, RefreshCw } from 'lucide-react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
@@ -35,6 +35,8 @@ export function Header({ user }: { user: any }) {
     const [dbTeams, setDbTeams] = useState<{ id: string, name: string, workstream_id: string }[]>([])
     const [userProfile, setUserProfile] = useState<{ full_name: string | null, avatar_url: string | null, role: string | null } | null>(null)
     const [searchQuery, setSearchQuery] = useState('')
+    const [syncing, setSyncing] = useState(false)
+    const [syncToast, setSyncToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
     const profileRef = useRef<HTMLDivElement>(null)
     const workstreamRef = useRef<HTMLDivElement>(null)
@@ -51,8 +53,20 @@ export function Header({ user }: { user: any }) {
         const params = new URLSearchParams(searchParams?.toString() || '')
         if (ws === 'All Workstreams') {
             params.delete('workstream')
+            params.delete('team') // reset team when workstream resets
         } else {
             params.set('workstream', ws)
+        }
+        const query = params.toString()
+        router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
+    }, [pathname, searchParams, router])
+
+    const pushTeamToUrl = useCallback((t: string) => {
+        const params = new URLSearchParams(searchParams?.toString() || '')
+        if (t === 'All Teams') {
+            params.delete('team')
+        } else {
+            params.set('team', t)
         }
         const query = params.toString()
         router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false })
@@ -93,6 +107,31 @@ export function Header({ user }: { user: any }) {
     async function handleSignOut() {
         await supabase.auth.signOut()
         router.push('/login')
+    }
+
+    async function handleRefreshData() {
+        setSyncing(true)
+        setSyncToast(null)
+        try {
+            const res = await fetch(
+                'https://n8n.srv1129130.hstgr.cloud/webhook/b0b19770-dbd2-41e3-ba84-b9c85b3ca9fd',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ source: 'antigravity', action: 'refresh_bpi' }),
+                }
+            )
+            if (res.ok) {
+                setSyncToast({ type: 'success', message: 'Sync started successfully.' })
+                setTimeout(() => setSyncToast(null), 5000)
+            } else {
+                setSyncToast({ type: 'error', message: 'Failed to start sync. Please try again.' })
+            }
+        } catch {
+            setSyncToast({ type: 'error', message: 'Failed to start sync. Please try again.' })
+        } finally {
+            setSyncing(false)
+        }
     }
 
     const name = userProfile?.full_name || user?.user_metadata?.full_name || user?.email || 'User'
@@ -194,6 +233,7 @@ export function Header({ user }: { user: any }) {
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             setTeam('All Teams');
+                                                            pushTeamToUrl('All Teams');
                                                             setTeamOpen(false);
                                                         }}
                                                         className="p-1 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-colors"
@@ -207,7 +247,7 @@ export function Header({ user }: { user: any }) {
                                         {teamOpen && (
                                             <div className="absolute left-0 mt-2 w-[240px] sm:w-[300px] lg:w-[360px] bg-white border border-slate-200 rounded-xl shadow-lg py-1 z-50 max-h-64 overflow-y-auto">
                                                 <button
-                                                    onClick={() => { setTeam('All Teams'); setTeamOpen(false); }}
+                                                    onClick={() => { setTeam('All Teams'); pushTeamToUrl('All Teams'); setTeamOpen(false); }}
                                                     className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center justify-between"
                                                 >
                                                     All Teams
@@ -216,7 +256,7 @@ export function Header({ user }: { user: any }) {
                                                 {availableTeams.map(t => (
                                                     <button
                                                         key={t.id}
-                                                        onClick={() => { setTeam(t.name); setTeamOpen(false); }}
+                                                        onClick={() => { setTeam(t.name); pushTeamToUrl(t.name); setTeamOpen(false); }}
                                                         className="w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 flex items-center justify-between"
                                                     >
                                                         <span className="truncate">{t.name}</span>
@@ -255,6 +295,16 @@ export function Header({ user }: { user: any }) {
                     </div>
 
                     <div className="flex items-center gap-4">
+                        {pathname?.startsWith('/phase-') && (
+                            <button
+                                onClick={handleRefreshData}
+                                disabled={syncing}
+                                className="text-slate-50 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed hover:shadow-md transition-all hidden sm:flex items-center gap-2 text-sm font-medium px-4 py-1.5 rounded-full shadow-sm"
+                            >
+                                <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                                {syncing ? 'Syncing…' : 'Refresh Data'}
+                            </button>
+                        )}
                         <button className="text-emerald-50 bg-emerald-600 hover:bg-emerald-700 hover:shadow-md transition-all hidden sm:flex items-center gap-2 text-sm font-medium px-4 py-1.5 rounded-full shadow-sm">
                             <GraduationCap className="w-4 h-4 text-emerald-100" />
                             Academy
@@ -315,6 +365,17 @@ export function Header({ user }: { user: any }) {
                     </div>
                 </div>
             </div>
+
+            {/* Sync toast */}
+            {syncToast && (
+                <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 px-4 py-2 rounded-xl text-sm font-medium shadow-lg z-50 flex items-center gap-2 ${syncToast.type === 'success'
+                    ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
+                    : 'bg-red-50 border border-red-200 text-red-700'
+                    }`}>
+                    {syncToast.type === 'success' ? '✅' : '⚠️'} {syncToast.message}
+                    <button onClick={() => setSyncToast(null)} className="ml-1 opacity-60 hover:opacity-100">✕</button>
+                </div>
+            )}
         </header>
     )
 }
