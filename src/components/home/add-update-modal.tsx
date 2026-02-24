@@ -15,8 +15,16 @@ interface ParsedItem {
     description: string
 }
 
-export function AddUpdateModal({ weeklyUpdateId }: { weeklyUpdateId: string }) {
+interface WeekOption {
+    id: string
+    week_id: string
+    start_date?: string
+    end_date?: string
+}
+
+export function AddUpdateModal({ updates, defaultWeeklyUpdateId }: { updates: WeekOption[], defaultWeeklyUpdateId: string }) {
     const [open, setOpen] = useState(false)
+    const [selectedWeekId, setSelectedWeekId] = useState(defaultWeeklyUpdateId)
     const [text, setText] = useState('')
     const [parsedItems, setParsedItems] = useState<ParsedItem[]>([])
     const [isSubmitting, setIsSubmitting] = useState(false)
@@ -157,14 +165,14 @@ export function AddUpdateModal({ weeklyUpdateId }: { weeklyUpdateId: string }) {
             const { data: existingItems } = await supabase
                 .from('weekly_update_items')
                 .select('order_index')
-                .eq('weekly_update_id', weeklyUpdateId)
+                .eq('weekly_update_id', selectedWeekId)
                 .order('order_index', { ascending: false })
                 .limit(1)
 
             let startingIndex = (existingItems && existingItems.length > 0) ? (existingItems[0].order_index || 0) + 1 : 1
 
             const itemsToInsert = parsedItems.map((item, idx) => ({
-                weekly_update_id: weeklyUpdateId,
+                weekly_update_id: selectedWeekId,
                 section: item.section,
                 title: item.title,
                 description: item.description,
@@ -207,7 +215,18 @@ export function AddUpdateModal({ weeklyUpdateId }: { weeklyUpdateId: string }) {
                             <div className="p-1.5 rounded-md bg-blue-100/50 text-blue-600">
                                 <FileText className="w-5 h-5" />
                             </div>
-                            Add Weekly Update Items
+                            Add Items to
+                            <select
+                                value={selectedWeekId}
+                                onChange={(e) => setSelectedWeekId(e.target.value)}
+                                className="text-sm font-semibold text-slate-800 bg-white border border-slate-200 rounded-lg px-2.5 py-1 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
+                            >
+                                {updates.map((u) => (
+                                    <option key={u.id} value={u.id}>
+                                        {u.week_id}{u.start_date ? ` (${new Date(u.start_date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})` : ''}
+                                    </option>
+                                ))}
+                            </select>
                         </Dialog.Title>
                         <Dialog.Close className="rounded-full p-1.5 hover:bg-slate-200 transition-colors text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-300">
                             <X className="w-5 h-5" />

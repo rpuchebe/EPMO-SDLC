@@ -274,7 +274,7 @@ export function WeeklyUpdates({ updates }: { updates: any[] }) {
                 </div>
 
                 <div data-html2canvas-ignore="true" className="w-full md:w-1/3 flex justify-end items-center gap-2">
-                    {currentUpdate && <AddUpdateModal weeklyUpdateId={currentUpdate.id} />}
+                    {currentUpdate && <AddUpdateModal updates={updates} defaultWeeklyUpdateId={currentUpdate.id} />}
                     <button
                         onClick={handleExportPDF}
                         disabled={isExporting}
