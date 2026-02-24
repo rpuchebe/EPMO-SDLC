@@ -33,7 +33,7 @@ function getBarColor(status: string): string {
 
 export function StatusDistribution({ data }: StatusDistributionProps) {
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 mt-6">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
             <div className="mb-6">
                 <h3 className="text-sm font-semibold text-slate-900">Ticket Distribution by Status</h3>
                 <p className="text-xs text-slate-400 mt-0.5">Current ticket spread with ROI and duration metrics</p>

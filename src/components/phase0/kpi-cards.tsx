@@ -68,7 +68,7 @@ const cards = [
 
 export function KpiCards({ kpis }: KpiCardsProps) {
     return (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
             {cards.map((card) => {
                 const value = kpis[card.key]
                 const Icon = card.icon

@@ -21,7 +21,7 @@ export function DashboardHeader({ lastSync, onRefresh, isRefreshing }: Dashboard
         : 'Never'
 
     return (
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-4">
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
                 Dashboard
             </h1>

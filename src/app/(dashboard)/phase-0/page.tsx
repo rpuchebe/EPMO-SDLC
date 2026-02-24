@@ -145,9 +145,9 @@ export default function Phase0Page() {
             <KpiCards kpis={kpis} />
 
             {/* Main Content: 2 columns */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
                 {/* Left Column – 8 cols */}
-                <div className="lg:col-span-8 flex flex-col gap-6">
+                <div className="lg:col-span-8 flex flex-col gap-4">
                     <TimelineChart
                         data={timeline}
                         selectedWorkstream={selectedWorkstream}
