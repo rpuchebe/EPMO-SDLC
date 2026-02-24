@@ -24,35 +24,39 @@ import {
 const sidebarSections = [
     {
         title: 'General',
+        icon: Home,
         items: [
-            { name: 'Home', href: '/home', icon: Home },
+            { name: 'Home', href: '/home' },
         ]
     },
     {
         title: 'SDLC Phases',
         isExpandable: true,
+        icon: LayoutDashboard,
         items: [
-            { name: 'Rollout Overview', href: '/rollout-overview', icon: LayoutDashboard },
-            { name: 'Phase 0 – Ideation', href: '/phase-0', icon: Lightbulb },
-            { name: 'Phase 1 – Discovery', href: '/phase-1', icon: Compass },
-            { name: 'Phase 2 – Prioritization', href: '/phase-2', icon: ListTodo },
-            { name: 'Phase 3 – Design', href: '/phase-3', icon: PenTool },
-            { name: 'Phase 4 – Dev & Testing', href: '/phase-4', icon: Code },
-            { name: 'Phase 5 – Deployment', href: '/phase-5', icon: Rocket },
+            { name: 'Rollout Overview', href: '/rollout-overview' },
+            { name: 'Phase 0 – Ideation', href: '/phase-0' },
+            { name: 'Phase 1 – Discovery', href: '/phase-1' },
+            { name: 'Phase 2 – Prioritization', href: '/phase-2' },
+            { name: 'Phase 3 – Design', href: '/phase-3' },
+            { name: 'Phase 4 – Dev & Testing', href: '/phase-4' },
+            { name: 'Phase 5 – Deployment', href: '/phase-5' },
         ]
     },
     {
         title: 'Stability & Scalability',
         isExpandable: true,
+        icon: Server,
         items: [
-            { name: 'Overview', href: '/stability-overview', icon: Server },
+            { name: 'Overview', href: '/stability-overview' },
         ]
     },
     {
         title: 'Support Documents',
+        icon: FileText,
         items: [
-            { name: 'SDLC Guide', href: '#', icon: FileText },
-            { name: 'FAQ & Help', href: '#', icon: HelpCircle },
+            { name: 'SDLC Guide', href: '#' },
+            { name: 'FAQ & Help', href: '#' },
         ]
     }
 ]
@@ -129,18 +133,26 @@ export function Sidebar({
                             {section.isExpandable ? (
                                 <button
                                     onClick={() => toggleSection(section.title)}
-                                    className={`w-full flex items-center justify-between mb-2 transition-all duration-300 overflow-hidden shrink-0 group ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-6 opacity-100 px-3 hover:bg-slate-50 rounded-md py-4'
+                                    className={`w-full flex items-center justify-between mb-0.5 transition-all duration-300 overflow-hidden shrink-0 group ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-10 opacity-100 px-3 hover:bg-slate-50/80 rounded-lg py-2 mx-1'
                                         }`}
                                 >
-                                    <h3 className="text-[12px] font-semibold text-slate-500 group-hover:text-slate-800 uppercase tracking-wider whitespace-nowrap transition-colors">
-                                        {section.title}
-                                    </h3>
-                                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-transform duration-200 ${!isSectionExpanded ? '-rotate-90' : ''}`} />
+                                    <div className="flex items-center gap-2.5">
+                                        {section.icon && (
+                                            <section.icon className="w-[18px] h-[18px] text-slate-500 group-hover:text-slate-800 transition-colors" />
+                                        )}
+                                        <h3 className="text-[14px] font-semibold text-slate-800 transition-colors">
+                                            {section.title}
+                                        </h3>
+                                    </div>
+                                    <ChevronDown className={`w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-transform duration-200 ${!isSectionExpanded ? '-rotate-90' : ''}`} />
                                 </button>
                             ) : (
-                                <div className={`mb-2 transition-all duration-300 overflow-hidden shrink-0 ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-4 opacity-100 px-3'
+                                <div className={`flex items-center gap-2.5 mb-1 transition-all duration-300 overflow-hidden shrink-0 ${isCollapsed ? 'h-0 opacity-0 my-0' : 'h-10 opacity-100 px-3 mx-1'
                                     }`}>
-                                    <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                                    {section.icon && (
+                                        <section.icon className="w-[18px] h-[18px] text-slate-500" />
+                                    )}
+                                    <h3 className="text-[14px] font-semibold text-slate-500">
                                         {section.title}
                                     </h3>
                                 </div>
@@ -148,9 +160,7 @@ export function Sidebar({
 
                             {isCollapsed && idx > 0 && <div className="h-px bg-slate-200 mt-2 mb-4 mx-3 shrink-0" />}
 
-                            {/* Section Items */}
-                            {/* In collapsed mode, we ignore the local accordion state and force show icons, otherwise they'd vanish */}
-                            <div className={`flex flex-col gap-1.5 transition-all duration-300 overflow-hidden ${(!isSectionExpanded && !isCollapsed) ? 'h-0 opacity-0' : 'opacity-100'}`}>
+                            <div className={`flex flex-col gap-0.5 transition-all duration-300 overflow-hidden ${(!isSectionExpanded && !isCollapsed) ? 'h-0 opacity-0' : 'opacity-100'}`}>
                                 {section.items.map((item) => {
                                     const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/home')
 
@@ -158,15 +168,18 @@ export function Sidebar({
                                         <Link
                                             key={item.name}
                                             href={item.href}
-                                            className={`group flex items-center relative rounded-xl transition-all duration-200 py-2.5 min-h-[40px] shrink-0 my-0.5 ${isActive
-                                                ? 'bg-slate-900 text-white font-medium shadow-sm'
-                                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-medium'
-                                                } ${isCollapsed ? 'px-0 justify-center mx-2' : 'px-4 gap-3 mx-2'}`}
+                                            className={`group flex items-center relative rounded-xl transition-all duration-200 py-2.5 min-h-[38px] shrink-0 ${isActive
+                                                ? 'bg-slate-100/80 text-slate-900 font-semibold shadow-sm'
+                                                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 font-medium'
+                                                } ${isCollapsed ? 'px-0 justify-center mx-2' : 'pl-[42px] pr-4 mx-1'}`}
                                             title={isCollapsed ? item.name : undefined}
                                         >
-                                            {/* Icon */}
-                                            <item.icon className={`shrink-0 transition-colors ${isActive ? 'text-white w-[18px] h-[18px]' : 'text-slate-500 group-hover:text-slate-700 w-[18px] h-[18px]'
-                                                }`} />
+                                            {/* In collapsed state, show initials */}
+                                            {isCollapsed && (
+                                                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[12px] font-bold ${isActive ? 'bg-slate-200 text-slate-900' : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200 group-hover:text-slate-700'}`}>
+                                                    {item.name.charAt(0)}
+                                                </div>
+                                            )}
 
                                             {/* Label */}
                                             <span className={`text-[14px] tracking-wide whitespace-nowrap transition-opacity duration-300 ${isCollapsed ? 'opacity-0 hidden' : 'opacity-100 block'
