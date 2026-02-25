@@ -44,7 +44,7 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col h-full min-h-[350px]">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col h-full min-h-[280px]">
             <div className="flex items-center gap-2 mb-2 shrink-0">
                 <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
                     <PieChartIcon className="w-5 h-5" />
@@ -55,15 +55,15 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
                 </div>
             </div>
 
-            <div className="flex-1 h-full min-h-[300px] mt-4 relative">
+            <div className="flex-1 h-full min-h-[240px] mt-4 relative">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
                             data={data}
                             cx="50%"
                             cy="45%"
-                            innerRadius={70}
-                            outerRadius={100}
+                            innerRadius={50}
+                            outerRadius={80}
                             paddingAngle={3}
                             dataKey="count"
                             nameKey="type"

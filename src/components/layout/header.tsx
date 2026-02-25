@@ -113,12 +113,13 @@ export function Header({ user }: { user: any }) {
         setSyncing(true)
         setSyncToast(null)
         try {
+            const actionPayload = pathname.startsWith('/phase-2') ? 'refresh_phase2' : 'refresh_bpi'
             const res = await fetch(
                 'https://n8n.srv1129130.hstgr.cloud/webhook/b0b19770-dbd2-41e3-ba84-b9c85b3ca9fd',
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ source: 'antigravity', action: 'refresh_bpi' }),
+                    body: JSON.stringify({ source: 'antigravity', action: actionPayload }),
                 }
             )
             if (res.ok) {

@@ -19,7 +19,7 @@ export interface Phase1Ticket {
     reporter_avatar_url: string | null
     assignee_avatar_url: string | null
     linked_work_item_count: number | null
-    linked_work_items?: { key: string; status: string; issue_type: string }[] | null
+    linked_work_items?: { key: string; status: string; issue_type: string; summary?: string }[] | null
 }
 
 interface TicketListModalProps {

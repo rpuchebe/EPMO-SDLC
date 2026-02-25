@@ -40,13 +40,13 @@ interface SyncLogRow {
 
 const EMPTY_RESPONSE = {
     kpis: {
-        discoveryItems: 0,
-        maintenanceRTB: 0,
-        waitingForTriage: 0,
-        inDiscovery: 0,
-        definitionGate: 0,
-        atWorkstreamBacklog: 0,
-        completedItems: 0,
+        discoveryItems: { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] },
+        maintenanceRTB: { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] },
+        waitingForTriage: { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] },
+        inDiscovery: { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] },
+        definitionGate: { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] },
+        atWorkstreamBacklog: { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] },
+        completedItems: { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] },
         linkedItemsBreakdown: []
     },
     timeline: [],
@@ -107,40 +107,143 @@ export async function GET(request: NextRequest) {
         }
 
         // ── KPIs ──
-        const discoveryItems = typedTickets.filter(t => t.ticket_type === 'Discovery' || t.ticket_type === 'Discovery Item').length
-        const maintenanceRTB = typedTickets.filter(t => t.ticket_type === 'Maintenance (RTB)').length
+        const now = new Date()
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+
+        const weekBuckets = Array.from({ length: 8 }).map((_, i) => {
+            return new Date(now.getTime() - (7 - i) * 7 * 24 * 60 * 60 * 1000)
+        })
+
+        const buildKpi = (filtered: Phase1TicketRow[], isCumulative = false) => {
+            const val = filtered.length
+
+            let last7 = 0; let prev7 = 0; let sparkline: number[] = []
+
+            if (isCumulative) {
+                last7 = filtered.filter(t => new Date(t.created_at) < now).length
+                prev7 = filtered.filter(t => new Date(t.created_at) < sevenDaysAgo).length
+
+                sparkline = weekBuckets.map(bucketStart => {
+                    const bucketEnd = new Date(bucketStart.getTime() + 7 * 24 * 60 * 60 * 1000)
+                    return filtered.filter(t => new Date(t.created_at) < bucketEnd).length
+                })
+            } else {
+                const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+                last7 = filtered.filter(t => new Date(t.created_at) >= sevenDaysAgo).length
+                prev7 = filtered.filter(t => new Date(t.created_at) >= fourteenDaysAgo && new Date(t.created_at) < sevenDaysAgo).length
+
+                sparkline = weekBuckets.map(bucketStart => {
+                    const bucketEnd = new Date(bucketStart.getTime() + 7 * 24 * 60 * 60 * 1000)
+                    return filtered.filter(t => {
+                        const d = new Date(t.created_at)
+                        return d >= bucketStart && d < bucketEnd
+                    }).length
+                })
+            }
+
+            const deltaAbsolute = last7 - prev7
+            const deltaPercent = prev7 === 0 ? (last7 > 0 ? 100 : 0) : Math.round((deltaAbsolute / prev7) * 100)
+
+            return { value: val, deltaAbsolute, deltaPercent, sparkline }
+        }
+
+        const getAvgAge = (tickets: Phase1TicketRow[]) => {
+            if (!tickets.length) return 0
+            const totalDays = tickets.reduce((acc, t) => {
+                return acc + (now.getTime() - new Date(t.created_at).getTime()) / (1000 * 3600 * 24)
+            }, 0)
+            return Math.round(totalDays / tickets.length)
+        }
+
+        const getOldestAge = (tickets: Phase1TicketRow[]) => {
+            if (!tickets.length) return 0
+            return Math.round(Math.max(...tickets.map(t => (now.getTime() - new Date(t.created_at).getTime()) / (1000 * 3600 * 24))))
+        }
+
+        const getUnassignedCount = (tickets: Phase1TicketRow[]) => {
+            return tickets.filter(t => !t.assignee_account_id).length
+        }
+
+        const discoveryItemsTickets = typedTickets.filter(t => t.ticket_type === 'Discovery' || t.ticket_type === 'Discovery Item')
+        const discoveryItems = {
+            ...buildKpi(discoveryItemsTickets, true),
+            avgAge: getAvgAge(discoveryItemsTickets),
+            unassigned: getUnassignedCount(discoveryItemsTickets)
+        }
+
+        const maintenanceRTBTickets = typedTickets.filter(t => t.ticket_type === 'Maintenance (RTB)')
+        const maintenanceRTB = {
+            ...buildKpi(maintenanceRTBTickets, true),
+            avgAge: getAvgAge(maintenanceRTBTickets),
+            unassigned: getUnassignedCount(maintenanceRTBTickets)
+        }
 
         // Waiting for triage mapping: "Waiting for triage" and "Needs more info" (or "Needs more information")
-        const waitingForTriage = typedTickets.filter(t => {
+        const waitingForTriageTickets = typedTickets.filter(t => {
             const s = (t.status || '').toLowerCase()
             return s === 'needs more information' || s === 'needs more info' || s === 'waiting for triage'
-        }).length
+        })
+        const waitingForTriage = {
+            ...buildKpi(waitingForTriageTickets, true),
+            oldestTicket: getOldestAge(waitingForTriageTickets),
+            unassigned: getUnassignedCount(waitingForTriageTickets)
+        }
 
         // In Discovery maps to "Discovery", "Ready for Discovery", "In Progress"
-        const inDiscovery = typedTickets.filter(t => {
+        const inDiscoveryTickets = typedTickets.filter(t => {
             const s = (t.status || '').toLowerCase()
             return s === 'discovery' || s === 'ready for discovery' || s === 'in progress'
-        }).length
+        })
+        const inDiscovery = {
+            ...buildKpi(inDiscoveryTickets, true),
+            avgAge: getAvgAge(inDiscoveryTickets),
+            unassigned: getUnassignedCount(inDiscoveryTickets)
+        }
 
         // Definition Gate maps to "Internal audit" or "Definition Gate"
-        const definitionGate = typedTickets.filter(t => {
+        const definitionGateTickets = typedTickets.filter(t => {
             const s = (t.status || '').toLowerCase()
             return s === 'internal audit' || s === 'definition gate'
-        }).length
+        })
+        const definitionGate = {
+            ...buildKpi(definitionGateTickets, true),
+            avgAge: getAvgAge(definitionGateTickets),
+            unassigned: getUnassignedCount(definitionGateTickets)
+        }
 
         // At workstream backlog maps to "Backlog" or "Moved to Workstream Backlog"
         const backlogTickets = typedTickets.filter(t => {
             const s = (t.status || '').toLowerCase()
             return s === 'backlog' || s === 'moved to workstream backlog'
         })
-        const atWorkstreamBacklog = backlogTickets.length
+        const atWorkstreamBacklog = {
+            ...buildKpi(backlogTickets, true),
+            linkedItems: backlogTickets.reduce((acc, t) => {
+                try {
+                    const parsed = typeof t.linked_work_items === 'string' ? JSON.parse(t.linked_work_items) : t.linked_work_items
+                    return acc + (Array.isArray(parsed) ? parsed.length : 0)
+                } catch { return acc }
+            }, 0)
+        }
 
         // Completed items maps to "Done" status or completed_at != null
-        const completedItems = typedTickets.filter(t => {
+        const completedItemsTickets = typedTickets.filter(t => {
             const sCat = (t.status_category || '').toLowerCase()
             const s = (t.status || '').toLowerCase()
-            return sCat === 'done' || s === 'done' || t.completed_at !== null
-        }).length
+            return sCat === 'done' || s === 'done' || !!t.completed_at
+        })
+        const completedItems = {
+            ...buildKpi(completedItemsTickets, true),
+            avgDaysToDone: completedItemsTickets.length ? Math.round(completedItemsTickets.reduce((acc, t) => {
+                if (!t.completed_at) return acc
+                return acc + (new Date(t.completed_at).getTime() - new Date(t.created_at).getTime()) / (1000 * 3600 * 24)
+            }, 0) / completedItemsTickets.length) : 0,
+            completedThisMonth: completedItemsTickets.filter(t => {
+                if (!t.completed_at) return false
+                const d = new Date(t.completed_at)
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+            }).length
+        }
 
         // Fetch linked items for backlog breakdown
         let linkedItemsBreakdown: { type: string; count: number; percentage: number }[] = []

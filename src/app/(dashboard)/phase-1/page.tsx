@@ -3,26 +3,18 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { DashboardHeader } from '@/components/phase1/dashboard-header'
-import { KpiCards } from '@/components/phase1/kpi-cards'
+import { KpiCards, type PCBs as KPIs } from '@/components/phase1/kpi-cards'
 import { TimelineChart, type Granularity } from '@/components/phase1/timeline-chart'
 import { StatusDistribution } from '@/components/phase1/status-distribution'
 import { CollaboratorsReport } from '@/components/phase1/collaborators-report'
 import { TicketListModal, type Phase1Ticket } from '@/components/phase1/ticket-list-modal'
 import { BacklogDistribution } from '@/components/phase1/backlog-distribution'
+import { IncidentManagementTab } from '@/components/phase1/incident-management-tab'
 import { Loader2, ClipboardList, AlertTriangle } from 'lucide-react'
 
 // Map the exact types returned by /api/phase1
 interface DashboardData {
-    kpis: {
-        discoveryItems: number
-        maintenanceRTB: number
-        waitingForTriage: number
-        inDiscovery: number
-        definitionGate: number
-        atWorkstreamBacklog: number
-        completedItems: number
-        linkedItemsBreakdown: { type: string; count: number; percentage: number }[]
-    }
+    kpis: KPIs
     tickets: Phase1Ticket[]
     timeline: { count_date: string; workstream: string; ticket_type: string; ticket_count: number }[]
     statusDistribution: { status: string; count: number; avgDaysInStatus: number | null; avgRoi: number | null }[]
@@ -31,21 +23,43 @@ interface DashboardData {
     lastSync: string | null
 }
 
-const emptyKpis = {
-    discoveryItems: 0, maintenanceRTB: 0, waitingForTriage: 0,
-    inDiscovery: 0, definitionGate: 0, atWorkstreamBacklog: 0,
-    completedItems: 0, linkedItemsBreakdown: []
+const emptyKpiBase = { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] }
+const emptyKpis: KPIs = {
+    discoveryItems: { ...emptyKpiBase },
+    maintenanceRTB: { ...emptyKpiBase },
+    waitingForTriage: { ...emptyKpiBase },
+    inDiscovery: { ...emptyKpiBase },
+    definitionGate: { ...emptyKpiBase },
+    atWorkstreamBacklog: { ...emptyKpiBase },
+    completedItems: { ...emptyKpiBase },
+    linkedItemsBreakdown: []
 }
 
 function filterByKpi(tickets: Phase1Ticket[], kpiKey: string): Phase1Ticket[] {
     switch (kpiKey) {
-        case 'discoveryItems': return tickets.filter(t => t.ticket_type === 'Discovery')
+        case 'discoveryItems': return tickets.filter(t => t.ticket_type === 'Discovery' || t.ticket_type === 'Discovery Item')
         case 'maintenanceRTB': return tickets.filter(t => t.ticket_type === 'Maintenance (RTB)')
-        case 'waitingForTriage': return tickets.filter(t => t.status === 'Needs more information')
-        case 'inDiscovery': return tickets.filter(t => t.status === 'Discovery')
-        case 'definitionGate': return tickets.filter(t => t.status === 'Internal audit')
-        case 'atWorkstreamBacklog': return tickets.filter(t => t.status === 'Backlog')
-        case 'completedItems': return tickets.filter(t => t.status_category === 'Done' || t.completed_at !== null)
+        case 'waitingForTriage': return tickets.filter(t => {
+            const s = (t.status || '').toLowerCase()
+            return s === 'needs more information' || s === 'needs more info' || s === 'waiting for triage'
+        })
+        case 'inDiscovery': return tickets.filter(t => {
+            const s = (t.status || '').toLowerCase()
+            return s === 'discovery' || s === 'ready for discovery' || s === 'in progress'
+        })
+        case 'definitionGate': return tickets.filter(t => {
+            const s = (t.status || '').toLowerCase()
+            return s === 'internal audit' || s === 'definition gate'
+        })
+        case 'atWorkstreamBacklog': return tickets.filter(t => {
+            const s = (t.status || '').toLowerCase()
+            return s === 'backlog' || s === 'moved to workstream backlog'
+        })
+        case 'completedItems': return tickets.filter(t => {
+            const sCat = (t.status_category || '').toLowerCase()
+            const s = (t.status || '').toLowerCase()
+            return sCat === 'done' || s === 'done' || !!t.completed_at
+        })
         default: return tickets
     }
 }
@@ -131,12 +145,45 @@ export default function Phase1Page() {
     }
 
     const handleBacklogDrillDown = (type: string) => {
+        const backlogTickets = tickets.filter(t => t.status === 'Moved to Workstream Backlog' || t.status === 'Backlog')
+        const linkedTickets: Phase1Ticket[] = []
+
+        backlogTickets.forEach(parentTicket => {
+            if (parentTicket.linked_work_items && Array.isArray(parentTicket.linked_work_items)) {
+                parentTicket.linked_work_items.forEach(linkedItem => {
+                    if (linkedItem.issue_type === type) {
+                        const s = (linkedItem.status || '').toLowerCase()
+                        const category = (s.includes('done') || s.includes('closed')) ? 'Done' : (s.includes('progress') ? 'In Progress' : 'To Do')
+
+                        linkedTickets.push({
+                            id: linkedItem.key,
+                            jira_key: linkedItem.key,
+                            summary: linkedItem.summary ? linkedItem.summary : `Linked to ${parentTicket.jira_key}: ${parentTicket.summary || ''}`,
+                            status: linkedItem.status || 'Open',
+                            status_category: category,
+                            workstream: parentTicket.workstream,
+                            team: parentTicket.team,
+                            ticket_type: linkedItem.issue_type,
+                            created_at: parentTicket.created_at,
+                            completed_at: null,
+                            roi_score: null,
+                            reporter_display_name: parentTicket.reporter_display_name,
+                            reporter_avatar_url: parentTicket.reporter_avatar_url,
+                            assignee_avatar_url: parentTicket.assignee_avatar_url,
+                            linked_work_item_count: null,
+                            linked_work_items: null
+                        })
+                    }
+                })
+            }
+        })
+
+        // Deduplicate in case multiple backlog items link to the same external issue
+        const uniqueTickets = Array.from(new Map(linkedTickets.map(item => [item.id, item])).values())
+
         setDrillDown({
             title: `Workstream Backlog: ${type} items`,
-            tickets: tickets.filter(t =>
-                (t.status === 'Moved to Workstream Backlog' || t.status === 'Backlog') &&
-                t.linked_work_items?.some(i => i.issue_type === type)
-            )
+            tickets: uniqueTickets
         })
     }
 
@@ -194,10 +241,7 @@ export default function Phase1Page() {
             )}
 
             {activeTab === 'incident_management' && (
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 flex flex-col items-center justify-center min-h-[300px]">
-                    <h2 className="text-xl font-semibold text-slate-800 mb-2">Incident Management</h2>
-                    <p className="text-slate-500">Coming soon</p>
-                </div>
+                <IncidentManagementTab />
             )}
 
             {activeTab === 'planned_work' && (
@@ -217,7 +261,7 @@ export default function Phase1Page() {
                         </div>
                         <div className="lg:col-span-4 flex flex-col gap-4">
                             <BacklogDistribution
-                                data={kpis.linkedItemsBreakdown}
+                                data={data?.kpis.linkedItemsBreakdown || []}
                                 onItemClick={handleBacklogDrillDown}
                             />
                             <CollaboratorsReport

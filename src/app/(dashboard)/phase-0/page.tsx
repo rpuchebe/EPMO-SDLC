@@ -3,22 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { DashboardHeader } from '@/components/phase0/dashboard-header'
-import { KpiCards } from '@/components/phase0/kpi-cards'
+
 import { TimelineChart, type Granularity } from '@/components/phase0/timeline-chart'
 import { StatusDistribution } from '@/components/phase0/status-distribution'
 import { CollaboratorsReport } from '@/components/phase0/collaborators-report'
 import { TicketListModal, type Ticket } from '@/components/phase0/ticket-list-modal'
 import { Loader2 } from 'lucide-react'
-
-interface KPIs {
-    total: number
-    inProgress: number
-    discovery: number
-    movedToWorkstream: number
-    done: number
-    wontDo: number
-    avgRoi: number
-}
+import { KpiCards, type KPIs } from '@/components/phase0/kpi-cards'
 
 interface DailyCount {
     count_date: string
@@ -55,17 +46,25 @@ interface DrillDown {
     tickets: Ticket[]
 }
 
-const emptyKpis: KPIs = { total: 0, inProgress: 0, discovery: 0, movedToWorkstream: 0, done: 0, wontDo: 0, avgRoi: 0 }
+const emptyKpiBase = { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] }
+const emptyKpis: KPIs = {
+    ideasSubmitted: { ...emptyKpiBase, wontDo: 0, wontDoPercent: 0, conversionToDiscovery: 0 },
+    inProgressIdeas: { ...emptyKpiBase, avgAgeDays: 0, over14DaysCount: 0 },
+    onDiscovery: { ...emptyKpiBase, avgDaysToStart: 0, conversionFromSubmitted: 0 },
+    atWorkstream: { ...emptyKpiBase, avgDaysToWorkstream: 0, conversionFromDiscovery: 0 },
+    completedIdeas: { ...emptyKpiBase, completionRate: 0, avgDaysToCompletion: 0 },
+    avgRoiScoring: { ...emptyKpiBase, medianRoi: 0, top10Roi: 0 }
+}
 
 // ── Helpers to filter tickets for drill-down ──
 
 function filterByKpi(tickets: Ticket[], kpiKey: string): Ticket[] {
     switch (kpiKey) {
-        case 'total': return tickets
-        case 'inProgress': return tickets.filter((t) => t.status_category === 'In Progress')
-        case 'discovery': return tickets.filter((t) => t.status === 'Discovery')
-        case 'movedToWorkstream': return tickets.filter((t) => t.status === 'Moved to Workstream')
-        case 'done': return tickets.filter((t) => t.status_category === 'Done')
+        case 'ideasSubmitted': return tickets
+        case 'inProgressIdeas': return tickets.filter((t) => t.status_category === 'In Progress')
+        case 'onDiscovery': return tickets.filter((t) => t.status === 'Discovery')
+        case 'atWorkstream': return tickets.filter((t) => t.status === 'Moved to Workstream')
+        case 'completedIdeas': return tickets.filter((t) => t.status_category === 'Done' && t.status.toLowerCase() !== "won't do" && t.status.toLowerCase() !== 'wont do')
         default: return tickets
     }
 }

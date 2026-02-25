@@ -31,8 +31,16 @@ interface SyncLogRow {
     synced_at: string
 }
 
+const EMPTY_KPI = { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] }
 const EMPTY_RESPONSE = {
-    kpis: { total: 0, inProgress: 0, discovery: 0, movedToWorkstream: 0, done: 0, avgRoi: 0 },
+    kpis: {
+        ideasSubmitted: EMPTY_KPI,
+        inProgressIdeas: EMPTY_KPI,
+        onDiscovery: EMPTY_KPI,
+        atWorkstream: EMPTY_KPI,
+        completedIdeas: EMPTY_KPI,
+        avgRoiScoring: EMPTY_KPI
+    },
     timeline: [],
     statusDistribution: [],
     collaborators: [],
@@ -90,14 +98,153 @@ export async function GET(request: NextRequest) {
         }
 
         // ── KPIs ──
-        const total = typedTickets.length
-        const inProgress = typedTickets.filter((t) => t.status_category === 'In Progress').length
-        const discovery = typedTickets.filter((t) => t.status === 'Discovery').length
-        const movedToWorkstream = typedTickets.filter((t) => t.status === 'Moved to Workstream').length
-        const done = typedTickets.filter((t) => t.status_category === 'Done' && t.status.toLowerCase() !== "won't do" && t.status.toLowerCase() !== 'wont do').length
-        const wontDo = typedTickets.filter((t) => t.status.toLowerCase() === "won't do" || t.status.toLowerCase() === 'wont do').length
-        const roiValues = typedTickets.filter((t) => t.roi_score !== null).map((t) => t.roi_score as number)
-        const avgRoi = roiValues.length > 0 ? roiValues.reduce((a, b) => a + b, 0) / roiValues.length : 0
+        const now = new Date()
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+
+        // 8-week buckets for sparklines
+        const weekBuckets = Array.from({ length: 8 }).map((_, i) => {
+            return new Date(now.getTime() - (7 - i) * 7 * 24 * 60 * 60 * 1000)
+        })
+
+        const buildKpi = (filtered: TicketRow[], valueOverride?: number, metricType: 'count' | 'roi' = 'count') => {
+            const val = valueOverride !== undefined ? valueOverride : filtered.length
+
+            let last7 = 0; let prev7 = 0; let sparkline: number[] = []
+
+            if (metricType === 'count') {
+                // To get total cumulative count at a specific point in time:
+                last7 = filtered.filter(t => new Date(t.created_at) < now).length
+                prev7 = filtered.filter(t => new Date(t.created_at) < sevenDaysAgo).length
+
+                sparkline = weekBuckets.map(bucketStart => {
+                    const bucketEnd = new Date(bucketStart.getTime() + 7 * 24 * 60 * 60 * 1000)
+                    // Cumulative total up to the end of that bucket
+                    return filtered.filter(t => new Date(t.created_at) < bucketEnd).length
+                })
+            } else if (metricType === 'roi') {
+                const getRoiForPeriod = (start: Date, end: Date) => {
+                    const rois = filtered.filter(t => {
+                        const d = new Date(t.created_at)
+                        return d >= start && d < end && t.roi_score !== null
+                    }).map(t => t.roi_score as number)
+                    return rois.length ? rois.reduce((a, b) => a + b, 0) / rois.length : 0
+                }
+                last7 = getRoiForPeriod(sevenDaysAgo, now)
+                prev7 = getRoiForPeriod(fourteenDaysAgo, sevenDaysAgo)
+                sparkline = weekBuckets.map(bucketStart => {
+                    const bucketEnd = new Date(bucketStart.getTime() + 7 * 24 * 60 * 60 * 1000)
+                    return getRoiForPeriod(bucketStart, bucketEnd)
+                })
+            }
+
+            const deltaAbsolute = metricType === 'roi' ? Number((last7 - prev7).toFixed(1)) : (last7 - prev7)
+            const deltaPercent = prev7 === 0 ? (last7 > 0 ? 100 : 0) : Math.round((deltaAbsolute / prev7) * 100)
+
+            return { value: val, deltaAbsolute, deltaPercent, sparkline }
+        }
+
+        const totalTickets = typedTickets
+        const wipTickets = typedTickets.filter(t => t.status_category === 'In Progress')
+        const discoveryTickets = typedTickets.filter(t => t.status === 'Discovery')
+        const workstreamTickets = typedTickets.filter(t => t.status === 'Moved to Workstream')
+        const doneTickets = typedTickets.filter(t => t.status_category === 'Done' && t.status.toLowerCase() !== "won't do" && t.status.toLowerCase() !== 'wont do')
+        const wontDoTickets = typedTickets.filter(t => t.status.toLowerCase() === "won't do" || t.status.toLowerCase() === 'wont do')
+        const roiTickets = typedTickets.filter(t => t.roi_score !== null)
+
+        // Ideas Submitted logic
+        const wontDoCount = wontDoTickets.length
+        const totalCount = totalTickets.length
+        const totalExcludingWontDo = totalCount - wontDoCount
+        const wontDoPercent = totalCount ? Math.round((wontDoCount / totalCount) * 100) : 0
+
+        const hasReachedDiscovery = typedTickets.filter(t => t.status === 'Discovery').length
+
+        const conversionToDiscovery = totalExcludingWontDo ? Math.round((hasReachedDiscovery / totalExcludingWontDo) * 100) : 0
+        const ideasSubmittedKpi = {
+            ...buildKpi(totalTickets),
+            wontDo: wontDoCount,
+            wontDoPercent,
+            conversionToDiscovery,
+        }
+
+        // In Progress logic
+        const wipAges = wipTickets.map(t => (now.getTime() - new Date(t.created_at).getTime()) / (1000 * 60 * 60 * 24))
+        const avgAgeDays = wipAges.length ? Math.round(wipAges.reduce((a, b) => a + b, 0) / wipAges.length) : 0
+        const over14DaysCount = wipAges.filter(age => age > 14).length
+        const inProgressIdeasKpi = {
+            ...buildKpi(wipTickets),
+            avgAgeDays,
+            over14DaysCount
+        }
+
+        // Helper to sum status durations
+        const getSumDurations = (ticket: TicketRow, statusesToSum: string[]) => {
+            if (!ticket.status_durations) return 0
+            let sum = 0;
+            let durs = ticket.status_durations as any
+            if (typeof durs === 'string') { try { durs = JSON.parse(durs) } catch { durs = {} } }
+            for (const [k, v] of Object.entries(durs)) {
+                if (statusesToSum.map(s => s.toLowerCase()).includes(k.toLowerCase()) && typeof v === 'number') {
+                    sum += v
+                }
+            }
+            return sum / 86400
+        }
+
+        // On Discovery logic
+        const preDiscoveryStatuses = ['Needs more information', 'Waiting for triage', 'Ready for Discovery']
+        const daysToDiscoveryArray = discoveryTickets.map(t => getSumDurations(t, preDiscoveryStatuses)).filter(v => v > 0)
+        const avgDaysToStart = daysToDiscoveryArray.length ? (daysToDiscoveryArray.reduce((a, b) => a + b, 0) / daysToDiscoveryArray.length).toFixed(1) : 0
+        const conversionFromSubmitted = totalCount ? Math.round((discoveryTickets.length / totalCount) * 100) : 0
+        const onDiscoveryKpi = {
+            ...buildKpi(discoveryTickets),
+            avgDaysToStart: Number(avgDaysToStart),
+            conversionFromSubmitted
+        }
+
+        // At Workstream logic
+        const sumDiscoveryAndPre = [...preDiscoveryStatuses, 'Discovery']
+        const daysToWorkstreamArr = workstreamTickets.map(t => getSumDurations(t, sumDiscoveryAndPre)).filter(v => v > 0)
+        const avgDaysToWorkstream = daysToWorkstreamArr.length ? (daysToWorkstreamArr.reduce((a, b) => a + b, 0) / daysToWorkstreamArr.length).toFixed(1) : 0
+        const everDiscovery = discoveryTickets.length + workstreamTickets.length
+        const conversionFromDiscovery = everDiscovery ? Math.round((workstreamTickets.length / everDiscovery) * 100) : 0
+        const atWorkstreamKpi = {
+            ...buildKpi(workstreamTickets),
+            avgDaysToWorkstream: Number(avgDaysToWorkstream),
+            conversionFromDiscovery
+        }
+
+        // Completed Ideas logic
+        const completionRate = totalCount ? Math.round((doneTickets.length / totalCount) * 100) : 0
+        const doneAges = doneTickets.map(t => (now.getTime() - new Date(t.created_at).getTime()) / (1000 * 60 * 60 * 24))
+        const avgDaysToCompletion = doneAges.length ? Math.round(doneAges.reduce((a, b) => a + b, 0) / doneAges.length) : 0
+        const completedIdeasKpi = {
+            ...buildKpi(doneTickets),
+            completionRate,
+            avgDaysToCompletion
+        }
+
+        // Avg ROI Scoring logic
+        const rois = roiTickets.map(t => t.roi_score as number).sort((a, b) => a - b)
+        const avgRoiVal = rois.length ? rois.reduce((a, b) => a + b, 0) / rois.length : 0
+        const medianRoi = rois.length ? rois[Math.floor(rois.length / 2)] : 0
+        const top10Index = Math.floor(rois.length * 0.9)
+        const top10Roi = rois.length > 0 ? rois[top10Index] : 0
+        const avgRoiScoringKpi = {
+            ...buildKpi(roiTickets, Number(avgRoiVal.toFixed(1)), 'roi'),
+            medianRoi,
+            top10Roi
+        }
+
+        const kpisObj = {
+            ideasSubmitted: ideasSubmittedKpi,
+            inProgressIdeas: inProgressIdeasKpi,
+            onDiscovery: onDiscoveryKpi,
+            atWorkstream: atWorkstreamKpi,
+            completedIdeas: completedIdeasKpi,
+            avgRoiScoring: avgRoiScoringKpi
+        }
 
         // ── Timeline data (from ALL tickets so the "all workstreams" line always shows) ──
         const dailyMap: Record<string, Record<string, number>> = {}
@@ -206,15 +353,7 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({
-            kpis: {
-                total,
-                inProgress,
-                discovery,
-                movedToWorkstream,
-                done,
-                wontDo,
-                avgRoi: Math.round(avgRoi * 10) / 10,
-            },
+            kpis: kpisObj,
             tickets: typedTickets.map((t) => ({
                 jira_key: t.jira_key,
                 summary: t.summary,
