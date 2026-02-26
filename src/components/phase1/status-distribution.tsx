@@ -1,5 +1,6 @@
 'use client'
 
+import { BarChart3 } from 'lucide-react'
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts'
@@ -59,12 +60,15 @@ export function StatusDistribution({ data, onStatusClick }: StatusDistributionPr
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <div className="mb-6">
-                <h3 className="text-sm font-semibold text-slate-900">Ticket Distribution by Status</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Current ticket spread and average duration metrics</p>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40">
+                <div className="w-[3px] h-5 rounded-full bg-[#3b82f6] flex-shrink-0" />
+                <BarChart3 className="w-4 h-4 text-slate-500" />
+                <h3 className="text-sm font-semibold text-slate-800">Ticket Distribution by Status</h3>
+                <span className="ml-auto text-xs text-slate-400">Avg duration metrics</span>
             </div>
 
+            <div className="p-6">
             <ResponsiveContainer width="100%" height={320}>
                 <BarChart data={sortedData} margin={{ top: 5, right: 10, left: -10, bottom: 40 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -107,6 +111,7 @@ export function StatusDistribution({ data, onStatusClick }: StatusDistributionPr
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>
+            </div>
         </div>
     )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { TrendingUp, TrendingDown, User } from 'lucide-react'
+import { TrendingUp, TrendingDown, User, Users } from 'lucide-react'
 
 interface Collaborator {
     name: string
@@ -19,12 +19,15 @@ export function CollaboratorsReport({ data, onCollaboratorClick }: Collaborators
     const maxTickets = data.length > 0 ? Math.max(...data.map((c) => c.ticketCount)) : 1
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-full">
-            <div className="mb-5">
-                <h3 className="text-sm font-semibold text-slate-900">Reporters Report</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Ranked by ticket contribution</p>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full flex flex-col">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40 flex-shrink-0">
+                <div className="w-[3px] h-5 rounded-full bg-[#6366f1] flex-shrink-0" />
+                <Users className="w-4 h-4 text-slate-500" />
+                <h3 className="text-sm font-semibold text-slate-800">Reporters Report</h3>
+                <span className="ml-auto text-xs text-slate-400">By ticket contribution</span>
             </div>
 
+            <div className="p-6 flex-1 overflow-hidden">
             <div className="space-y-1 max-h-[750px] overflow-y-auto pr-1 hide-scrollbar">
                 {data.length === 0 && (
                     <p className="text-sm text-slate-400 text-center py-8">No collaborators found</p>
@@ -95,6 +98,7 @@ export function CollaboratorsReport({ data, onCollaboratorClick }: Collaborators
                         </div>
                     </button>
                 ))}
+            </div>
             </div>
         </div>
     )

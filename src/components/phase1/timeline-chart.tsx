@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { TrendingUp } from 'lucide-react'
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts'
@@ -113,37 +114,40 @@ export function TimelineChart({ data, onPeriodClick }: TimelineChartProps) {
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h3 className="text-sm font-semibold text-slate-900">Ticket Creation Timeline</h3>
-                    <div className="flex items-center gap-4 mt-1">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40">
+                <div className="w-[3px] h-5 rounded-full bg-[#3b82f6] flex-shrink-0" />
+                <TrendingUp className="w-4 h-4 text-slate-500" />
+                <h3 className="text-sm font-semibold text-slate-800">Ticket Creation Timeline</h3>
+                <div className="ml-auto flex items-center gap-4">
+                    <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1.5">
                             <div className="w-2 h-2 rounded-full bg-blue-500" />
-                            <span className="text-xs text-slate-500">Discovery Items</span>
+                            <span className="text-xs text-slate-500">Discovery</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                             <div className="w-2 h-2 rounded-full bg-orange-500" />
-                            <span className="text-xs text-slate-500">Maintenance (RTB)</span>
+                            <span className="text-xs text-slate-500">RTB</span>
                         </div>
                     </div>
-                </div>
-                <div className="flex bg-slate-100 rounded-lg p-0.5">
-                    {granularities.map((g) => (
-                        <button
-                            key={g.value}
-                            onClick={() => setGranularity(g.value)}
-                            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200
-                                        ${granularity === g.value
-                                    ? 'bg-white text-slate-900 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-700'}`}
-                        >
-                            {g.label}
-                        </button>
-                    ))}
+                    <div className="flex bg-slate-100 rounded-lg p-0.5">
+                        {granularities.map((g) => (
+                            <button
+                                key={g.value}
+                                onClick={() => setGranularity(g.value)}
+                                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all duration-200
+                                            ${granularity === g.value
+                                        ? 'bg-white text-slate-900 shadow-sm'
+                                        : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                {g.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
 
+            <div className="p-6">
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart
                     data={chartData}
@@ -204,6 +208,7 @@ export function TimelineChart({ data, onPeriodClick }: TimelineChartProps) {
                     />
                 </LineChart>
             </ResponsiveContainer>
+            </div>
         </div>
     )
 }

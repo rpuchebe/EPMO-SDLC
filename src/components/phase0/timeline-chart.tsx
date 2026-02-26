@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { TrendingUp } from 'lucide-react'
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area
 } from 'recharts'
@@ -112,13 +113,12 @@ export function TimelineChart({ data, selectedWorkstream, onPeriodClick }: Timel
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <h3 className="text-sm font-semibold text-slate-900">Ticket Creation Timeline</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Click on a data point to see tickets</p>
-                </div>
-                <div className="flex bg-slate-100 rounded-lg p-0.5">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40">
+                <div className="w-[3px] h-5 rounded-full bg-[#6366f1] flex-shrink-0" />
+                <TrendingUp className="w-4 h-4 text-slate-500" />
+                <h3 className="text-sm font-semibold text-slate-800">Ticket Creation Timeline</h3>
+                <div className="ml-auto flex bg-slate-100 rounded-lg p-0.5">
                     {granularities.map((g) => (
                         <button
                             key={g.value}
@@ -134,6 +134,7 @@ export function TimelineChart({ data, selectedWorkstream, onPeriodClick }: Timel
                 </div>
             </div>
 
+            <div className="p-6">
             <ResponsiveContainer width="100%" height={300}>
                 <LineChart
                     data={chartData}
@@ -203,6 +204,7 @@ export function TimelineChart({ data, selectedWorkstream, onPeriodClick }: Timel
                     />
                 </LineChart>
             </ResponsiveContainer>
+            </div>
         </div>
     )
 }

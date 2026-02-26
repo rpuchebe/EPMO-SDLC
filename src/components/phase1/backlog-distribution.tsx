@@ -24,18 +24,19 @@ const COLORS = [
 ]
 
 export function BacklogDistribution({ data, onItemClick }: BacklogDistributionProps) {
+    const header = (
+        <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40 flex-shrink-0">
+            <div className="w-[3px] h-5 rounded-full bg-[#3b82f6] flex-shrink-0" />
+            <PieChartIcon className="w-4 h-4 text-slate-500" />
+            <h3 className="text-sm font-semibold text-slate-800">Workstream Backlog Distribution</h3>
+            <span className="ml-auto text-xs text-slate-400">Issue type breakdown</span>
+        </div>
+    )
+
     if (!data || data.length === 0) {
         return (
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col h-full">
-                <div className="flex items-center gap-2 mb-6 shrink-0">
-                    <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                        <PieChartIcon className="w-5 h-5" />
-                    </div>
-                    <div>
-                        <h3 className="text-base font-bold text-slate-900">Workstream Backlog Distribution</h3>
-                        <p className="text-xs text-slate-500">Issue types created distribution on the workstream projects</p>
-                    </div>
-                </div>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full">
+                {header}
                 <div className="flex-1 flex items-center justify-center min-h-[250px] text-sm text-slate-400">
                     No backlog breakdown data yet
                 </div>
@@ -44,18 +45,10 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col h-full min-h-[220px]">
-            <div className="flex items-center gap-2 mb-2 shrink-0">
-                <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                    <PieChartIcon className="w-5 h-5" />
-                </div>
-                <div>
-                    <h3 className="text-base font-bold text-slate-900">Workstream Backlog Distribution</h3>
-                    <p className="text-xs text-slate-500">Issue types created distribution on the workstream projects</p>
-                </div>
-            </div>
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full min-h-[220px]">
+            {header}
 
-            <div className="flex-1 h-full min-h-[180px] mt-4 relative">
+            <div className="p-6 flex-1 relative min-h-[180px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart margin={{ top: 0, bottom: 0 }}>
                         <Pie

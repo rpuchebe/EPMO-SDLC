@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import { TrendingUp, TrendingDown, User } from 'lucide-react'
+import { TrendingUp, TrendingDown, User, Users } from 'lucide-react'
 
 interface Collaborator {
     name: string
@@ -33,28 +33,28 @@ export function CollaboratorsReport({
     const maxTickets = data.length > 0 ? Math.max(...data.map((c) => c.ticketCount)) : 1
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 h-full">
-            <div className="flex items-center justify-between mb-5">
-                <div>
-                    <h3 className="text-sm font-semibold text-slate-900">Contributors Report</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Ranked by ticket count</p>
-                </div>
-                <div className="flex bg-slate-100 p-0.5 rounded-lg space-x-1">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden h-full flex flex-col">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40 flex-shrink-0">
+                <div className="w-[3px] h-5 rounded-full bg-[#3b82f6] flex-shrink-0" />
+                <Users className="w-4 h-4 text-slate-500" />
+                <h3 className="text-sm font-semibold text-slate-800">Contributors Report</h3>
+                <div className="ml-auto flex bg-slate-100 p-0.5 rounded-lg space-x-1">
                     <button
                         onClick={() => setActiveTab('reporters')}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${activeTab === 'reporters' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${activeTab === 'reporters' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Reporters
                     </button>
                     <button
                         onClick={() => setActiveTab('assignees')}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${activeTab === 'assignees' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${activeTab === 'assignees' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Assignees
                     </button>
                 </div>
             </div>
 
+            <div className="p-6 flex-1 overflow-hidden">
             <div className="space-y-1 max-h-[750px] overflow-y-auto pr-1 hide-scrollbar">
                 {data.length === 0 && (
                     <p className="text-sm text-slate-400 text-center py-8">No reporters found</p>
@@ -125,6 +125,7 @@ export function CollaboratorsReport({
                         </div>
                     </button>
                 ))}
+            </div>
             </div>
         </div>
     )
