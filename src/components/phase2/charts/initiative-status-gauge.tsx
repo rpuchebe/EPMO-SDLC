@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 
 interface GaugeData {
     name: string
@@ -14,11 +14,19 @@ interface InitiativeStatusGaugeProps {
     total: number
 }
 
-export function InitiativeStatusGauge({ data, total }: InitiativeStatusGaugeProps) {
-    // The "Pending" or "To Do" is part of the total. 
-    // In our case, we have "Completed", "In Progress", and maybe "To Do" / "Not Started" / "Backlog".
+function GaugeTooltip({ active, payload }: any) {
+    if (!active || !payload || !payload.length) return null
+    const { name, value, color } = payload[0].payload
+    return (
+        <div className="bg-slate-800 text-white px-3 py-2 rounded-lg shadow-lg text-xs flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+            <span className="font-semibold">{name}:</span>
+            <span>{value}</span>
+        </div>
+    )
+}
 
-    // Sum of all values
+export function InitiativeStatusGauge({ data, total }: InitiativeStatusGaugeProps) {
     const sum = data.reduce((acc, curr) => acc + curr.value, 0)
     const pieData = data
 
@@ -44,6 +52,7 @@ export function InitiativeStatusGauge({ data, total }: InitiativeStatusGaugeProp
                 <div className="absolute inset-x-0 inset-y-0 h-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
+                            <Tooltip content={<GaugeTooltip />} />
                             <Pie
                                 data={pieData}
                                 cx="50%"
@@ -67,7 +76,7 @@ export function InitiativeStatusGauge({ data, total }: InitiativeStatusGaugeProp
                 {/* Center Text */}
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none translate-y-3">
                     <span className="text-[32px] font-extrabold text-slate-800 leading-none tracking-tight">{total}</span>
-                    <span className="text-[12px] font-bold text-slate-500 mt-1 uppercase tracking-widest">{total === 1 ? 'Created' : 'Created'}</span>
+                    <span className="text-[12px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Created</span>
                 </div>
             </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { Activity, CheckCircle, Network, FileX, ChevronRight } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { MiniBarChart } from './charts/mini-bar-chart'
 import { MiniDonutChart } from './charts/mini-donut-chart'
 import { SemiGaugeChart } from './charts/semi-gauge-chart'
@@ -22,8 +23,11 @@ export function ProjectsSection({ data }: ProjectsSectionProps) {
     }
 
     return (
-        <section className="mb-8">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Projects</h2>
+        <section className="space-y-6 bg-[#8b5cf6]/10 p-6 rounded-3xl border border-[#8b5cf6]/20 mb-8">
+            <div className="flex items-center gap-3">
+                <Image src="/projects-icon.png" width={28} height={28} alt="Projects Icon" className="rounded-md" />
+                <h2 className="text-xl font-bold text-slate-900 tracking-tight">Projects</h2>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-7 gap-4">
 

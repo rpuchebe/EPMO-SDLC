@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Image from 'next/image'
 import { Activity, AlertTriangle, Calendar, AlertOctagon, Waypoints, Clock, ShieldAlert, CheckCircle2, CircleDashed, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { InvestmentCategoryDonut } from './charts/investment-category-donut'
 import { InitiativeStatusGauge } from './charts/initiative-status-gauge'
+import { WorkstreamBarChart } from './charts/workstream-bar-chart'
 import { IssueListModal, ColumnDef } from './modals/issue-list-modal'
 import { format } from 'date-fns'
 
@@ -66,6 +68,19 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
             value: counts[c.name],
             color: c.color
         })).filter(c => c.value > 0)
+    }, [initiatives])
+
+    // --- Workstream Distribution ---
+    const WORKSTREAM_COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#f43f5e', '#06b6d4', '#84cc16', '#a855f7']
+    const workstreamData = useMemo(() => {
+        const counts: Record<string, number> = {}
+        initiatives.forEach(i => {
+            const ws = i.workstream || 'Unassigned'
+            counts[ws] = (counts[ws] || 0) + 1
+        })
+        return Object.entries(counts)
+            .map(([name, count], i) => ({ name, count, color: WORKSTREAM_COLORS[i % WORKSTREAM_COLORS.length] }))
+            .sort((a, b) => b.count - a.count)
     }, [initiatives])
 
     // --- Row 2 Governance Logic ---
@@ -149,33 +164,45 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
 
 
     return (
-        <section className="mb-12 pb-6 space-y-6">
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">Workstream Initiatives</h2>
+        <section className="space-y-6 bg-[#39c4d0]/10 p-6 rounded-3xl border border-[#39c4d0]/20 mb-8">
+            <div className="flex items-center gap-3">
+                <Image src="/initiatives-icon.png" width={28} height={28} alt="Initiatives Icon" className="rounded-md" />
+                <h2 className="text-xl font-bold text-slate-900 tracking-tight">Workstream Initiatives</h2>
+            </div>
 
             {/* --- ROW 1: Metrics & Donut --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 h-[200px] max-h-[200px]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-[200px] max-h-[200px]">
 
-                {/* Metrics Card */}
+                {/* 1. Initiative Progress */}
                 <div
                     onClick={() => openModal('All Initiatives', initiatives, [...baseColumns, childsColumn])}
-                    className="col-span-1 lg:col-span-1 bg-white rounded-xl border border-slate-200 shadow-sm p-5 cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all group flex flex-col"
+                    className="col-span-1 bg-white rounded-xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all group flex flex-col"
                 >
-                    <div className="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 className="text-sm font-semibold text-slate-700">Initiative Progress</h3>
-                        </div>
-                    </div>
-
+                    <h3 className="text-sm font-semibold text-slate-700 mb-1">Initiative Progress</h3>
                     <div className="flex-1 flex flex-col justify-end">
                         <InitiativeStatusGauge data={gaugeData} total={createdCount} />
                     </div>
                 </div>
 
-                {/* Investment Category Donut */}
-                <div className="col-span-1 lg:col-span-1 relative group flex flex-col h-full rounded-xl bg-white border border-slate-200 shadow-sm p-5 hover:border-indigo-300 hover:shadow-md transition-all">
-                    <div className="flex justify-between items-center mb-2 z-10 relative">
+                {/* 2. By Workstream */}
+                <div
+                    onClick={() => openModal('All Initiatives by Workstream', initiatives, [...baseColumns, childsColumn])}
+                    className="col-span-1 bg-white rounded-xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all flex flex-col"
+                >
+                    <h3 className="text-sm font-semibold text-slate-700 mb-1">By Workstream</h3>
+                    <div className="flex-1 min-h-0">
+                        <WorkstreamBarChart
+                            data={workstreamData}
+                            onClickBar={(ws) => openModal(`Workstream: ${ws}`, initiatives.filter(i => i.workstream === ws), [...baseColumns, childsColumn])}
+                        />
+                    </div>
+                </div>
+
+                {/* 3. Investment Category */}
+                <div className="col-span-1 relative group flex flex-col h-full rounded-xl bg-white border border-slate-200 shadow-sm p-4 hover:border-indigo-300 hover:shadow-md transition-all">
+                    <div className="flex justify-between items-center mb-1 z-10 relative">
                         <h3 className="text-sm font-semibold text-slate-700">Investment Category</h3>
-                        <div className="flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium bg-rose-50 text-rose-600">
+                        <div className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-rose-50 text-rose-600">
                             <TrendingUp className="w-3 h-3" />
                             +4.2% Unassigned vs last week
                         </div>

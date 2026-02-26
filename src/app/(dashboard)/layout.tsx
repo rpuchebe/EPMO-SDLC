@@ -22,7 +22,7 @@ export default async function DashboardLayout({
             <SidebarWrapper />
             <div className="flex-1 flex flex-col h-full overflow-hidden">
                 <Header user={user} />
-                <main className="flex-1 overflow-y-auto p-6 md:p-8">
+                <main className="flex-1 overflow-y-auto pt-1 px-6 pb-6 md:pt-1 md:px-8 md:pb-8">
                     <div className="max-w-7xl mx-auto">
                         {children}
                     </div>

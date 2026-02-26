@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch / utility scripts
+test-*.js
+puppeteer_test.js
+create-user.js
+run-*.js
+seed_update.sql

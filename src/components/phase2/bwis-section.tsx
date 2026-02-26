@@ -2,6 +2,7 @@
 
 import { Briefcase, AlertTriangle, ChevronRight, Activity } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { MiniDonutChart } from './charts/mini-donut-chart'
 import { StackedBarChart } from './charts/stacked-bar-chart'
 
@@ -23,8 +24,11 @@ export function BwisSection({ data }: BwisSectionProps) {
     }
 
     return (
-        <section className="mb-8">
-            <h2 className="text-lg font-semibold text-slate-900 mb-4">Business Work Items (BWI)</h2>
+        <section className="space-y-6 bg-[#22c55e]/10 p-6 rounded-3xl border border-[#22c55e]/20 mb-8">
+            <div className="flex items-center gap-3">
+                <Image src="/bwi-icon.png" width={28} height={28} alt="BWI Icon" className="rounded-md" />
+                <h2 className="text-xl font-bold text-slate-900 tracking-tight">Business Work Items (BWI)</h2>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
