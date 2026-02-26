@@ -54,7 +54,7 @@ export function IncidentKpiCards({ kpis, activeFilter = 'total', onFilterChange 
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-2 w-full">
             {kpis.map((card) => {
                 const deltaInfo = getDeltaInfo(card.deltaAbsolute, card.deltaPercent, true) // inverted = true because incidents are bad
                 const sparkData = card.sparkline.map((val: number, i: number) => ({ index: i, value: val }))
@@ -104,54 +104,52 @@ export function IncidentKpiCards({ kpis, activeFilter = 'total', onFilterChange 
                         className={`w-full bg-white rounded-2xl text-left
                                     transition-all duration-300 ease-out cursor-pointer outline-none focus:outline-none focus:ring-0
                                     ${opacityClass} ${activeStyleClass}
-                                    p-4 pt-3.5 flex flex-col h-[153px] relative overflow-hidden`}
+                                    p-4 pt-3.5 flex flex-col h-[155px] relative overflow-hidden`}
                         style={{ outline: 'none' }}
                     >
                         {/* Title Row */}
-                        <div className="flex items-center gap-2 mb-2 relative z-10">
-                            <div className={`flex items-center justify-center w-[26px] h-[26px] rounded-lg ${bgClass} ${textClass}`}>
-                                <IconOption className="w-4 h-4 stroke-[2.5]" />
+                        <div className="flex items-center gap-1.5 mb-2 relative z-10">
+                            <div className={`flex items-center justify-center w-[22px] h-[22px] rounded-lg ${bgClass} ${textClass}`}>
+                                <IconOption className="w-3.5 h-3.5 stroke-[2.5]" />
                             </div>
-                            <span className="text-[14px] font-semibold text-slate-700 truncate">{card.label}</span>
+                            <span className="text-[12px] font-medium text-slate-600 truncate">{card.label}</span>
                         </div>
 
                         {/* Main KPI Value & WoW */}
-                        <div className="flex items-end justify-between mb-3 relative z-10 pl-1">
-                            <div className="text-4xl leading-none font-bold text-slate-800 tracking-tight">
+                        <div className="flex items-end justify-between mb-3 relative z-10">
+                            <div className="text-[28px] leading-none font-bold text-slate-800 tracking-tight">
                                 {card.value}
                             </div>
                             <div className="flex flex-col items-end">
-                                <span className={`flex items-center text-sm font-bold leading-none ${deltaInfo.color}`}>
-                                    {deltaInfo.abs !== '0' && <deltaInfo.Icon className="w-3.5 h-3.5 mr-[2px]" strokeWidth={3} />}
+                                <span className={`flex items-center text-[13px] font-bold leading-none ${deltaInfo.color}`}>
+                                    {deltaInfo.abs !== '0' && <deltaInfo.Icon className="w-3 h-3 mr-[2px]" strokeWidth={3} />}
                                     {deltaInfo.abs !== '0' ? deltaInfo.abs : '-'}
                                 </span>
                                 {deltaInfo.abs !== '0' && (
-                                    <span className={`text-[11px] font-semibold mt-[2px] opacity-90 ${deltaInfo.color}`}>
+                                    <span className={`text-[10px] font-semibold mt-[2px] opacity-90 ${deltaInfo.color}`}>
                                         ({deltaInfo.pct}%)
                                     </span>
                                 )}
-                                {deltaInfo.abs === '0' && (
-                                    <span className="text-[11px] font-medium mt-[2px] text-slate-400">
-                                        no change
-                                    </span>
-                                )}
                             </div>
                         </div>
+
+                        {/* Divider */}
+                        <div className="w-full h-px bg-slate-100 mb-2 relative z-10" />
 
                         {/* Data Sub-metrics */}
-                        <div className="flex flex-col gap-1 z-10 relative mb-2">
-                            <div className="flex justify-between items-center text-xs leading-tight">
-                                <span className="text-slate-500 font-medium">Completed</span>
-                                <span className="font-bold text-emerald-600">{card.completedCount}</span>
+                        <div className="flex flex-col gap-[3px] z-10 relative">
+                            <div className="flex justify-between items-center text-[10.5px] leading-tight">
+                                <span className="text-slate-500">Completed</span>
+                                <span className="font-semibold text-emerald-600">{card.completedCount}</span>
                             </div>
-                            <div className="flex justify-between items-center text-xs leading-tight">
-                                <span className="text-slate-500 font-medium">Postmortems</span>
-                                <span className="font-bold text-slate-700">{card.postmortemCount}</span>
+                            <div className="flex justify-between items-center text-[10.5px] leading-tight">
+                                <span className="text-slate-500">Postmortems</span>
+                                <span className="font-semibold text-slate-700">{card.postmortemCount}</span>
                             </div>
                         </div>
 
-                        {/* Sparkline chart at very bottom (behind) */}
-                        <div className="absolute bottom-0 left-0 right-0 h-[45px] pointer-events-none opacity-50 z-0">
+                        {/* Sparkline */}
+                        <div className="absolute bottom-0 left-0 right-0 h-[36px] pointer-events-none opacity-50 z-0">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={sparkData} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
                                     <defs>
@@ -165,7 +163,7 @@ export function IncidentKpiCards({ kpis, activeFilter = 'total', onFilterChange 
                                         type="monotone"
                                         dataKey="value"
                                         stroke={hex}
-                                        strokeWidth={2}
+                                        strokeWidth={1.5}
                                         strokeOpacity={0.5}
                                         fill={`url(#grad-${card.id})`}
                                         isAnimationActive={false}
