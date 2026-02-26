@@ -1,0 +1,75 @@
+'use client'
+
+import React from 'react'
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts'
+
+interface GaugeData {
+    name: string
+    value: number
+    color: string
+}
+
+interface InitiativeStatusGaugeProps {
+    data: GaugeData[]
+    total: number
+}
+
+export function InitiativeStatusGauge({ data, total }: InitiativeStatusGaugeProps) {
+    // The "Pending" or "To Do" is part of the total. 
+    // In our case, we have "Completed", "In Progress", and maybe "To Do" / "Not Started" / "Backlog".
+
+    // Sum of all values
+    const sum = data.reduce((acc, curr) => acc + curr.value, 0)
+    const pieData = data
+
+    return (
+        <div className="flex flex-row items-center justify-between w-full h-full relative pt-0 pl-2">
+            {/* Legends (Left) */}
+            <div className="flex flex-col items-start justify-center gap-4">
+                {data.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                        <span
+                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: item.color }}
+                        />
+                        <span className="text-sm font-medium text-slate-600 whitespace-nowrap">
+                            {item.name}
+                        </span>
+                    </div>
+                ))}
+            </div>
+
+            {/* Gauge (Right) */}
+            <div className="relative flex-1 min-h-[160px] flex items-end justify-center -mt-10">
+                <div className="absolute inset-x-0 inset-y-0 h-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={pieData}
+                                cx="50%"
+                                cy="100%"
+                                startAngle={180}
+                                endAngle={0}
+                                innerRadius="78%"
+                                outerRadius="120%"
+                                paddingAngle={2}
+                                dataKey="value"
+                                stroke="none"
+                                cornerRadius={sum > 0 ? 8 : 0}
+                            >
+                                {pieData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                            </Pie>
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+                {/* Center Text */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none translate-y-3">
+                    <span className="text-[32px] font-extrabold text-slate-800 leading-none tracking-tight">{total}</span>
+                    <span className="text-[12px] font-bold text-slate-500 mt-1 uppercase tracking-widest">{total === 1 ? 'Created' : 'Created'}</span>
+                </div>
+            </div>
+        </div>
+    )
+}

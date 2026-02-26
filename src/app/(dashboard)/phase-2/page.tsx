@@ -6,7 +6,6 @@ import { DashboardHeader } from '@/components/phase2/dashboard-header'
 import { InitiativesSection } from '@/components/phase2/initiatives-section'
 import { ProjectsSection } from '@/components/phase2/projects-section'
 import { BwisSection } from '@/components/phase2/bwis-section'
-import { CleanupProgress } from '@/components/phase2/cleanup-progress'
 import { Loader2 } from 'lucide-react'
 
 export default function Phase2Page() {
@@ -63,7 +62,6 @@ export default function Phase2Page() {
     return (
         <div className="max-w-7xl mx-auto space-y-6">
             <DashboardHeader lastSync={data.lastSync} />
-            <CleanupProgress data={data.cleanupProgress} />
             <InitiativesSection data={data.initiatives} />
             <ProjectsSection data={data.projects} />
             <BwisSection data={data.bwi} />
