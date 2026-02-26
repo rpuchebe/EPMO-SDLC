@@ -1,7 +1,7 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
-import { X, Presentation, Route, ExternalLink } from 'lucide-react'
+import { useRef, useEffect, useState } from 'react'
+import { X, Presentation, Route, ExternalLink, Play } from 'lucide-react'
 
 interface InfoModalProps {
     open: boolean
@@ -10,22 +10,51 @@ interface InfoModalProps {
 
 const LINKS = {
     walkthrough: 'https://drive.google.com/file/d/1C6kCFrzQ1Towrz86OKGVMFFiT3PjRCm3/view',
-    presentation: 'https://drive.google.com/drive/folders/1tcpFwOBXPVaidU-GtTSyBbJay38tXKAX',
 }
 
 export function InfoModal({ open, onClose }: InfoModalProps) {
     const overlayRef = useRef<HTMLDivElement>(null)
+    const [showVideo, setShowVideo] = useState(false)
 
     useEffect(() => {
-        if (!open) return
+        if (!open) {
+            setShowVideo(false)
+            return
+        }
         const handler = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose()
+            if (e.key === 'Escape') {
+                if (showVideo) setShowVideo(false)
+                else onClose()
+            }
         }
         document.addEventListener('keydown', handler)
         return () => document.removeEventListener('keydown', handler)
-    }, [open, onClose])
+    }, [open, onClose, showVideo])
 
     if (!open) return null
+
+    if (showVideo) {
+        return (
+            <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="relative w-full max-w-5xl mx-4 aspect-video rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                    <button
+                        onClick={() => setShowVideo(false)}
+                        className="absolute top-4 right-4 z-50 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                    <video
+                        className="w-full h-full object-cover"
+                        controls
+                        autoPlay
+                        src="/Phase 0 - Business Ideation.mp4"
+                    >
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center">
@@ -86,18 +115,16 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
                         Walkthrough
                         <ExternalLink className="w-3 h-3 text-indigo-400" />
                     </a>
-                    <a
-                        href={LINKS.presentation}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <button
+                        onClick={() => setShowVideo(true)}
                         className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5
                                    text-sm font-medium text-violet-700 bg-violet-50 hover:bg-violet-100
-                                   rounded-xl transition-all duration-200 group"
+                                   rounded-xl transition-all duration-200 group relative"
                     >
                         <Presentation className="w-4 h-4 text-violet-500 group-hover:text-violet-600" />
                         Presentation
-                        <ExternalLink className="w-3 h-3 text-violet-400" />
-                    </a>
+                        <Play className="w-3 h-3 text-violet-400 fill-violet-400 opacity-0 group-hover:opacity-100 -ml-1 transition-opacity absolute right-4" />
+                    </button>
                 </div>
             </div>
         </div>

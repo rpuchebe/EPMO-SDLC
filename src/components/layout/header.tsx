@@ -325,7 +325,7 @@ export function Header({ user }: { user: any }) {
                                 }}
                                 className="flex items-center gap-3 hover:bg-slate-50 p-1.5 pr-2 rounded-full transition-colors border border-transparent hover:border-slate-200"
                             >
-                                {avatar ? (
+                                {avatar && !avatar.startsWith('https://secure.gravatar.com/avatar/') ? (
                                     <img src={avatar} alt={name} className="w-8 h-8 rounded-full border border-slate-200 object-cover" />
                                 ) : (
                                     <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-white text-xs font-bold shadow-inner">

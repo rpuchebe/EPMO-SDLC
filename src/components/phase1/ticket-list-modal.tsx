@@ -17,6 +17,7 @@ export interface Phase1Ticket {
     roi_score: number | null
     reporter_display_name: string | null
     reporter_avatar_url: string | null
+    assignee_display_name: string | null
     assignee_avatar_url: string | null
     linked_work_item_count: number | null
     linked_work_items?: { key: string; status: string; issue_type: string; summary?: string }[] | null
@@ -130,7 +131,7 @@ export function TicketListModal({ open, title, tickets, onClose }: TicketListMod
                                         </td>
                                         <td className="px-4 py-2.5">
                                             <div className="flex items-center gap-1.5">
-                                                {t.reporter_avatar_url ? (
+                                                {t.reporter_avatar_url && !t.reporter_avatar_url.startsWith('https://secure.gravatar.com/avatar/') ? (
                                                     <img src={t.reporter_avatar_url} alt="" className="w-5 h-5 rounded-full" />
                                                 ) : (
                                                     <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">

@@ -10,10 +10,12 @@ export interface BaseKPI {
     sparkline: number[]
     avgAge?: number | string
     unassigned?: number
+    declined?: number
     oldestTicket?: number | string
     linkedItems?: number
     avgDaysToDone?: number
     completedThisMonth?: number
+    readyForDiscovery?: number
 }
 
 export interface LinkedItemBreakdown {
@@ -151,7 +153,17 @@ export function KpiCards({ kpis, onDrillDown }: KpiCardsProps) {
         // Construct metrics array mapping Phase 0 style
         let metrics: CardMetric[] = []
 
-        if (c.key === 'discoveryItems' || c.key === 'maintenanceRTB' || c.key === 'inDiscovery' || c.key === 'definitionGate') {
+        if (c.key === 'discoveryItems' || c.key === 'maintenanceRTB') {
+            metrics = [
+                { label: 'Avg age', value: `${kpiData?.avgAge || 0}d` },
+                { label: 'Declined', value: `${kpiData?.declined || 0}` },
+            ]
+        } else if (c.key === 'inDiscovery') {
+            metrics = [
+                { label: 'Avg age', value: `${kpiData?.avgAge || 0}d` },
+                { label: 'Ready for Disc', value: `${kpiData?.readyForDiscovery || 0}` },
+            ]
+        } else if (c.key === 'definitionGate') {
             metrics = [
                 { label: 'Avg age', value: `${kpiData?.avgAge || 0}d` },
                 { label: 'Unassigned', value: `${kpiData?.unassigned || 0}`, isAlert: (kpiData?.unassigned || 0) > 0 },

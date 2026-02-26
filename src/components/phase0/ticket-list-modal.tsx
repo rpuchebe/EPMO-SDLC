@@ -115,7 +115,7 @@ export function TicketListModal({ open, title, tickets, onClose }: TicketListMod
                                         </td>
                                         <td className="px-4 py-2.5">
                                             <div className="flex items-center gap-1.5">
-                                                {t.reporter_avatar_url ? (
+                                                {t.reporter_avatar_url && !t.reporter_avatar_url.startsWith('https://secure.gravatar.com/avatar/') ? (
                                                     <img src={t.reporter_avatar_url} alt="" className="w-5 h-5 rounded-full" />
                                                 ) : (
                                                     <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">

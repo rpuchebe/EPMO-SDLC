@@ -33,7 +33,7 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
                     </div>
                     <div>
                         <h3 className="text-base font-bold text-slate-900">Workstream Backlog Distribution</h3>
-                        <p className="text-xs text-slate-500">Linked issue types for backlog tickets</p>
+                        <p className="text-xs text-slate-500">Issue types created distribution on the workstream projects</p>
                     </div>
                 </div>
                 <div className="flex-1 flex items-center justify-center min-h-[250px] text-sm text-slate-400">
@@ -44,26 +44,26 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col h-full min-h-[280px]">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col h-full min-h-[220px]">
             <div className="flex items-center gap-2 mb-2 shrink-0">
                 <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
                     <PieChartIcon className="w-5 h-5" />
                 </div>
                 <div>
                     <h3 className="text-base font-bold text-slate-900">Workstream Backlog Distribution</h3>
-                    <p className="text-xs text-slate-500">Linked issue types for backlog tickets</p>
+                    <p className="text-xs text-slate-500">Issue types created distribution on the workstream projects</p>
                 </div>
             </div>
 
-            <div className="flex-1 h-full min-h-[240px] mt-4 relative">
+            <div className="flex-1 h-full min-h-[180px] mt-4 relative">
                 <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
+                    <PieChart margin={{ top: 0, bottom: 0 }}>
                         <Pie
                             data={data}
                             cx="50%"
                             cy="45%"
-                            innerRadius={50}
-                            outerRadius={80}
+                            innerRadius={45}
+                            outerRadius={65}
                             paddingAngle={3}
                             dataKey="count"
                             nameKey="type"
@@ -95,12 +95,12 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
                         />
                         <Legend
                             verticalAlign="bottom"
-                            height={36}
+                            height={28}
                             content={(props) => {
                                 const { payload } = props;
                                 if (!payload) return null;
                                 return (
-                                    <ul className="flex flex-wrap justify-center gap-4 mt-8">
+                                    <ul className="flex flex-wrap justify-center gap-3 mt-0">
                                         {payload.map((entry, index) => (
                                             <li
                                                 key={`item-${index}`}
@@ -123,7 +123,7 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
 
                 {/* Center label */}
                 <div className="absolut inset-0 pointer-events-none flex flex-col items-center justify-center text-center pb-8 absolute top-0 left-0 right-0 bottom-0 h-[90%]">
-                    <span className="text-3xl font-bold tracking-tight text-slate-900">
+                    <span className="text-xl font-bold tracking-tight text-slate-900">
                         {data.reduce((sum, item) => sum + item.count, 0)}
                     </span>
                     <span className="text-xs text-slate-500 font-medium tracking-wide uppercase mt-0.5">

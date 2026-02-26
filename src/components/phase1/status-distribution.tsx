@@ -17,11 +17,13 @@ interface StatusDistributionProps {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-    'Needs more information': '#f59e0b', // Amber
+    'Waiting for triage': '#f59e0b', // Amber
+    'Ready for Discovery': '#2dd4bf', // Teal/cyan
     'Discovery': '#38bdf8', // Sky
-    'Internal audit': '#a78bfa', // Violet
-    'Backlog': '#64748b', // Slate
+    'Definition Gate': '#a78bfa', // Violet
+    'Moved to Workstream Backlog': '#64748b', // Slate
     'Done': '#10b981', // Emerald
+    "Won't do": '#ef4444', // Red
 }
 
 function getBarColor(status: string): string {
@@ -29,11 +31,13 @@ function getBarColor(status: string): string {
 }
 
 const STATUS_ORDER = [
-    'Needs more information',
+    'Waiting for triage',
+    'Ready for Discovery',
     'Discovery',
-    'Internal audit',
-    'Backlog',
+    'Definition Gate',
+    'Moved to Workstream Backlog',
     'Done',
+    "Won't do"
 ]
 
 // Sort by fixed order, put unknown statuses at the end

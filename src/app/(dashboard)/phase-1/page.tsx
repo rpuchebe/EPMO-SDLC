@@ -18,7 +18,8 @@ interface DashboardData {
     tickets: Phase1Ticket[]
     timeline: { count_date: string; workstream: string; ticket_type: string; ticket_count: number }[]
     statusDistribution: { status: string; count: number; avgDaysInStatus: number | null; avgRoi: number | null }[]
-    collaborators: { name: string; avatar: string | null; ticketCount: number; avgRoi: number | null }[]
+    collaborators: { name: string; avatar: string | null; ticketCount: number; avgRoi: number | null; avgOriginalRoi: number | null }[]
+    assignees: { name: string; avatar: string | null; ticketCount: number; avgRoi: number | null; avgOriginalRoi: number | null }[]
     workstreams: string[]
     lastSync: string | null
 }
@@ -41,24 +42,23 @@ function filterByKpi(tickets: Phase1Ticket[], kpiKey: string): Phase1Ticket[] {
         case 'maintenanceRTB': return tickets.filter(t => t.ticket_type === 'Maintenance (RTB)')
         case 'waitingForTriage': return tickets.filter(t => {
             const s = (t.status || '').toLowerCase()
-            return s === 'needs more information' || s === 'needs more info' || s === 'waiting for triage'
+            return s === 'needs more information' || s === 'needs more info' || s === 'waiting for triage' || s === 'open'
         })
         case 'inDiscovery': return tickets.filter(t => {
             const s = (t.status || '').toLowerCase()
-            return s === 'discovery' || s === 'ready for discovery' || s === 'in progress'
+            return s === 'discovery' || s === 'in progress'
         })
         case 'definitionGate': return tickets.filter(t => {
             const s = (t.status || '').toLowerCase()
-            return s === 'internal audit' || s === 'definition gate'
+            return s === 'internal audit' || s === 'definition gate' || s === 'pending sign-off'
         })
         case 'atWorkstreamBacklog': return tickets.filter(t => {
             const s = (t.status || '').toLowerCase()
             return s === 'backlog' || s === 'moved to workstream backlog'
         })
         case 'completedItems': return tickets.filter(t => {
-            const sCat = (t.status_category || '').toLowerCase()
             const s = (t.status || '').toLowerCase()
-            return sCat === 'done' || s === 'done' || !!t.completed_at
+            return s === 'done'
         })
         default: return tickets
     }
@@ -137,11 +137,30 @@ export default function Phase1Page() {
     }
 
     const handleStatusDrillDown = (status: string) => {
-        setDrillDown({ title: `Status: ${status}`, tickets: tickets.filter(t => t.status === status) })
+        const getMappedStatus = (originalStatus: string) => {
+            const sLower = (originalStatus || '').toLowerCase()
+            if (sLower === 'open' || sLower === 'waiting for triage' || sLower === 'needs more information' || sLower === 'needs more info') return 'Waiting for triage'
+            if (sLower === 'ready for discovery') return 'Ready for Discovery'
+            if (sLower === 'in progress' || sLower === 'discovery') return 'Discovery'
+            if (sLower === 'pending sign-off' || sLower === 'internal audit' || sLower === 'definition gate') return 'Definition Gate'
+            if (sLower === 'moved to workstream backlog' || sLower === 'backlog') return 'Moved to Workstream Backlog'
+            if (sLower === 'done') return 'Done'
+            if (sLower === 'declined' || sLower === 'descoped' || sLower === "won't do") return "Won't do"
+            return originalStatus
+        }
+
+        setDrillDown({
+            title: `Status: ${status}`,
+            tickets: tickets.filter(t => getMappedStatus(t.status) === status)
+        })
     }
 
     const handleCollaboratorDrillDown = (name: string) => {
         setDrillDown({ title: `Reporter: ${name}`, tickets: tickets.filter(t => (t.reporter_display_name || 'Unknown') === name) })
+    }
+
+    const handleAssigneeDrillDown = (name: string) => {
+        setDrillDown({ title: `Assignee: ${name}`, tickets: tickets.filter(t => (t.assignee_display_name || 'Unassigned') === name) })
     }
 
     const handleBacklogDrillDown = (type: string) => {
@@ -169,6 +188,7 @@ export default function Phase1Page() {
                             roi_score: null,
                             reporter_display_name: parentTicket.reporter_display_name,
                             reporter_avatar_url: parentTicket.reporter_avatar_url,
+                            assignee_display_name: parentTicket.assignee_display_name,
                             assignee_avatar_url: parentTicket.assignee_avatar_url,
                             linked_work_item_count: null,
                             linked_work_items: null
@@ -200,6 +220,7 @@ export default function Phase1Page() {
     const timeline = data?.timeline || []
     const statusDistribution = data?.statusDistribution || []
     const collaborators = data?.collaborators || []
+    const assignees = data?.assignees || []
     const lastSync = data?.lastSync || null
 
     return (
@@ -265,8 +286,10 @@ export default function Phase1Page() {
                                 onItemClick={handleBacklogDrillDown}
                             />
                             <CollaboratorsReport
-                                data={collaborators}
-                                onCollaboratorClick={handleCollaboratorDrillDown}
+                                reportersData={collaborators}
+                                assigneesData={assignees}
+                                onReporterClick={handleCollaboratorDrillDown}
+                                onAssigneeClick={handleAssigneeDrillDown}
                             />
                         </div>
                     </div>

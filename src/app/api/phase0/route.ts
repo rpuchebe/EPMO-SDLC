@@ -8,6 +8,7 @@ interface TicketRow {
     status_category: string
     workstream: string | null
     roi_score: number | null
+    original_roi: number | null
     created_at: string
     reporter_display_name: string | null
     reporter_avatar_url: string | null
@@ -35,7 +36,7 @@ const EMPTY_KPI = { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] }
 const EMPTY_RESPONSE = {
     kpis: {
         ideasSubmitted: EMPTY_KPI,
-        inProgressIdeas: EMPTY_KPI,
+        readyForDiscoveryIdeas: EMPTY_KPI,
         onDiscovery: EMPTY_KPI,
         atWorkstream: EMPTY_KPI,
         completedIdeas: EMPTY_KPI,
@@ -145,7 +146,7 @@ export async function GET(request: NextRequest) {
         }
 
         const totalTickets = typedTickets
-        const wipTickets = typedTickets.filter(t => t.status_category === 'In Progress')
+        const readyForDiscoveryTickets = typedTickets.filter(t => t.status && t.status.toLowerCase() === 'ready for discovery')
         const discoveryTickets = typedTickets.filter(t => t.status === 'Discovery')
         const workstreamTickets = typedTickets.filter(t => t.status === 'Moved to Workstream')
         const doneTickets = typedTickets.filter(t => t.status_category === 'Done' && t.status.toLowerCase() !== "won't do" && t.status.toLowerCase() !== 'wont do')
@@ -168,12 +169,12 @@ export async function GET(request: NextRequest) {
             conversionToDiscovery,
         }
 
-        // In Progress logic
-        const wipAges = wipTickets.map(t => (now.getTime() - new Date(t.created_at).getTime()) / (1000 * 60 * 60 * 24))
-        const avgAgeDays = wipAges.length ? Math.round(wipAges.reduce((a, b) => a + b, 0) / wipAges.length) : 0
-        const over14DaysCount = wipAges.filter(age => age > 14).length
-        const inProgressIdeasKpi = {
-            ...buildKpi(wipTickets),
+        // Ready for Discovery logic
+        const rfdAges = readyForDiscoveryTickets.map(t => (now.getTime() - new Date(t.created_at).getTime()) / (1000 * 60 * 60 * 24))
+        const avgAgeDays = rfdAges.length ? Math.round(rfdAges.reduce((a, b) => a + b, 0) / rfdAges.length) : 0
+        const over14DaysCount = rfdAges.filter(age => age > 14).length
+        const readyForDiscoveryIdeasKpi = {
+            ...buildKpi(readyForDiscoveryTickets),
             avgAgeDays,
             over14DaysCount
         }
@@ -239,7 +240,7 @@ export async function GET(request: NextRequest) {
 
         const kpisObj = {
             ideasSubmitted: ideasSubmittedKpi,
-            inProgressIdeas: inProgressIdeasKpi,
+            readyForDiscoveryIdeas: readyForDiscoveryIdeasKpi,
             onDiscovery: onDiscoveryKpi,
             atWorkstream: atWorkstreamKpi,
             completedIdeas: completedIdeasKpi,
@@ -309,6 +310,8 @@ export async function GET(request: NextRequest) {
             ticketCount: number
             roiSum: number
             roiCount: number
+            originalRoiSum: number
+            originalRoiCount: number
         }> = {}
 
         for (const t of typedTickets) {
@@ -320,12 +323,18 @@ export async function GET(request: NextRequest) {
                     ticketCount: 0,
                     roiSum: 0,
                     roiCount: 0,
+                    originalRoiSum: 0,
+                    originalRoiCount: 0,
                 }
             }
             collabMap[name].ticketCount++
             if (t.roi_score !== null) {
                 collabMap[name].roiSum += t.roi_score
                 collabMap[name].roiCount++
+            }
+            if (t.original_roi !== null && t.original_roi !== undefined) {
+                collabMap[name].originalRoiSum += t.original_roi
+                collabMap[name].originalRoiCount++
             }
         }
 
@@ -335,6 +344,7 @@ export async function GET(request: NextRequest) {
                 avatar: c.avatar,
                 ticketCount: c.ticketCount,
                 avgRoi: c.roiCount > 0 ? Math.round((c.roiSum / c.roiCount) * 10) / 10 : null,
+                avgOriginalRoi: c.originalRoiCount > 0 ? Math.round((c.originalRoiSum / c.originalRoiCount) * 10) / 10 : null,
             }))
             .sort((a, b) => b.ticketCount - a.ticketCount)
 

@@ -2,40 +2,49 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { Incident, FollowUpTicket, WorkstreamIncidentTicket, IncidentSyncLog } from '@/types/incidents'
 
-async function safeQuery<T>(result: { data: unknown | null; error: { message: string } | null }): Promise<T> {
-    const { data, error } = result
-    if (error) {
-        if (error.message?.includes('does not exist') || error.message?.includes('relation')) {
-            return [] as unknown as T
+async function fetchAll<T>(supabase: any, table: string): Promise<T[]> {
+    let allData: T[] = []
+    let page = 0
+    const pageSize = 1000
+    while (true) {
+        const { data, error } = await supabase
+            .from(table)
+            .select('*')
+            .range(page * pageSize, (page + 1) * pageSize - 1)
+
+        if (error) {
+            if (error.message?.includes('does not exist') || error.message?.includes('relation')) {
+                return []
+            }
+            throw new Error(error.message)
         }
-        throw new Error(error.message)
+        if (!data || data.length === 0) break
+        allData = allData.concat(data as T[])
+        if (data.length < pageSize) break
+        page++
     }
-    return (data as T) || ([] as unknown as T)
+    return allData
 }
 
 export async function GET(request: NextRequest) {
     const supabase = await createClient()
 
     try {
-        // Fetch all data
-        const incidents = await safeQuery<Incident[]>(
-            await supabase.from('incidents').select('*')
-        )
-
-        const followups = await safeQuery<FollowUpTicket[]>(
-            await supabase.from('followups').select('*')
-        )
-
-        const workstreamTickets = await safeQuery<WorkstreamIncidentTicket[]>(
-            await supabase.from('workstream_incident_tickets').select('*')
-        )
+        // Fetch all data using pagination
+        const incidents = await fetchAll<Incident>(supabase, 'incidents')
+        const followups = await fetchAll<FollowUpTicket>(supabase, 'followups')
+        const workstreamTickets = await fetchAll<WorkstreamIncidentTicket>(supabase, 'workstream_incident_tickets')
 
         let lastSync: string | null = null
         try {
-            const syncLog = await safeQuery<IncidentSyncLog[]>(
-                await supabase.from('incident_sync_log').select('last_updated').order('last_updated', { ascending: false }).limit(1)
-            )
-            lastSync = syncLog?.[0]?.last_updated || null
+            const { data, error } = await supabase
+                .from('incident_sync_log')
+                .select('last_updated')
+                .order('last_updated', { ascending: false })
+                .limit(1)
+            if (!error && data && data.length > 0) {
+                lastSync = data[0].last_updated
+            }
         } catch { }
 
         // We can just return everything to the client and let the client filter by dates/impacts,

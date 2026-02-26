@@ -15,7 +15,7 @@ export interface IdeasSubmittedKPI extends BaseKPI {
     conversionToDiscovery: number
 }
 
-export interface InProgressKPI extends BaseKPI {
+export interface ReadyForDiscoveryKPI extends BaseKPI {
     avgAgeDays: number
     over14DaysCount: number
 }
@@ -42,7 +42,7 @@ export interface AvgRoiScoringKPI extends BaseKPI {
 
 export interface KPIs {
     ideasSubmitted: IdeasSubmittedKPI
-    inProgressIdeas: InProgressKPI
+    readyForDiscoveryIdeas: ReadyForDiscoveryKPI
     onDiscovery: OnDiscoveryKPI
     atWorkstream: AtWorkstreamKPI
     completedIdeas: CompletedIdeasKPI
@@ -101,17 +101,17 @@ export function KpiCards({ kpis, onDrillDown }: KpiCardsProps) {
             ] as CardMetric[]
         },
         {
-            key: 'inProgressIdeas' as const,
-            label: 'In Prog. Ideas',
+            key: 'readyForDiscoveryIdeas' as const,
+            label: 'Ready for Discovery',
             icon: Loader2,
             colorCls: 'text-amber-600',
             bgCls: 'bg-amber-50',
             hex: '#d97706',
-            data: kpis.inProgressIdeas,
+            data: kpis.readyForDiscoveryIdeas,
             inverseGood: true,
             metrics: [
-                { label: 'Avg age', value: `${kpis.inProgressIdeas.avgAgeDays}d` },
-                { label: `${kpis.inProgressIdeas.over14DaysCount} over 14d`, value: '', isAlert: kpis.inProgressIdeas.over14DaysCount > 0 },
+                { label: 'Avg age', value: `${kpis.readyForDiscoveryIdeas.avgAgeDays}d` },
+                { label: `${kpis.readyForDiscoveryIdeas.over14DaysCount} over 14d`, value: '', isAlert: kpis.readyForDiscoveryIdeas.over14DaysCount > 0 },
             ] as CardMetric[]
         },
         {

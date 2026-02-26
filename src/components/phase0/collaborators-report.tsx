@@ -1,12 +1,13 @@
 'use client'
 
-import { TrendingUp, User } from 'lucide-react'
+import { TrendingUp, TrendingDown, User } from 'lucide-react'
 
 interface Collaborator {
     name: string
     avatar: string | null
     ticketCount: number
     avgRoi: number | null
+    avgOriginalRoi: number | null
 }
 
 interface CollaboratorsReportProps {
@@ -44,7 +45,7 @@ export function CollaboratorsReport({ data, onCollaboratorClick }: Collaborators
                         {/* Avatar */}
                         <div className="w-9 h-9 rounded-full overflow-hidden bg-slate-100 shrink-0
                                         ring-2 ring-white shadow-sm flex items-center justify-center">
-                            {collaborator.avatar ? (
+                            {collaborator.avatar && !collaborator.avatar.startsWith('https://secure.gravatar.com/avatar/') ? (
                                 <img
                                     src={collaborator.avatar}
                                     alt={collaborator.name}
@@ -67,10 +68,21 @@ export function CollaboratorsReport({ data, onCollaboratorClick }: Collaborators
                                     {collaborator.ticketCount} ticket{collaborator.ticketCount !== 1 ? 's' : ''}
                                 </span>
                                 {collaborator.avgRoi !== null && (
-                                    <span className="inline-flex items-center gap-1 text-xs text-violet-600 font-medium">
-                                        <TrendingUp className="w-3 h-3" />
-                                        ROI {collaborator.avgRoi}
-                                    </span>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="inline-flex items-center gap-1 text-xs text-violet-600 font-medium">
+                                            <TrendingUp className="w-3 h-3" />
+                                            ROI {collaborator.avgRoi}
+                                        </span>
+                                        {collaborator.avgOriginalRoi !== null && Math.abs(collaborator.avgRoi - collaborator.avgOriginalRoi) > 0.1 && (
+                                            <span className={`inline-flex items-center gap-0.5 text-[10px] font-medium ${collaborator.avgRoi >= collaborator.avgOriginalRoi ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                                {collaborator.avgRoi >= collaborator.avgOriginalRoi ? (
+                                                    <>+{Math.round(collaborator.avgRoi - collaborator.avgOriginalRoi)}% <TrendingUp className="w-2.5 h-2.5" /></>
+                                                ) : (
+                                                    <>{Math.round(collaborator.avgRoi - collaborator.avgOriginalRoi)}% <TrendingDown className="w-2.5 h-2.5" /></>
+                                                )}
+                                            </span>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                             {/* Progress bar */}

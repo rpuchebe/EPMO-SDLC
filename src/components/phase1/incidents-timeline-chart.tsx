@@ -14,9 +14,7 @@ interface IncidentsTimelineChartProps {
 
 const IMPACT_COLORS = {
     1: '#ef4444', // Red for Impact 1
-    2: '#f97316', // Orange for Impact 2
-    3: '#eab308', // Yellow for Impact 3
-    4: '#3b82f6', // Blue for Impact 4
+    2: '#eab308', // Yellow for Impact 2
 }
 
 function aggregateByGranularity(
@@ -32,7 +30,7 @@ function aggregateByGranularity(
         const impactKey = `impact${incident.impact || 4}`
 
         if (!periodMap[key]) {
-            periodMap[key] = { impact1: 0, impact2: 0, impact3: 0, impact4: 0 }
+            periodMap[key] = { impact1: 0, impact2: 0 }
         }
         periodMap[key][impactKey] = (periodMap[key][impactKey] || 0) + 1
     }
@@ -159,9 +157,7 @@ export function IncidentsTimelineChart({ data }: IncidentsTimelineChartProps) {
                         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
 
                         <Bar dataKey="impact1" name="Impact 1" stackId="a" fill={IMPACT_COLORS[1]} radius={[0, 0, 4, 4]} />
-                        <Bar dataKey="impact2" name="Impact 2" stackId="a" fill={IMPACT_COLORS[2]} />
-                        <Bar dataKey="impact3" name="Impact 3" stackId="a" fill={IMPACT_COLORS[3]} />
-                        <Bar dataKey="impact4" name="Impact 4" stackId="a" fill={IMPACT_COLORS[4]} radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="impact2" name="Impact 2" stackId="a" fill={IMPACT_COLORS[2]} radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>

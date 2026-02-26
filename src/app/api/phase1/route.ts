@@ -17,6 +17,7 @@ interface Phase1TicketRow {
     assignee_display_name: string | null
     assignee_avatar_url: string | null
     roi_score: number | null
+    original_roi: number | null
     status_durations: Record<string, number> | null
     lead_time_seconds: number | null
     linked_work_items: { key: string; status: string; issue_type: string }[] | null
@@ -52,6 +53,7 @@ const EMPTY_RESPONSE = {
     timeline: [],
     statusDistribution: [],
     collaborators: [],
+    assignees: [],
     workstreams: [],
     teams: [],
     lastSync: null,
@@ -164,24 +166,28 @@ export async function GET(request: NextRequest) {
             return tickets.filter(t => !t.assignee_account_id).length
         }
 
+        const getDeclinedCount = (tickets: Phase1TicketRow[]) => {
+            return tickets.filter(t => (t.status || '').toLowerCase() === 'declined').length
+        }
+
         const discoveryItemsTickets = typedTickets.filter(t => t.ticket_type === 'Discovery' || t.ticket_type === 'Discovery Item')
         const discoveryItems = {
             ...buildKpi(discoveryItemsTickets, true),
             avgAge: getAvgAge(discoveryItemsTickets),
-            unassigned: getUnassignedCount(discoveryItemsTickets)
+            declined: getDeclinedCount(discoveryItemsTickets)
         }
 
         const maintenanceRTBTickets = typedTickets.filter(t => t.ticket_type === 'Maintenance (RTB)')
         const maintenanceRTB = {
             ...buildKpi(maintenanceRTBTickets, true),
             avgAge: getAvgAge(maintenanceRTBTickets),
-            unassigned: getUnassignedCount(maintenanceRTBTickets)
+            declined: getDeclinedCount(maintenanceRTBTickets)
         }
 
-        // Waiting for triage mapping: "Waiting for triage" and "Needs more info" (or "Needs more information")
+        // Waiting for triage mapping: "Waiting for triage", "Needs more info", "Open"
         const waitingForTriageTickets = typedTickets.filter(t => {
             const s = (t.status || '').toLowerCase()
-            return s === 'needs more information' || s === 'needs more info' || s === 'waiting for triage'
+            return s === 'needs more information' || s === 'needs more info' || s === 'waiting for triage' || s === 'open'
         })
         const waitingForTriage = {
             ...buildKpi(waitingForTriageTickets, true),
@@ -189,21 +195,25 @@ export async function GET(request: NextRequest) {
             unassigned: getUnassignedCount(waitingForTriageTickets)
         }
 
-        // In Discovery maps to "Discovery", "Ready for Discovery", "In Progress"
+        const getReadyForDiscoveryCount = (tickets: Phase1TicketRow[]) => {
+            return tickets.filter(t => (t.status || '').toLowerCase() === 'ready for discovery').length
+        }
+
+        // In Discovery maps to "Discovery", "In Progress"
         const inDiscoveryTickets = typedTickets.filter(t => {
             const s = (t.status || '').toLowerCase()
-            return s === 'discovery' || s === 'ready for discovery' || s === 'in progress'
+            return s === 'discovery' || s === 'in progress'
         })
         const inDiscovery = {
             ...buildKpi(inDiscoveryTickets, true),
             avgAge: getAvgAge(inDiscoveryTickets),
-            unassigned: getUnassignedCount(inDiscoveryTickets)
+            readyForDiscovery: getReadyForDiscoveryCount(typedTickets)
         }
 
-        // Definition Gate maps to "Internal audit" or "Definition Gate"
+        // Definition Gate maps to "Internal audit", "Definition Gate", "Pending Sign-Off"
         const definitionGateTickets = typedTickets.filter(t => {
             const s = (t.status || '').toLowerCase()
-            return s === 'internal audit' || s === 'definition gate'
+            return s === 'internal audit' || s === 'definition gate' || s === 'pending sign-off'
         })
         const definitionGate = {
             ...buildKpi(definitionGateTickets, true),
@@ -226,11 +236,10 @@ export async function GET(request: NextRequest) {
             }, 0)
         }
 
-        // Completed items maps to "Done" status or completed_at != null
+        // Completed items maps to "Done" status
         const completedItemsTickets = typedTickets.filter(t => {
-            const sCat = (t.status_category || '').toLowerCase()
             const s = (t.status || '').toLowerCase()
-            return sCat === 'done' || s === 'done' || !!t.completed_at
+            return s === 'done'
         })
         const completedItems = {
             ...buildKpi(completedItemsTickets, true),
@@ -297,19 +306,32 @@ export async function GET(request: NextRequest) {
         typedCounts.sort((a, b) => a.count_date.localeCompare(b.count_date))
 
         // ── Status Distribution ──
+        const getMappedStatus = (originalStatus: string) => {
+            const sLower = (originalStatus || '').toLowerCase()
+            if (sLower === 'open' || sLower === 'waiting for triage' || sLower === 'needs more information' || sLower === 'needs more info') return 'Waiting for triage'
+            if (sLower === 'ready for discovery') return 'Ready for Discovery'
+            if (sLower === 'in progress' || sLower === 'discovery') return 'Discovery'
+            if (sLower === 'pending sign-off' || sLower === 'internal audit' || sLower === 'definition gate') return 'Definition Gate'
+            if (sLower === 'moved to workstream backlog' || sLower === 'backlog') return 'Moved to Workstream Backlog'
+            if (sLower === 'done') return 'Done'
+            if (sLower === 'declined' || sLower === 'descoped' || sLower === "won't do") return "Won't do"
+            return originalStatus // Fallback for others
+        }
+
         const statusMap: Record<string, { count: number; roiSum: number; roiCount: number }> = {}
         for (const t of typedTickets) {
-            if (!statusMap[t.status]) statusMap[t.status] = { count: 0, roiSum: 0, roiCount: 0 }
-            statusMap[t.status].count++
+            const mappedStatus = getMappedStatus(t.status)
+            if (!statusMap[mappedStatus]) statusMap[mappedStatus] = { count: 0, roiSum: 0, roiCount: 0 }
+            statusMap[mappedStatus].count++
             if (t.roi_score !== null) {
-                statusMap[t.status].roiSum += t.roi_score
-                statusMap[t.status].roiCount++
+                statusMap[mappedStatus].roiSum += t.roi_score
+                statusMap[mappedStatus].roiCount++
             }
         }
 
-        // Calculate avg time in each status from status_durations JSONB field (values in seconds)
         const statusTimeMap: Record<string, number[]> = {}
         for (const t of typedTickets) {
+            const mappedStatus = getMappedStatus(t.status)
             if (!t.status_durations) continue
 
             let durations = t.status_durations
@@ -318,11 +340,17 @@ export async function GET(request: NextRequest) {
             }
             if (typeof durations !== 'object' || durations === null) continue
 
-            for (const [status, seconds] of Object.entries(durations)) {
+            for (const [statusKey, seconds] of Object.entries(durations)) {
                 if (typeof seconds !== 'number' || seconds <= 0) continue
                 const days = seconds / 86400
-                if (!statusTimeMap[status]) statusTimeMap[status] = []
-                statusTimeMap[status].push(days)
+                // Match the specific original status to its duration and bucket it into the mapped status
+                const mappedDurStatus = getMappedStatus(statusKey)
+                if (mappedDurStatus === mappedStatus) {
+                    // Only accumulate if the duration status maps to the current ticket's mapped status
+                    // Wait, status_durations contains the history. It's better to just track time spent in ALL statuses mapped.
+                    if (!statusTimeMap[mappedDurStatus]) statusTimeMap[mappedDurStatus] = []
+                    statusTimeMap[mappedDurStatus].push(days)
+                }
             }
         }
 
@@ -338,25 +366,92 @@ export async function GET(request: NextRequest) {
         })
 
         // ── Collaborators (Reporters) ──
-        const collabMap: Record<string, { name: string; avatar: string | null; ticketCount: number; roiSum: number; roiCount: number }> = {}
+        const collabMap: Record<string, {
+            name: string
+            avatar: string | null
+            ticketCount: number
+            roiSum: number
+            roiCount: number
+            originalRoiSum: number
+            originalRoiCount: number
+        }> = {}
+
         for (const t of typedTickets) {
             const name = t.reporter_display_name || 'Unknown'
             if (!collabMap[name]) {
-                collabMap[name] = { name, avatar: t.reporter_avatar_url, ticketCount: 0, roiSum: 0, roiCount: 0 }
+                collabMap[name] = {
+                    name,
+                    avatar: t.reporter_avatar_url,
+                    ticketCount: 0,
+                    roiSum: 0,
+                    roiCount: 0,
+                    originalRoiSum: 0,
+                    originalRoiCount: 0,
+                }
             }
             collabMap[name].ticketCount++
             if (t.roi_score !== null) {
                 collabMap[name].roiSum += t.roi_score
                 collabMap[name].roiCount++
             }
+            if (t.original_roi !== null && t.original_roi !== undefined) {
+                collabMap[name].originalRoiSum += t.original_roi
+                collabMap[name].originalRoiCount++
+            }
         }
 
         const collaborators = Object.values(collabMap)
-            .map(c => ({
+            .map((c) => ({
                 name: c.name,
                 avatar: c.avatar,
                 ticketCount: c.ticketCount,
-                avgRoi: c.roiCount > 0 ? Math.round((c.roiSum / c.roiCount) * 10) / 10 : null
+                avgRoi: c.roiCount > 0 ? Math.round((c.roiSum / c.roiCount) * 10) / 10 : null,
+                avgOriginalRoi: c.originalRoiCount > 0 ? Math.round((c.originalRoiSum / c.originalRoiCount) * 10) / 10 : null,
+            }))
+            .sort((a, b) => b.ticketCount - a.ticketCount)
+
+        // ── Assignees ──
+        const assigneeMap: Record<string, {
+            name: string
+            avatar: string | null
+            ticketCount: number
+            roiSum: number
+            roiCount: number
+            originalRoiSum: number
+            originalRoiCount: number
+        }> = {}
+
+        for (const t of typedTickets) {
+            const name = t.assignee_display_name || 'Unassigned'
+            if (!assigneeMap[name]) {
+                assigneeMap[name] = {
+                    name,
+                    avatar: t.assignee_avatar_url,
+                    ticketCount: 0,
+                    roiSum: 0,
+                    roiCount: 0,
+                    originalRoiSum: 0,
+                    originalRoiCount: 0,
+                }
+            }
+            assigneeMap[name].ticketCount++
+            if (t.roi_score !== null) {
+                assigneeMap[name].roiSum += t.roi_score
+                assigneeMap[name].roiCount++
+            }
+            if (t.original_roi !== null && t.original_roi !== undefined) {
+                assigneeMap[name].originalRoiSum += t.original_roi
+                assigneeMap[name].originalRoiCount++
+            }
+        }
+
+        const assignees = Object.values(assigneeMap)
+            .map((c) => ({
+                name: c.name,
+                avatar: c.avatar,
+                ticketCount: c.ticketCount,
+                avgRoi: c.roiCount > 0 ? Math.round((c.roiSum / c.roiCount) * 10) / 10 : null,
+                avgOriginalRoi: c.originalRoiCount > 0 ? Math.round((c.originalRoiSum / c.originalRoiCount) * 10) / 10 : null,
             }))
             .sort((a, b) => b.ticketCount - a.ticketCount)
 
@@ -368,7 +463,7 @@ export async function GET(request: NextRequest) {
         let lastSync: string | null = null
         try {
             const syncLog = await safeQuery<SyncLogRow[]>(
-                await supabase.from('bpi_sync_log').select('synced_at').order('synced_at', { ascending: false }).limit(1)
+                await supabase.from('sync_log').select('synced_at').order('synced_at', { ascending: false }).limit(1)
             )
             lastSync = syncLog?.[0]?.synced_at || null
         } catch { }
@@ -412,6 +507,7 @@ export async function GET(request: NextRequest) {
             timeline: typedCounts,
             statusDistribution,
             collaborators,
+            assignees,
             workstreams,
             teams,
             lastSync,

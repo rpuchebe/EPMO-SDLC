@@ -3,6 +3,9 @@ export interface Incident {
     jira_key: string
     product: string | null
     impact: 1 | 2 | 3 | 4 | null
+    status?: string | null
+    postmortem_linked_issues?: any[] | null
+    postmortem_linked_count?: number | null
     created_at: string
     updated_at: string
 }

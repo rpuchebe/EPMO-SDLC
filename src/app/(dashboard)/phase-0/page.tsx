@@ -29,6 +29,7 @@ interface Collaborator {
     avatar: string | null
     ticketCount: number
     avgRoi: number | null
+    avgOriginalRoi: number | null
 }
 
 interface DashboardData {
@@ -49,7 +50,7 @@ interface DrillDown {
 const emptyKpiBase = { value: 0, deltaAbsolute: 0, deltaPercent: 0, sparkline: [] }
 const emptyKpis: KPIs = {
     ideasSubmitted: { ...emptyKpiBase, wontDo: 0, wontDoPercent: 0, conversionToDiscovery: 0 },
-    inProgressIdeas: { ...emptyKpiBase, avgAgeDays: 0, over14DaysCount: 0 },
+    readyForDiscoveryIdeas: { ...emptyKpiBase, avgAgeDays: 0, over14DaysCount: 0 },
     onDiscovery: { ...emptyKpiBase, avgDaysToStart: 0, conversionFromSubmitted: 0 },
     atWorkstream: { ...emptyKpiBase, avgDaysToWorkstream: 0, conversionFromDiscovery: 0 },
     completedIdeas: { ...emptyKpiBase, completionRate: 0, avgDaysToCompletion: 0 },
@@ -61,7 +62,7 @@ const emptyKpis: KPIs = {
 function filterByKpi(tickets: Ticket[], kpiKey: string): Ticket[] {
     switch (kpiKey) {
         case 'ideasSubmitted': return tickets
-        case 'inProgressIdeas': return tickets.filter((t) => t.status_category === 'In Progress')
+        case 'readyForDiscoveryIdeas': return tickets.filter((t) => t.status && t.status.toLowerCase() === 'ready for discovery')
         case 'onDiscovery': return tickets.filter((t) => t.status === 'Discovery')
         case 'atWorkstream': return tickets.filter((t) => t.status === 'Moved to Workstream')
         case 'completedIdeas': return tickets.filter((t) => t.status_category === 'Done' && t.status.toLowerCase() !== "won't do" && t.status.toLowerCase() !== 'wont do')
