@@ -164,109 +164,87 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
 
 
     return (
-        <section className="space-y-6 bg-[#39c4d0]/10 p-6 rounded-3xl border border-[#39c4d0]/20 mb-8">
-            <div className="flex items-center gap-3">
-                <Image src="/initiatives-icon.png" width={28} height={28} alt="Initiatives Icon" className="rounded-md" />
-                <h2 className="text-xl font-bold text-slate-900 tracking-tight">Workstream Initiatives</h2>
+        <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+            {/* Section header */}
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40">
+                <div className="w-[3px] h-5 rounded-full bg-[#39c4d0] flex-shrink-0" />
+                <Image src="/initiatives-icon.png" width={20} height={20} alt="Initiatives Icon" className="rounded-md" />
+                <h2 className="text-sm font-semibold text-slate-800">Workstream Initiatives</h2>
+                <span className="ml-auto text-xs text-slate-400 font-medium">{createdCount} initiatives</span>
             </div>
 
-            {/* --- ROW 1: Metrics & Donut --- */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-[200px] max-h-[200px]">
+            <div className="p-6 space-y-4">
+                {/* --- ROW 1: Metrics & Charts --- */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-[200px] max-h-[200px]">
 
-                {/* 1. Initiative Progress */}
-                <div
-                    onClick={() => openModal('All Initiatives', initiatives, [...baseColumns, childsColumn])}
-                    className="col-span-1 bg-white rounded-xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all group flex flex-col"
-                >
-                    <h3 className="text-sm font-semibold text-slate-700 mb-1">Initiative Progress</h3>
-                    <div className="flex-1 flex flex-col justify-end">
-                        <InitiativeStatusGauge data={gaugeData} total={createdCount} />
-                    </div>
-                </div>
-
-                {/* 2. By Workstream */}
-                <div
-                    onClick={() => openModal('All Initiatives by Workstream', initiatives, [...baseColumns, childsColumn])}
-                    className="col-span-1 bg-white rounded-xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-indigo-300 hover:shadow-md transition-all flex flex-col"
-                >
-                    <h3 className="text-sm font-semibold text-slate-700 mb-1">By Workstream</h3>
-                    <div className="flex-1 min-h-0">
-                        <WorkstreamBarChart
-                            data={workstreamData}
-                            onClickBar={(ws) => openModal(`Workstream: ${ws}`, initiatives.filter(i => i.workstream === ws), [...baseColumns, childsColumn])}
-                        />
-                    </div>
-                </div>
-
-                {/* 3. Investment Category */}
-                <div className="col-span-1 relative group flex flex-col h-full rounded-xl bg-white border border-slate-200 shadow-sm p-4 hover:border-indigo-300 hover:shadow-md transition-all">
-                    <div className="flex justify-between items-center mb-1 z-10 relative">
-                        <h3 className="text-sm font-semibold text-slate-700">Investment Category</h3>
-                        <div className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-rose-50 text-rose-600">
-                            <TrendingUp className="w-3 h-3" />
-                            +4.2% Unassigned vs last week
+                    {/* 1. Initiative Progress */}
+                    <div
+                        onClick={() => openModal('All Initiatives', initiatives, [...baseColumns, childsColumn])}
+                        className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all group flex flex-col"
+                    >
+                        <h3 className="text-[12px] font-medium text-slate-600 mb-1">Initiative Progress</h3>
+                        <div className="flex-1 flex flex-col justify-end">
+                            <InitiativeStatusGauge data={gaugeData} total={createdCount} />
                         </div>
                     </div>
 
-                    <div className="absolute inset-0 z-0 bg-transparent rounded-xl"
-                        onClick={() => openModal('Investment Categories', initiatives, [...baseColumns, categoryColumn])}
-                    ></div>
-                    <div className="relative z-10 w-full h-full pointer-events-none">
-                        <div className="pointer-events-auto h-full w-full">
-                            <InvestmentCategoryDonut
-                                data={invCategoryData}
-                                total={createdCount}
-                                trendPercentage={4.2}
-                                onClickSlice={(name) => openModal(`Category: ${name}`, initiatives.filter(i => (i.investment_category || 'Unassigned') === name), [...baseColumns, categoryColumn])}
+                    {/* 2. By Workstream */}
+                    <div
+                        onClick={() => openModal('All Initiatives by Workstream', initiatives, [...baseColumns, childsColumn])}
+                        className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all flex flex-col"
+                    >
+                        <h3 className="text-[12px] font-medium text-slate-600 mb-1">By Workstream</h3>
+                        <div className="flex-1 min-h-0">
+                            <WorkstreamBarChart
+                                data={workstreamData}
+                                onClickBar={(ws) => openModal(`Workstream: ${ws}`, initiatives.filter(i => i.workstream === ws), [...baseColumns, childsColumn])}
                             />
                         </div>
                     </div>
+
+                    {/* 3. Investment Category */}
+                    <div className="col-span-1 relative group flex flex-col h-full rounded-2xl bg-white border border-slate-200 shadow-sm p-4 hover:border-slate-300 hover:shadow-md transition-all">
+                        <div className="flex justify-between items-center mb-1 z-10 relative">
+                            <h3 className="text-[12px] font-medium text-slate-600">Investment Category</h3>
+                            <div className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-rose-50 text-rose-600">
+                                <TrendingUp className="w-3 h-3" />
+                                +4.2% Unassigned
+                            </div>
+                        </div>
+                        <div className="absolute inset-0 z-0 bg-transparent rounded-2xl"
+                            onClick={() => openModal('Investment Categories', initiatives, [...baseColumns, categoryColumn])}
+                        />
+                        <div className="relative z-10 w-full h-full pointer-events-none">
+                            <div className="pointer-events-auto h-full w-full">
+                                <InvestmentCategoryDonut
+                                    data={invCategoryData}
+                                    total={createdCount}
+                                    trendPercentage={4.2}
+                                    onClickSlice={(name) => openModal(`Category: ${name}`, initiatives.filter(i => (i.investment_category || 'Unassigned') === name), [...baseColumns, categoryColumn])}
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-            </div>
-
-            {/* --- ROW 2: Governance Alerts --- */}
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {/* Alert 1 */}
-                <AlertCard
-                    title="Missing Critical Dates"
-                    count={alerts.missingDates.length}
-                    severity="Medium"
-                    icon={<Calendar className="w-4 h-4" />}
-                    onClick={() => openModal('Missing Critical Dates', alerts.missingDates, baseColumns)}
-                />
-                {/* Alert 2 */}
-                <AlertCard
-                    title="Behind Schedule"
-                    count={alerts.behindSchedule.length}
-                    severity="High"
-                    icon={<Clock className="w-4 h-4" />}
-                    onClick={() => openModal('Behind Schedule', alerts.behindSchedule, baseColumns)}
-                />
-                {/* Alert 3 */}
-                <AlertCard
-                    title="No Child Issues"
-                    count={alerts.noChildren.length}
-                    severity="High"
-                    icon={<AlertOctagon className="w-4 h-4" />}
-                    onClick={() => openModal('Without Child Issues', alerts.noChildren, [...baseColumns, childsColumn])}
-                />
-                {/* Alert 4 */}
-                <AlertCard
-                    title="Closed, Open Children"
-                    count={alerts.closedOpenChildren.length}
-                    severity="High"
-                    icon={<AlertTriangle className="w-4 h-4" />}
-                    onClick={() => openModal('Closed with Open Children', alerts.closedOpenChildren, [...baseColumns, childsColumn])}
-                />
-                {/* Alert 5 */}
-                <AlertCard
-                    title="Status Inconsistency"
-                    count={alerts.statusInconsistency.length}
-                    severity="Medium"
-                    icon={<Waypoints className="w-4 h-4" />}
-                    onClick={() => openModal('Status Inconsistency', alerts.statusInconsistency, [...baseColumns, childsColumn])}
-                />
+                {/* --- ROW 2: Governance Alerts --- */}
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <AlertCard title="Missing Critical Dates" count={alerts.missingDates.length} severity="Medium"
+                        icon={<Calendar className="w-3.5 h-3.5" />}
+                        onClick={() => openModal('Missing Critical Dates', alerts.missingDates, baseColumns)} />
+                    <AlertCard title="Behind Schedule" count={alerts.behindSchedule.length} severity="High"
+                        icon={<Clock className="w-3.5 h-3.5" />}
+                        onClick={() => openModal('Behind Schedule', alerts.behindSchedule, baseColumns)} />
+                    <AlertCard title="No Child Issues" count={alerts.noChildren.length} severity="High"
+                        icon={<AlertOctagon className="w-3.5 h-3.5" />}
+                        onClick={() => openModal('Without Child Issues', alerts.noChildren, [...baseColumns, childsColumn])} />
+                    <AlertCard title="Closed, Open Children" count={alerts.closedOpenChildren.length} severity="High"
+                        icon={<AlertTriangle className="w-3.5 h-3.5" />}
+                        onClick={() => openModal('Closed with Open Children', alerts.closedOpenChildren, [...baseColumns, childsColumn])} />
+                    <AlertCard title="Status Inconsistency" count={alerts.statusInconsistency.length} severity="Medium"
+                        icon={<Waypoints className="w-3.5 h-3.5" />}
+                        onClick={() => openModal('Status Inconsistency', alerts.statusInconsistency, [...baseColumns, childsColumn])} />
+                </div>
             </div>
 
             <IssueListModal
@@ -287,28 +265,37 @@ function AlertCard({ title, count, severity, icon, onClick }: { title: string, c
     return (
         <div
             onClick={onClick}
-            className={`w-full h-full min-h-[120px] flex flex-col justify-between bg-white p-4 rounded-xl border border-slate-200 cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all group overflow-hidden relative`}
+            className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 p-4 pt-3.5 flex flex-col h-[155px] relative overflow-hidden cursor-pointer"
         >
-            <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-3">
-                    <div className={`w-7 h-7 flex items-center justify-center rounded-full ${isHigh ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}`}>
-                        {icon}
-                    </div>
-                    <span className="text-sm font-semibold text-slate-700 leading-tight pr-2">{title}</span>
+            {/* Title row */}
+            <div className="flex items-center gap-1.5 mb-2 relative z-10">
+                <div className={`w-[22px] h-[22px] flex-shrink-0 flex items-center justify-center rounded-lg ${isHigh ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}`}>
+                    {icon}
                 </div>
+                <span className="text-[12px] font-medium text-slate-600 truncate">{title}</span>
             </div>
 
-            <div className="flex justify-between items-end relative z-10 pb-1">
-                <div className="text-[44px] font-extrabold text-slate-800 leading-none tracking-tight">{count}</div>
-                {count > 0 && (
-                    <span className={`text-[10px] font-bold px-2 py-1 rounded-md mb-2 uppercase tracking-wide ${isHigh ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
+            {/* Main value */}
+            <div className="text-[28px] leading-none font-bold text-slate-800 tracking-tight mb-3 relative z-10">
+                {count}
+            </div>
+
+            {/* Divider */}
+            <div className="w-full h-px bg-slate-100 mb-2 relative z-10" />
+
+            {/* Bottom row */}
+            <div className="flex items-center justify-between relative z-10">
+                <span className="text-[10.5px] text-slate-500">Severity</span>
+                {count > 0 ? (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md uppercase tracking-wide ${isHigh ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'}`}>
                         {severity}
+                    </span>
+                ) : (
+                    <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">
+                        None
                     </span>
                 )}
             </div>
-
-            {/* Faint accent background */}
-            <div className={`absolute -bottom-2 -left-2 -right-2 h-1.5 opacity-60 ${isHigh ? 'bg-rose-400' : 'bg-amber-400'} group-hover:h-3 transition-all duration-300 pointer-events-none rounded-b-xl`}></div>
         </div>
     )
 }
