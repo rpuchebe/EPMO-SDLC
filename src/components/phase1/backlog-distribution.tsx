@@ -45,83 +45,87 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-full min-h-[220px]">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col max-w-[500px] h-[350px]">
             {header}
 
-            <div className="p-6 flex-1 relative min-h-[180px]">
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart margin={{ top: 0, bottom: 0 }}>
-                        <Pie
-                            data={data}
-                            cx="50%"
-                            cy="45%"
-                            innerRadius={45}
-                            outerRadius={65}
-                            paddingAngle={3}
-                            dataKey="count"
-                            nameKey="type"
-                            stroke="none"
-                            onClick={(entry) => onItemClick?.(entry.type)}
-                            className={onItemClick ? "cursor-pointer" : ""}
-                        >
-                            {data.map((entry, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={COLORS[index % COLORS.length]}
-                                    className="hover:opacity-80 transition-opacity outline-none"
-                                />
-                            ))}
-                        </Pie>
-                        <RechartsTooltip
-                            content={({ active, payload }) => {
-                                if (!active || !payload?.length) return null
-                                const data = payload[0].payload
-                                return (
-                                    <div className="bg-white p-3 rounded-lg shadow-lg border border-slate-100 min-w-[150px]">
-                                        <p className="font-semibold text-slate-900 text-sm mb-1">{data.type}</p>
-                                        <p className="text-slate-600 text-xs">
-                                            {data.count} items ({data.percentage}%)
-                                        </p>
-                                    </div>
-                                )
-                            }}
-                        />
-                        <Legend
-                            verticalAlign="bottom"
-                            height={28}
-                            content={(props) => {
-                                const { payload } = props;
-                                if (!payload) return null;
-                                return (
-                                    <ul className="flex flex-wrap justify-center gap-3 mt-0">
-                                        {payload.map((entry, index) => (
-                                            <li
-                                                key={`item-${index}`}
-                                                className="flex items-center text-xs text-slate-600"
-                                            >
-                                                <span
-                                                    className="w-3 h-3 rounded-full mr-2"
-                                                    style={{ backgroundColor: entry.color }}
-                                                />
-                                                <span className="font-medium">{entry.value}</span>
-                                                <span className="ml-1 text-slate-400">({data[index].count})</span>
-                                            </li>
+            <div className="px-6 py-3 flex-1 mx-auto w-full">
+                <div className="flex flex-col h-full relative border-none">
+                    <div className="flex-1 flex items-center justify-between min-h-[120px]">
+                        {/* Donut (left) */}
+                        <div className="relative w-1/2 h-full min-h-[120px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={data}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={52}
+                                        outerRadius={70}
+                                        paddingAngle={5}
+                                        dataKey="count"
+                                        nameKey="type"
+                                        cornerRadius={8}
+                                        stroke="none"
+                                        onClick={(entry) => onItemClick?.(entry.type)}
+                                        className="cursor-pointer outline-none hover:opacity-80 transition-opacity"
+                                        startAngle={90}
+                                        endAngle={-270}
+                                    >
+                                        {data.map((entry, index) => (
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={COLORS[index % COLORS.length]}
+                                            />
                                         ))}
-                                    </ul>
-                                );
-                            }}
-                        />
-                    </PieChart>
-                </ResponsiveContainer>
+                                    </Pie>
 
-                {/* Center label */}
-                <div className="absolut inset-0 pointer-events-none flex flex-col items-center justify-center text-center pb-8 absolute top-0 left-0 right-0 bottom-0 h-[90%]">
-                    <span className="text-xl font-bold tracking-tight text-slate-900">
-                        {data.reduce((sum, item) => sum + item.count, 0)}
-                    </span>
-                    <span className="text-xs text-slate-500 font-medium tracking-wide uppercase mt-0.5">
-                        Linked Items
-                    </span>
+                                    <RechartsTooltip
+                                        cursor={false}
+                                        contentStyle={{
+                                            borderRadius: '8px',
+                                            border: '1px solid #e2e8f0',
+                                            boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                                            fontSize: '12px',
+                                        }}
+                                        itemStyle={{ color: '#1e293b', fontWeight: 500 }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+
+                            {/* Center Text */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                                <span className="text-xl font-bold text-slate-800 leading-none">
+                                    {data.reduce((sum, item) => sum + item.count, 0)}
+                                </span>
+                                <span className="text-[9px] uppercase tracking-wider text-slate-400 font-medium">Total</span>
+                            </div>
+                        </div>
+
+                        {/* Legend (right) */}
+                        <div className="w-1/2 flex flex-col justify-center gap-1.5 pl-4">
+                            {data.map((item, idx) => (
+                                <div
+                                    key={idx}
+                                    onClick={() => onItemClick?.(item.type)}
+                                    className="flex items-center justify-between group cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-2 overflow-hidden">
+                                        <span
+                                            className="w-2 h-2 rounded-full shrink-0 group-hover:scale-125 transition-transform"
+                                            style={{ backgroundColor: COLORS[idx % COLORS.length] }}
+                                        />
+                                        <span className="text-[11px] text-slate-600 truncate group-hover:text-slate-900 transition-colors">
+                                            {item.type}
+                                        </span>
+                                    </div>
+
+                                    <span className="text-[11px] font-semibold text-slate-700 ml-2 tabular-nums">
+                                        {item.count}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

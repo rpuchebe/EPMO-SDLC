@@ -40,7 +40,7 @@ export function InitiativeStatusGauge({ data, total }: InitiativeStatusGaugeProp
                             className="w-3 h-3 rounded-full flex-shrink-0"
                             style={{ backgroundColor: item.color }}
                         />
-                        <span className="text-sm font-medium text-slate-600 whitespace-nowrap">
+                        <span className="text-xs font-medium text-slate-600 whitespace-nowrap">
                             {item.name}
                         </span>
                     </div>
@@ -75,8 +75,8 @@ export function InitiativeStatusGauge({ data, total }: InitiativeStatusGaugeProp
                 </div>
                 {/* Center Text */}
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none translate-y-3">
-                    <span className="text-[32px] font-extrabold text-slate-800 leading-none tracking-tight">{total}</span>
-                    <span className="text-[12px] font-bold text-slate-500 mt-1 uppercase tracking-widest">Created</span>
+                    <span className="text-2xl font-bold text-slate-800 leading-none tracking-tight">{total}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-slate-400 font-medium mt-1">Created</span>
                 </div>
             </div>
         </div>

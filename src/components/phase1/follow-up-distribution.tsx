@@ -93,10 +93,11 @@ export function FollowUpDistribution({ data }: FollowUpDistributionProps) {
                             data={chartData}
                             cx="50%"
                             cy="50%"
-                            innerRadius={80}
-                            outerRadius={120}
-                            paddingAngle={2}
+                            innerRadius={52}
+                            outerRadius={70}
+                            paddingAngle={5}
                             dataKey="value"
+                            cornerRadius={8}
                             stroke="none"
                         >
                             {chartData.map((entry, index) => (

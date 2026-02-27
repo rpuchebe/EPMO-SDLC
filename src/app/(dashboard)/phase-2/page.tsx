@@ -61,9 +61,9 @@ export default function Phase2Page() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-6">
-            <DashboardHeader lastSync={data.lastSync} />
+            <DashboardHeader lastSync={data.lastSync} workstream={workstream} />
             <InitiativesSection data={data.initiatives} />
-            <ProjectsSection data={data.projects} />
+            <ProjectsSection data={data.projects} workstream={workstream} />
             <BwisSection data={data.bwi} />
         </div>
     )

@@ -101,6 +101,12 @@ export function WorkstreamIncidentTable({ data }: WorkstreamIncidentTableProps) 
                     </tbody>
                 </table>
             </div>
+
+            <div className="mt-4 pt-4 border-t border-slate-50">
+                <p className="text-[10px] text-red-500 text-center italic font-medium">
+                    * Note: This report contains fake data. We are currently working on building it.
+                </p>
+            </div>
         </div>
     )
 }
