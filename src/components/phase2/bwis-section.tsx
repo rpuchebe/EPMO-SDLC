@@ -85,9 +85,9 @@ export function BwisSection({ data }: BwisSectionProps) {
 
                     <div onClick={openPlaceholder} className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all flex flex-col group">
                         <div className="flex items-center justify-between mb-1 relative z-10">
-                            <h3 className="text-[12px] font-medium text-slate-600 underline underline-offset-4 decoration-slate-200 group-hover:decoration-slate-400">Investment Category</h3>
+                            <h3 className="text-[12px] font-medium text-slate-600">Investment Category</h3>
                         </div>
-                        <div className="flex-1 relative z-10 min-h-0 flex items-center justify-center">
+                        <div className="flex-1 relative z-10 min-h-0">
                             {data.byInvestmentCategory.length > 0 ? (
                                 <InvestmentCategoryDonut data={data.byInvestmentCategory} total={total} onClickSlice={openPlaceholder} />
                             ) : (

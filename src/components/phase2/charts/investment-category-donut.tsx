@@ -21,7 +21,7 @@ export function InvestmentCategoryDonut({ data, total, trendPercentage = 0, onCl
     return (
         <div className="flex flex-col h-full relative border-none">
             <div className="flex-1 flex items-center justify-between min-h-[140px]">
-                <div className="relative w-1/2 h-full min-h-[140px]">
+                <div className="flex-shrink-0 w-[140px] h-[140px] relative">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
@@ -56,23 +56,23 @@ export function InvestmentCategoryDonut({ data, total, trendPercentage = 0, onCl
                 </div>
 
                 {/* Legend positioned to the right */}
-                <div className="w-1/2 flex flex-col justify-center gap-2 pl-4">
+                <div className="flex-1 flex flex-col justify-center gap-1.5 pl-6 min-w-0">
                     {data.map((item, idx) => (
                         <div
                             key={idx}
                             onClick={() => onClickSlice(item.name)}
                             className="flex items-center justify-between group cursor-pointer"
                         >
-                            <div className="flex items-center gap-2 overflow-hidden">
+                            <div className="flex items-center gap-2 min-w-0">
                                 <span
                                     className="w-2.5 h-2.5 rounded-full shrink-0 group-hover:scale-125 transition-transform"
                                     style={{ backgroundColor: item.color }}
                                 />
-                                <span className="text-xs text-slate-600 truncate group-hover:text-slate-900 transition-colors">
+                                <span className="text-[11px] text-slate-600 whitespace-nowrap group-hover:text-slate-900 transition-colors">
                                     {item.name}
                                 </span>
                             </div>
-                            <span className="text-xs font-semibold text-slate-700 ml-2">
+                            <span className="text-[11px] font-semibold text-slate-700 ml-auto pl-2">
                                 {item.value}
                             </span>
                         </div>

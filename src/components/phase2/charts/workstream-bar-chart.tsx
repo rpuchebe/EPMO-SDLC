@@ -33,7 +33,7 @@ export function WorkstreamBarChart({ data, onClickBar }: WorkstreamBarChartProps
     // Truncate long workstream names for the Y axis
     const chartData = data.map((d, i) => ({
         ...d,
-        shortName: d.name.length > 14 ? d.name.slice(0, 12) + '…' : d.name,
+        shortName: d.name.length > 20 ? d.name.slice(0, 18) + '…' : d.name,
         fill: d.color || COLORS[i % COLORS.length]
     }))
 
@@ -50,8 +50,8 @@ export function WorkstreamBarChart({ data, onClickBar }: WorkstreamBarChartProps
                     <YAxis
                         type="category"
                         dataKey="shortName"
-                        width={90}
-                        tick={{ fontSize: 11, fill: '#64748b', fontWeight: 500 }}
+                        width={110}
+                        tick={{ fontSize: 10, fill: '#64748b', fontWeight: 500 }}
                         axisLine={false}
                         tickLine={false}
                     />
