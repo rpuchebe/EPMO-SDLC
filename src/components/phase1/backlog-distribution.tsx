@@ -81,6 +81,7 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
 
                                     <RechartsTooltip
                                         cursor={false}
+                                        allowEscapeViewBox={{ x: true, y: true }}
                                         contentStyle={{
                                             borderRadius: '8px',
                                             border: '1px solid #e2e8f0',

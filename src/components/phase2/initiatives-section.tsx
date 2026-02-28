@@ -238,7 +238,7 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
 
 
     return (
-        <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+        <section className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6">
             {/* Section header */}
             <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40">
                 <div className="w-[3px] h-5 rounded-full bg-[#39c4d0] flex-shrink-0" />

@@ -1,17 +1,29 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from './sidebar'
 
+// Routes where the sidebar should start collapsed to maximise content area
+const AUTO_COLLAPSE_ROUTES = ['/phase-3']
+
 export function SidebarWrapper() {
+    const pathname = usePathname()
     const [isCollapsed, setIsCollapsed] = useState(false)
     const [mounted, setMounted] = useState(false)
 
-    // Only render after mount to prevent hydration mismatch if we later 
+    // Only render after mount to prevent hydration mismatch if we later
     // persist collapsed state to localStorage
     useEffect(() => {
         setMounted(true)
     }, [])
+
+    // Auto-collapse when navigating to routes that need full width
+    useEffect(() => {
+        if (AUTO_COLLAPSE_ROUTES.includes(pathname)) {
+            setIsCollapsed(true)
+        }
+    }, [pathname])
 
     if (!mounted) {
         // Render a skeleton matching the default (expanded) width

@@ -55,7 +55,7 @@ export function WorkstreamBarChart({ data, onClickBar }: WorkstreamBarChartProps
                         axisLine={false}
                         tickLine={false}
                     />
-                    <Tooltip content={<BarTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+                    <Tooltip content={<BarTooltip />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} allowEscapeViewBox={{ x: true, y: true }} />
                     <Bar
                         dataKey="count"
                         radius={[6, 6, 6, 6]}

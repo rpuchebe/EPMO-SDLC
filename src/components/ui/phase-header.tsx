@@ -8,9 +8,10 @@ interface PhaseHeaderProps {
     title: string
     description: string
     lastSync: string | null
+    workstream?: string
 }
 
-export function PhaseHeader({ icon: Icon, title, description, lastSync }: PhaseHeaderProps) {
+export function PhaseHeader({ icon: Icon, title, description, lastSync, workstream }: PhaseHeaderProps) {
     const formattedDate = lastSync
         ? new Date(lastSync).toLocaleString('en-US', {
             month: 'short',
@@ -21,6 +22,10 @@ export function PhaseHeader({ icon: Icon, title, description, lastSync }: PhaseH
             timeZone: 'America/Bogota',
         })
         : 'Never'
+
+    const displayTitle = workstream && workstream !== 'All Workstreams'
+        ? `${title.split(' – ')[0]} – ${workstream}`
+        : title
 
     return (
         <div
@@ -36,7 +41,7 @@ export function PhaseHeader({ icon: Icon, title, description, lastSync }: PhaseH
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-white tracking-tight">
-                            {title}
+                            {displayTitle}
                         </h1>
                         <p className="text-sm mt-1.5 max-w-2xl leading-relaxed" style={{ color: '#9dbfb3' }}>
                             {description}

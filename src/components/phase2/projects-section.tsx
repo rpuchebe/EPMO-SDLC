@@ -236,7 +236,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
     )
 
     return (
-        <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+        <section className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6">
 
             {/* ── Section header ── */}
             <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40">

@@ -104,7 +104,7 @@ export function FollowUpDistribution({ data }: FollowUpDistributionProps) {
                                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                             ))}
                         </Pie>
-                        <Tooltip content={<CustomTooltip />} />
+                        <Tooltip content={<CustomTooltip />} allowEscapeViewBox={{ x: true, y: true }} />
                         <Legend
                             verticalAlign="bottom"
                             height={36}

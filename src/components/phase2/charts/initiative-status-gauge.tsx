@@ -52,7 +52,7 @@ export function InitiativeStatusGauge({ data, total }: InitiativeStatusGaugeProp
                 <div className="absolute inset-x-0 inset-y-0 h-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                            <Tooltip content={<GaugeTooltip />} />
+                            <Tooltip content={<GaugeTooltip />} allowEscapeViewBox={{ x: true, y: true }} />
                             <Pie
                                 data={pieData}
                                 cx="50%"

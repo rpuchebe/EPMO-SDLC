@@ -89,6 +89,16 @@ export function Header({ user }: { user: any }) {
     }, [])
 
     useEffect(() => {
+        const ws = searchParams?.get('workstream')
+        if (ws) setWorkstream(ws)
+        else setWorkstream('All Workstreams')
+
+        const t = searchParams?.get('team')
+        if (t) setTeam(t)
+        else setTeam('All Teams')
+    }, [searchParams])
+
+    useEffect(() => {
         async function fetchFilters() {
             const { data: wsData } = await supabase.from('workstreams').select('id, name').order('name')
             const { data: tData } = await supabase.from('teams').select('id, name, workstream_id').order('name')

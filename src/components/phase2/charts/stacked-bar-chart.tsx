@@ -32,7 +32,7 @@ export function StackedBarChart({ data, height = 40 }: StackedBarChartProps) {
                 <BarChart data={transformedData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                     <XAxis type="number" hide />
                     <YAxis dataKey="name" type="category" hide />
-                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', zIndex: 50 }} />
+                    <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', zIndex: 50 }} allowEscapeViewBox={{ x: true, y: true }} />
                     {keysArray.map((key, index) => {
                         // We need to dynamically get the color from the item definition
                         // Recharts Bar fill prop can take a function but it's easier to just pick the first matching color from our raw data.

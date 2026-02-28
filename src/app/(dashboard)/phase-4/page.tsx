@@ -1,26 +1,19 @@
-'use client'
+import { createClient } from '@/utils/supabase/server'
+import { Phase4Content } from '@/components/phase4/phase4-content'
 
-import { Code } from 'lucide-react'
-import { PhaseHeader } from '@/components/ui/phase-header'
+export default async function Phase4Page() {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
-export default function Phase4Page() {
-    return (
-        <div className="flex flex-col gap-6 w-full animate-in fade-in duration-500">
-            <PhaseHeader
-                icon={Code}
-                title="Phase 4 – Development & Testing"
-                description="Monitor development velocity, code quality, testing coverage, and sprint delivery across all workstreams. Ensuring build quality and team productivity."
-                lastSync={null}
-            />
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-8 flex flex-col items-center justify-center min-h-[300px]">
-                <div className="bg-slate-50 text-slate-400 p-4 rounded-full mb-4">
-                    <Code className="w-8 h-8" />
-                </div>
-                <h2 className="text-lg font-semibold text-slate-700 mb-2">Dashboard Coming Soon</h2>
-                <p className="text-slate-400 text-center max-w-md text-sm">
-                    Phase 4 details, documentation, and specific workflows will be available soon.
-                </p>
-            </div>
-        </div>
-    )
+    let isAdmin = false
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single()
+        isAdmin = (profile?.role ?? '').toLowerCase() === 'admin'
+    }
+
+    return <Phase4Content isAdmin={isAdmin} />
 }

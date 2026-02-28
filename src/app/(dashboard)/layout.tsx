@@ -1,5 +1,6 @@
 import { SidebarWrapper } from '@/components/layout/sidebar-wrapper'
 import { Header } from '@/components/layout/header'
+import { MainContent } from '@/components/layout/main-content'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
@@ -22,11 +23,7 @@ export default async function DashboardLayout({
             <SidebarWrapper />
             <div className="flex-1 flex flex-col h-full overflow-hidden">
                 <Header user={user} />
-                <main className="flex-1 overflow-y-auto pt-1 px-6 pb-6 md:pt-1 md:px-8 md:pb-8">
-                    <div className="max-w-7xl mx-auto">
-                        {children}
-                    </div>
-                </main>
+                <MainContent>{children}</MainContent>
             </div>
         </div>
     )
