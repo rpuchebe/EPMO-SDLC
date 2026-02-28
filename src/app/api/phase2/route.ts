@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getInitiativesDashboardData } from '@/lib/server/initiatives'
 import { getProjectsDashboardData } from '@/lib/server/projects'
-import { getPhase2BwiSectionData } from '@/lib/server/bwis'
+import { getPhase2BwiSnapshotData } from '@/lib/server/bwis'
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const [initiativesResult, projectsResult, bwisResult] = await Promise.allSettled([
         getInitiativesDashboardData(workstream),
         getProjectsDashboardData(workstream),
-        getPhase2BwiSectionData(workstream, bwiSearch, bwiDateWindow, bwiHideClosed)
+        getPhase2BwiSnapshotData()
     ])
 
     if (initiativesResult.status === 'rejected') {
@@ -101,6 +101,6 @@ export async function GET(request: Request) {
         },
         projects: projectsData,
         bwi: bwisData,
-        lastSync: lastUpdated,
+        lastSync: (bwisData as any).generated_at || lastUpdated,
     })
 }
