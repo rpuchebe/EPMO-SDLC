@@ -50,13 +50,8 @@ export function BwisSection({ data }: BwisSectionProps) {
                             Filter: {workstream}
                         </span>
                     )}
-                </div>                {/* KPI Right Side */}
-                <div className="flex items-center gap-3 xl:ml-auto select-none overflow-x-auto w-full xl:w-auto pb-1 xl:pb-0">
-                    <KPIBox label="Total BWIs" value={data.totalBwis} color="text-slate-800" bg="bg-slate-100/50" />
-                    <KPIBox label="In Progress" value={data.inProgress} color="text-indigo-600" bg="bg-indigo-50/50" />
-                    <KPIBox label="Pending" value={data.pending} color="text-amber-600" bg="bg-amber-50/50" />
-                    <KPIBox label="Done" value={data.done} color="text-emerald-600" bg="bg-emerald-50/50" />
                 </div>
+                <span className="ml-auto text-xs text-slate-400 font-medium">{data.totalBwis} business work items</span>
             </div>
 
             <div className="p-6 space-y-6">
@@ -212,14 +207,5 @@ export function BwisSection({ data }: BwisSectionProps) {
                 </div>
             </div>
         </section>
-    )
-}
-
-function KPIBox({ label, value, color, bg }: { label: string, value: number, color: string, bg: string }) {
-    return (
-        <div className={`flex flex-col items-center justify-center px-4 py-1.5 rounded-lg border border-slate-200/50 ${bg} min-w-[90px]`}>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-0.5">{label}</span>
-            <span className={`text-xl font-black leading-none tracking-tight ${color}`}>{value}</span>
-        </div>
     )
 }

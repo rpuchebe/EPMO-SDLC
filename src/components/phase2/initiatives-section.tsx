@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import Image from 'next/image'
+import { useSearchParams } from 'next/navigation'
 import { Activity, AlertTriangle, Calendar, AlertOctagon, Waypoints, Clock, ShieldAlert, CheckCircle2, CircleDashed, TrendingUp, TrendingDown, Minus, ExternalLink } from 'lucide-react'
 import { InvestmentCategoryDonut } from './charts/investment-category-donut'
 import { InitiativeStatusGauge } from './charts/initiative-status-gauge'
@@ -60,6 +61,9 @@ const INV_CATEGORIES = [
 ]
 
 export function InitiativesSection({ data }: InitiativesSectionProps) {
+    const searchParams = useSearchParams()
+    const workstream = searchParams?.get('workstream') || 'All Workstreams'
+
     const initiatives = data.raw || []
     const alertSeverities = data.alertSeverities
     const alertTrends = data.alertTrends
@@ -240,10 +244,20 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
     return (
         <section className="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6">
             {/* Section header */}
-            <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-100 bg-slate-50/40">
-                <div className="w-[3px] h-5 rounded-full bg-[#39c4d0] flex-shrink-0" />
-                <Image src="/initiatives-icon.png" width={20} height={20} alt="Initiatives Icon" className="rounded-md" />
-                <h2 className="text-sm font-semibold text-slate-800">Workstream Initiatives</h2>
+            <div className="flex flex-col xl:flex-row items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/40 gap-4">
+                <div className="flex items-center gap-3 w-full xl:w-auto">
+                    <div className="w-[3px] h-5 rounded-full bg-[#39c4d0] flex-shrink-0" />
+                    <Image src="/initiatives-icon.png" width={20} height={20} alt="Initiatives Icon" className="rounded-md" />
+                    <div className="flex flex-col">
+                        <h2 className="text-sm font-semibold text-slate-800">Workstream Initiatives</h2>
+                        {workstream && workstream !== 'All Workstreams' && (
+                            <span className="text-[10px] text-cyan-600 font-bold uppercase tracking-wider -mt-0.5">
+                                Filter: {workstream}
+                            </span>
+                        )}
+                    </div>
+                </div>
+
                 <span className="ml-auto text-xs text-slate-400 font-medium">{createdCount} initiatives</span>
             </div>
 
