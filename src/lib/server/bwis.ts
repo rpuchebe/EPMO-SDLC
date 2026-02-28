@@ -123,11 +123,14 @@ export async function getPhase2BwiSnapshotData(): Promise<BwiSectionDTO> {
             color: INV_CAT_COLORS[name] || '#94a3b8'
         })).filter(c => c.value > 0).sort((a, b) => b.value - a.value)
 
-        const childDistribution = Object.entries(snapshotData.child_issue_type_distribution || {}).map(([name, value], i) => ({
-            name,
-            value: Number(value),
-            color: CHILD_DISTR_COLORS[i % CHILD_DISTR_COLORS.length]
-        })).filter(c => c.value > 0).sort((a, b) => b.value - a.value)
+        const ALLOWED_CHILD_TYPES = ['Story', 'Task', 'Bug', 'Clarification', 'Hot Fix', 'Change', 'Business Task']
+        const childDistribution = Object.entries(snapshotData.child_issue_type_distribution || {})
+            .filter(([name]) => ALLOWED_CHILD_TYPES.includes(name))
+            .map(([name, value], i) => ({
+                name,
+                value: Number(value),
+                color: CHILD_DISTR_COLORS[i % CHILD_DISTR_COLORS.length]
+            })).filter(c => c.value > 0).sort((a, b) => b.value - a.value)
 
         // compute severities (dumb heuristic)
         const sev = (count: number, t: number) => count > t * 0.1 ? 'High' : count > t * 0.05 ? 'Medium' : count > 0 ? 'Low' : 'None'
