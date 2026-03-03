@@ -27,6 +27,7 @@ const sidebarSections = [
         icon: Home,
         items: [
             { name: 'Home', href: '/home' },
+            { name: 'CTO Dashboard', href: '/cto-dashboard' },
         ]
     },
     {

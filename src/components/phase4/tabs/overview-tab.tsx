@@ -21,7 +21,7 @@ import React, { useState, useMemo, useCallback, useRef } from 'react'
 import {
     CheckCircle2, Clock, Circle, BookOpen, Bug, ListTodo,
     MoreHorizontal, Layers, GitPullRequest, Zap, Sparkles,
-    AlertTriangle, Info, Maximize2, X,
+    AlertTriangle, Info, Maximize2, X, Users,
 } from 'lucide-react'
 import { IssueListModal, ColumnDef } from '@/components/shared/modals/issue-list-modal'
 import {
@@ -169,6 +169,35 @@ const phase4Columns: ColumnDef<Phase4Issue>[] = [
     { header: 'Due', cell: (item) => item.dueDate ?? '—' },
 ]
 
+// ─── Sprint Health drill-down types ───────────────────────────────────────────
+
+interface SprintHealthIssue {
+    jira_key: string
+    summary: string
+    status: string
+    statusCategory: string
+    issueType: string
+    workstream: string
+    storyPoints: number | null
+    sprintCount: number
+}
+
+const sprintHealthColumns: ColumnDef<SprintHealthIssue>[] = [
+    {
+        header: 'Key',
+        cell: (item) => (
+            <a href={`https://prioritytechsupport.atlassian.net/browse/${item.jira_key}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">
+                {item.jira_key}
+            </a>
+        ),
+    },
+    { header: 'Summary', accessorKey: 'summary' },
+    { header: 'Type', accessorKey: 'issueType' },
+    { header: 'Status', cell: (item) => <StatusChip status={item.status} /> },
+    { header: 'SP', cell: (item) => item.storyPoints != null ? String(item.storyPoints) : '—' },
+    { header: 'Sprints', cell: (item) => String(item.sprintCount) },
+]
+
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
@@ -197,6 +226,28 @@ export function OverviewTab({ dto }: Props) {
     const [modal, setModal] = useState<{
         title: string; desc?: string; issues: Phase4Issue[]
     } | null>(null)
+
+    // ── Sprint Health drill-down modal ────────────────────────────────────────
+    const [sprintModal, setSprintModal] = useState<{
+        title: string; issues: SprintHealthIssue[]
+    } | null>(null)
+    const [sprintModalLoading, setSprintModalLoading] = useState(false)
+
+    const handleSprintBarClick = useCallback(async (sprintLabel: string, category: string, categoryLabel: string) => {
+        // Strip the star prefix for active sprint
+        const cleanLabel = sprintLabel.replace(/^★\s*/, '')
+        setSprintModalLoading(true)
+        setSprintModal({ title: `${categoryLabel} · ${cleanLabel}`, issues: [] })
+        try {
+            const res = await fetch(`/api/phase4/sprint-health-detail?sprintLabel=${encodeURIComponent(cleanLabel)}&category=${encodeURIComponent(category)}`)
+            const data = await res.json()
+            setSprintModal({ title: `${categoryLabel} · ${cleanLabel}`, issues: data.issues || [] })
+        } catch {
+            setSprintModal({ title: `${categoryLabel} · ${cleanLabel}`, issues: [] })
+        } finally {
+            setSprintModalLoading(false)
+        }
+    }, [])
 
     // ── AI ────────────────────────────────────────────────────────────────────
     const [aiLoading, setAiLoading] = useState(false)
@@ -407,33 +458,39 @@ export function OverviewTab({ dto }: Props) {
     const [sprintMode, setSprintMode] = useState<'points' | 'issues'>('points')
 
     const sprintChartData = useMemo(() => {
-        // Data comes pre-sorted and pre-filtered from the server (active + 5 previous closed, no future)
-        // Snapshot fields:
-        //   added          = total issues/points in sprint
-        //   newly_committed = issues in their 1st sprint (subset of added)
-        //   carryover      = issues in 2+ sprints        (subset of added, carryover_2x_plus ⊂ carryover)
-        //   carryover_2x_plus = issues in 3+ sprints     (subset of carryover)
-        // Bar stacking (mutually exclusive):
-        //   Newly Committed = newly_committed
-        //   Carryover       = carryover − carryover_2x_plus  (exactly 2 sprints)
-        //   Carryover 2x+   = carryover_2x_plus              (3+ sprints)
-        //   Completed       = separate bar (green)
+        // Two stacked bars per sprint:
+        //
+        // BAR 1 — Scope (stackId="scope"), bottom → top:
+        //   Carryover 2x+      = issues in 3+ sprints         (RED)
+        //   Carryover           = issues in exactly 2 sprints  (ORANGE)
+        //   Committed           = first-sprint issues, NOT added mid-sprint (LIGHT BLUE)
+        //   Added Mid-Sprint    = issues added after sprint started (YELLOW) — 0 until counters exist
+        //
+        // BAR 2 — Output (stackId="output"), bottom → top:
+        //   Completed           = done issues   (GREEN)
+        //   Removed             = removed mid-sprint (TRANSPARENT YELLOW) — 0 until counters exist
         return dto.sprintHealth.map(s => {
             const isPoints = sprintMode === 'points'
             const newlyCommitted = isPoints ? s.pointsNewlyCommitted : s.issuesNewlyCommitted
             const completed = isPoints ? s.pointsCompleted : s.issuesCompleted
             const carryoverRaw = isPoints ? s.pointsCarryover : s.issuesCarryover
             const carryover2x = isPoints ? s.pointsCarryover2xPlus : s.issuesCarryover2xPlus
-            // Carryover exactly-once = total carryover minus 2x+ (avoid double-count)
             const carryoverOnce = Math.max(0, carryoverRaw - carryover2x)
-            const scopeTotal = newlyCommitted + carryoverOnce + carryover2x
+            // TODO: replace 0 with real data when counters are available
+            const addedMidSprint = 0
+            const removed = 0
+            const scopeTotal = carryover2x + carryoverOnce + newlyCommitted + addedMidSprint
+            const outputTotal = completed + removed
             return {
                 sprint: s.sprintState === 'active' ? `★ ${s.sprintLabel}` : s.sprintLabel,
-                'Newly Committed': newlyCommitted,
-                'Carryover': carryoverOnce,
                 'Carryover 2x+': carryover2x,
+                'Carryover': carryoverOnce,
+                'Committed': newlyCommitted,
+                'Added Mid-Sprint': addedMidSprint,
                 'Completed': completed,
+                'Removed': removed,
                 _scopeTotal: scopeTotal > 0 ? scopeTotal : null,
+                _outputTotal: outputTotal > 0 ? outputTotal : null,
             }
         })
     }, [dto.sprintHealth, sprintMode])
@@ -946,35 +1003,33 @@ export function OverviewTab({ dto }: Props) {
                     {dto.sprintHealth.length === 0 ? (
                         <DataBanner message="Sprint snapshot data not available. Ensure phase4_sprint_health_snapshot is populated." />
                     ) : (
-                        <div className="flex-1 min-h-0">
-                            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+                        <div className="flex-1 min-h-0" style={{ minHeight: 340 }}>
+                            <ResponsiveContainer width="100%" height="100%">
                                 <BarChart
                                     data={sprintChartData}
-                                    margin={{ top: 22, right: 8, left: 2, bottom: 50 }}
-                                    barCategoryGap="15%"
+                                    margin={{ top: 28, right: 8, left: 18, bottom: 8 }}
+                                    barCategoryGap="18%"
                                     barGap={2}
                                 >
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                     <XAxis
                                         dataKey="sprint"
-                                        tick={{ fontSize: 9, fill: '#64748b' }}
+                                        tick={{ fontSize: 12, fill: '#334155' }}
                                         axisLine={false}
                                         tickLine={false}
-                                        angle={-30}
-                                        textAnchor="end"
                                         interval={0}
-                                        height={56}
+                                        height={28}
                                     />
                                     <YAxis
                                         tick={{ fontSize: 10, fill: '#94a3b8' }}
                                         axisLine={false}
                                         tickLine={false}
-                                        width={30}
+                                        width={36}
                                         label={{
                                             value: sprintMode === 'points' ? 'Story Points' : 'Issues',
                                             angle: -90,
                                             position: 'insideLeft',
-                                            offset: 8,
+                                            offset: 4,
                                             style: { fontSize: 10, fill: '#94a3b8' },
                                         }}
                                     />
@@ -996,48 +1051,87 @@ export function OverviewTab({ dto }: Props) {
                                         formatter={value => (
                                             <span style={{ fontSize: 11, color: '#475569' }}>{value}</span>
                                         )}
-                                        wrapperStyle={{ paddingTop: 8 }}
+                                        wrapperStyle={{ paddingTop: 4 }}
                                     />
 
-                                    {/* ── Scope stack: bottom → top ─────────────────── */}
-                                    <Bar dataKey="Carryover 2x+" stackId="scope" fill="#f97316" name="Carryover 2x+" maxBarSize={60}>
+                                    {/* ── BAR 1: Scope stack (bottom → top) ────────── */}
+                                    {/* Carryover 2x+ — RED */}
+                                    <Bar dataKey="Carryover 2x+" stackId="scope" fill="#ef4444" name="Carryover 2x+" maxBarSize={56} cursor="pointer"
+                                        onClick={(d: any) => d?.sprint && handleSprintBarClick(d.sprint, 'carryover2x', 'Carryover 2x+')}
+                                    >
                                         <LabelList
                                             dataKey="Carryover 2x+"
                                             position="center"
-                                            style={{ fill: 'white', fontSize: 10, fontWeight: 700 }}
+                                            style={{ fill: 'white', fontSize: 9, fontWeight: 700 }}
                                             formatter={(v: unknown) => (typeof v === 'number' && v >= 2) ? String(v) : ''}
                                         />
                                     </Bar>
-                                    <Bar dataKey="Carryover" stackId="scope" fill="#fda4af" name="Carryover" maxBarSize={60}>
+                                    {/* Carryover — ORANGE */}
+                                    <Bar dataKey="Carryover" stackId="scope" fill="#f97316" name="Carryover" maxBarSize={56} cursor="pointer"
+                                        onClick={(d: any) => d?.sprint && handleSprintBarClick(d.sprint, 'carryover', 'Carryover')}
+                                    >
                                         <LabelList
                                             dataKey="Carryover"
                                             position="center"
-                                            style={{ fill: '#881337', fontSize: 10, fontWeight: 700 }}
+                                            style={{ fill: 'white', fontSize: 9, fontWeight: 700 }}
                                             formatter={(v: unknown) => (typeof v === 'number' && v >= 2) ? String(v) : ''}
                                         />
                                     </Bar>
-                                    {/* Newly Committed is the topmost scope bar — carries the total label */}
-                                    <Bar dataKey="Newly Committed" stackId="scope" fill="#bfdbfe" name="Newly Committed" maxBarSize={60} radius={[3, 3, 0, 0]}>
+                                    {/* Committed — LIGHT BLUE */}
+                                    <Bar dataKey="Committed" stackId="scope" fill="#93c5fd" name="Committed" maxBarSize={56} cursor="pointer"
+                                        onClick={(d: any) => d?.sprint && handleSprintBarClick(d.sprint, 'committed', 'Committed')}
+                                    >
                                         <LabelList
-                                            dataKey="Newly Committed"
+                                            dataKey="Committed"
                                             position="center"
-                                            style={{ fill: '#1e3a8a', fontSize: 10, fontWeight: 700 }}
+                                            style={{ fill: '#1e3a8a', fontSize: 9, fontWeight: 700 }}
+                                            formatter={(v: unknown) => (typeof v === 'number' && v >= 2) ? String(v) : ''}
+                                        />
+                                    </Bar>
+                                    {/* Added Mid-Sprint — YELLOW (topmost scope bar, carries total label) */}
+                                    <Bar dataKey="Added Mid-Sprint" stackId="scope" fill="#facc15" name="Added Mid-Sprint" maxBarSize={56} radius={[3, 3, 0, 0]} cursor="pointer"
+                                        onClick={(d: any) => d?.sprint && handleSprintBarClick(d.sprint, 'addedMidSprint', 'Added Mid-Sprint')}
+                                    >
+                                        <LabelList
+                                            dataKey="Added Mid-Sprint"
+                                            position="center"
+                                            style={{ fill: '#713f12', fontSize: 9, fontWeight: 700 }}
                                             formatter={(v: unknown) => (typeof v === 'number' && v >= 2) ? String(v) : ''}
                                         />
                                         <LabelList
                                             dataKey="_scopeTotal"
                                             position="top"
-                                            style={{ fill: '#0f172a', fontSize: 11, fontWeight: 800 }}
+                                            style={{ fill: '#0f172a', fontSize: 10, fontWeight: 800 }}
                                             formatter={(v: unknown) => (typeof v === 'number' && v > 0) ? String(v) : ''}
                                         />
                                     </Bar>
 
-                                    {/* ── Completed: separate bar (right of scope group) ── */}
-                                    <Bar dataKey="Completed" stackId="done" fill="#22c55e" name="Completed" maxBarSize={60} radius={[3, 3, 0, 0]}>
+                                    {/* ── BAR 2: Output stack (bottom → top) ────────── */}
+                                    {/* Completed — GREEN */}
+                                    <Bar dataKey="Completed" stackId="output" fill="#22c55e" name="Completed" maxBarSize={56} cursor="pointer"
+                                        onClick={(d: any) => d?.sprint && handleSprintBarClick(d.sprint, 'completed', 'Completed')}
+                                    >
                                         <LabelList
                                             dataKey="Completed"
+                                            position="center"
+                                            style={{ fill: 'white', fontSize: 9, fontWeight: 700 }}
+                                            formatter={(v: unknown) => (typeof v === 'number' && v >= 2) ? String(v) : ''}
+                                        />
+                                    </Bar>
+                                    {/* Removed — TRANSPARENT YELLOW (topmost output bar, carries total label) */}
+                                    <Bar dataKey="Removed" stackId="output" fill="rgba(250, 204, 21, 0.4)" name="Removed" maxBarSize={56} radius={[3, 3, 0, 0]} cursor="pointer"
+                                        onClick={(d: any) => d?.sprint && handleSprintBarClick(d.sprint, 'removed', 'Removed')}
+                                    >
+                                        <LabelList
+                                            dataKey="Removed"
+                                            position="center"
+                                            style={{ fill: '#713f12', fontSize: 9, fontWeight: 700 }}
+                                            formatter={(v: unknown) => (typeof v === 'number' && v >= 2) ? String(v) : ''}
+                                        />
+                                        <LabelList
+                                            dataKey="_outputTotal"
                                             position="top"
-                                            style={{ fill: '#15803d', fontSize: 11, fontWeight: 800 }}
+                                            style={{ fill: '#15803d', fontSize: 10, fontWeight: 800 }}
                                             formatter={(v: unknown) => (typeof v === 'number' && v > 0) ? String(v) : ''}
                                         />
                                     </Bar>
@@ -1048,43 +1142,58 @@ export function OverviewTab({ dto }: Props) {
                 </div>
 
                 {/* 4B) Contributors */}
-                <div className="lg:col-span-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-                    <SectionTitle className="mb-3">
-                        <GitPullRequest className="w-4 h-4 text-indigo-500" />
+                <div className="lg:col-span-3 bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col max-h-[420px]">
+                    <SectionTitle className="mb-3 shrink-0">
+                        <Users className="w-4 h-4 text-indigo-500" />
                         Contributors
                     </SectionTitle>
-                    <DataBanner message="Assignee data is not stored in the current jira_issues sync. Add assignee_display_name to enable per-person metrics." />
 
-                    {/* Workstream breakdown as proxy */}
-                    <div className="mt-4">
-                        <p className="text-[11px] text-slate-500 font-medium mb-2">
-                            Issues by workstream <span className="font-normal text-slate-400">(proxy view)</span>
-                        </p>
-                        <div className="space-y-2">
-                            {wsBreakdown.entries.map(([ws, count], idx) => (
-                                <div key={ws} className="flex items-center gap-2">
-                                    <div
-                                        className="w-2 h-2 rounded-full shrink-0"
-                                        style={{ background: TYPE_COLORS[idx % TYPE_COLORS.length] }}
-                                    />
-                                    <span className="text-xs text-slate-700 truncate flex-1 min-w-0" title={ws}>{ws}</span>
-                                    <span className="text-xs font-semibold text-slate-700 shrink-0">{count}</span>
-                                    <div className="w-14 h-1.5 bg-slate-100 rounded-full overflow-hidden shrink-0">
-                                        <div
-                                            className="h-full rounded-full"
-                                            style={{
-                                                width: `${wsBreakdown.total > 0 ? Math.round(count / wsBreakdown.total * 100) : 0}%`,
-                                                background: TYPE_COLORS[idx % TYPE_COLORS.length],
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                            {wsBreakdown.entries.length === 0 && (
-                                <p className="text-sm text-slate-400">No workstream data</p>
-                            )}
+                    {dto.contributors && dto.contributors.length > 0 ? (
+                        <div className="flex-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar">
+                            <table className="w-full text-left border-collapse pb-2">
+                                <thead className="sticky top-0 bg-white z-10 shadow-sm border-b border-slate-100">
+                                    <tr>
+                                        <th className="font-semibold text-[11px] text-slate-400 uppercase tracking-wider py-2 font-inter bg-white">Assignee</th>
+                                        <th className="font-semibold text-[11px] text-slate-400 uppercase tracking-wider py-2 text-right bg-white">Tickets</th>
+                                        <th className="font-semibold text-[11px] text-slate-400 uppercase tracking-wider py-2 text-right pr-2 bg-white">SP</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50">
+                                    {dto.contributors.map((c) => (
+                                        <tr key={c.accountId} className="group hover:bg-slate-50/80 transition-colors">
+                                            <td className="py-2.5">
+                                                <div className="flex items-center gap-2.5">
+                                                    {c.avatarUrl ? (
+                                                        <img src={c.avatarUrl} alt={c.displayName || 'Avatar'} className="w-7 h-7 rounded-full object-cover shadow-sm bg-white border border-slate-100 shrink-0" />
+                                                    ) : (
+                                                        <div className="w-7 h-7 rounded-full bg-indigo-50 flex items-center justify-center text-[10px] font-bold text-indigo-600 border border-indigo-100 shrink-0">
+                                                            {(c.displayName || '?').charAt(0).toUpperCase()}
+                                                        </div>
+                                                    )}
+                                                    <span className="text-slate-700 font-medium text-xs truncate max-w-[130px]" title={c.displayName || 'Unknown'}>
+                                                        {c.displayName || 'Unknown'}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td className="py-2.5 text-right font-medium text-slate-600 text-[11px]">
+                                                {c.ticketsCount > 0 ? c.ticketsCount : '—'}
+                                            </td>
+                                            <td className="py-2.5 text-right pr-2">
+                                                <span className="text-slate-800 text-xs font-bold">
+                                                    {c.storyPointsTotal > 0 ? c.storyPointsTotal : '—'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
+                    ) : (
+                        <div className="flex flex-col flex-1 items-center justify-center text-slate-400 text-sm py-8">
+                            <Users className="w-8 h-8 text-slate-200 mb-2" />
+                            <p>No contributors found</p>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -1189,6 +1298,20 @@ export function OverviewTab({ dto }: Props) {
                     data={modal.issues}
                     columns={phase4Columns}
                     statusKey="statusName"
+                />
+            )}
+
+            {/* ─── Sprint Health drill-down modal ─────────────────────────────── */}
+            {sprintModal && (
+                <IssueListModal
+                    key={sprintModal.title}
+                    open
+                    onOpenChange={(op) => { if (!op) setSprintModal(null) }}
+                    title={sprintModalLoading ? `${sprintModal.title} (loading…)` : sprintModal.title}
+                    data={sprintModal.issues}
+                    columns={sprintHealthColumns}
+                    statusKey="status"
+                    workstreamKey="workstream"
                 />
             )}
         </div>
