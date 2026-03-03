@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { format } from 'date-fns'
 import { ExternalLink, Filter, Download, X } from 'lucide-react'
@@ -18,19 +18,30 @@ interface IssueListModalProps<T> {
     title: string
     data: T[]
     columns: ColumnDef<T>[]
+    statusKey?: keyof T
+    workstreamKey?: keyof T
 }
 
-export function IssueListModal<T extends Record<string, any>>({ open, onOpenChange, title, data, columns }: IssueListModalProps<T>) {
+export function IssueListModal<T extends Record<string, any>>({ open, onOpenChange, title, data, columns, statusKey = 'status' as keyof T, workstreamKey = 'workstream' as keyof T }: IssueListModalProps<T>) {
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [workstreamFilter, setWorkstreamFilter] = useState<string>('all')
 
+    // Reset internal filters every time the modal opens so stale selections
+    // from a previous drill-down never bleed into a new one.
+    useEffect(() => {
+        if (open) {
+            setStatusFilter('all')
+            setWorkstreamFilter('all')
+        }
+    }, [open])
+
     // Extract unique values for filters
-    const statuses = Array.from(new Set(data.map(item => item.status))).filter(Boolean)
-    const workstreams = Array.from(new Set(data.map(item => item.workstream))).filter(Boolean)
+    const statuses = Array.from(new Set(data.map(item => item[statusKey]))).filter(Boolean)
+    const workstreams = Array.from(new Set(data.map(item => item[workstreamKey]))).filter(Boolean)
 
     const filteredData = data.filter(item => {
-        if (statusFilter !== 'all' && item.status !== statusFilter) return false
-        if (workstreamFilter !== 'all' && item.workstream !== workstreamFilter) return false
+        if (statusFilter !== 'all' && String(item[statusKey]) !== statusFilter) return false
+        if (workstreamFilter !== 'all' && String(item[workstreamKey]) !== workstreamFilter) return false
         return true
     })
 
@@ -38,15 +49,11 @@ export function IssueListModal<T extends Record<string, any>>({ open, onOpenChan
         const exportData = filteredData.map(item => {
             const row: any = {}
             columns.forEach(col => {
-                // If there's an accessorKey, use it. Otherwise, we might need a text-only version of the cell content.
-                // For simplicity, we'll try to use accessorKey or a basic label.
                 if (col.accessorKey) {
                     row[col.header] = item[col.accessorKey]
                 } else if (col.header === 'Key') {
-                    row['Key'] = item.key
+                    row['Key'] = item.key || item.jira_key || item.jira_issue_id
                 } else {
-                    // Fallback for custom cells: we can't easily export complex React nodes to Excel
-                    // You might want to add an 'exportValue' key to ColumnDef for this.
                     row[col.header] = '(See Dashboard)'
                 }
             })
@@ -158,14 +165,25 @@ export function IssueListModal<T extends Record<string, any>>({ open, onOpenChan
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {filteredData.length === 0 ? (
+                                {!filteredData || filteredData.length === 0 ? (
                                     <tr>
-                                        <td colSpan={columns.length} className="px-5 py-12 text-center">
+                                        <td colSpan={columns.length} className="px-5 py-24 text-center">
                                             <div className="flex flex-col items-center gap-3">
-                                                <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-                                                    <X className="w-6 h-6 text-slate-400" />
+                                                <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100 mb-2">
+                                                    <Filter className="w-8 h-8 text-slate-300" />
                                                 </div>
-                                                <p className="text-slate-500 font-medium">No records found matching your filters.</p>
+                                                <h3 className="text-slate-600 font-bold">No items found</h3>
+                                                <p className="text-slate-400 text-xs max-w-[240px] mx-auto">
+                                                    No records match your current filters or the selection is empty ({data?.length || 0} total items).
+                                                </p>
+                                                {(statusFilter !== 'all' || workstreamFilter !== 'all') && (
+                                                    <button
+                                                        onClick={() => { setStatusFilter('all'); setWorkstreamFilter('all'); }}
+                                                        className="mt-2 text-indigo-600 hover:text-indigo-800 text-xs font-bold px-4 py-2 bg-indigo-50 rounded-lg transition-colors"
+                                                    >
+                                                        Clear all filters
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

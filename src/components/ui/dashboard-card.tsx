@@ -27,6 +27,8 @@ export interface DashboardCardProps {
     accentHex: string
     /** The main KPI number displayed large */
     value: string | number
+    /** Optional smaller text shown next to the value (e.g. %) */
+    valueSuffix?: string | number
     /** Absolute change vs previous period */
     deltaAbsolute: number
     /** Percentage change vs previous period */
@@ -77,6 +79,7 @@ export function DashboardCard({
     iconBg,
     accentHex,
     value,
+    valueSuffix,
     deltaAbsolute,
     deltaPercent,
     inverseGood = false,
@@ -108,8 +111,13 @@ export function DashboardCard({
 
             {/* Row 2 — Main Value + Trend */}
             <div className="flex items-end justify-between mb-3 relative z-10">
-                <div className="text-[28px] leading-none font-bold text-slate-800 tracking-tight">
+                <div className="text-[28px] leading-none font-bold text-slate-800 tracking-tight flex items-baseline gap-1">
                     {value}
+                    {valueSuffix !== undefined && (
+                        <span className="text-[14px] font-semibold text-slate-400">
+                            ({valueSuffix}%)
+                        </span>
+                    )}
                 </div>
                 <div className="flex flex-col items-end">
                     <span className={`flex items-center text-[13px] font-bold leading-none ${delta.color}`}>

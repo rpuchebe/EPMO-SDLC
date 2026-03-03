@@ -314,13 +314,16 @@ function computeHealthScore(filteredIssues: Phase4Issue[]): { delivery: number; 
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
+import { FilterRow } from '../phase4-ui'
+
 interface Props {
     dto: Phase4DTO
     filters: Phase4Filters
+    setFilter: <K extends keyof Phase4Filters>(key: K, value: Phase4Filters[K]) => void
     filteredIssues: Phase4Issue[]
 }
 
-export function AISummaryTab({ dto, filteredIssues }: Props) {
+export function AISummaryTab({ dto, filters, setFilter, filteredIssues }: Props) {
     const insights = useMemo(() => generateInsights(dto, filteredIssues), [dto, filteredIssues])
     const scores = useMemo(() => computeHealthScore(filteredIssues), [filteredIssues])
 
@@ -339,6 +342,7 @@ export function AISummaryTab({ dto, filteredIssues }: Props) {
 
     return (
         <div className="space-y-5">
+            <FilterRow filters={filters} setFilter={setFilter} />
 
             {/* ── Header ────────────────────────────────────────────────────── */}
             <div className="bg-gradient-to-r from-indigo-600 to-violet-600 rounded-xl p-5 text-white">

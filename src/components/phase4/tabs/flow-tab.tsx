@@ -65,15 +65,16 @@ function calcAgeDays(issue: Phase4Issue): number | null {
     return Math.max(0, Math.round(ms / 86_400_000))
 }
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+import { FilterRow } from '../phase4-ui'
 
 interface Props {
     dto: Phase4DTO
     filters: Phase4Filters
+    setFilter: <K extends keyof Phase4Filters>(key: K, value: Phase4Filters[K]) => void
     filteredIssues: Phase4Issue[]
 }
 
-export function FlowTab({ filteredIssues }: Props) {
+export function FlowTab({ filters, setFilter, filteredIssues }: Props) {
     const total = filteredIssues.length
 
     // Status breakdown bar data
@@ -152,6 +153,7 @@ export function FlowTab({ filteredIssues }: Props) {
 
     return (
         <div className="space-y-5">
+            <FilterRow filters={filters} setFilter={setFilter} />
 
             {/* ── Flow KPIs ──────────────────────────────────────────────────── */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

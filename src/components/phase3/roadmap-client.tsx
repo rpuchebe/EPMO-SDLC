@@ -382,8 +382,8 @@ export function RoadmapClient({ isAdmin = false, workstream = 'All Workstreams' 
             })
             .then((data: RoadmapDTO) => {
                 setDto(data)
-                // Auto-expand all root (initiative) nodes
-                setExpandedIds(new Set(data.rootIds ?? []))
+                // Default to all nodes collapsed
+                setExpandedIds(new Set())
                 setLoading(false)
             })
             .catch((err: Error) => {
@@ -705,10 +705,10 @@ export function RoadmapClient({ isAdmin = false, workstream = 'All Workstreams' 
                                             paddingLeft: indentPx,
                                             paddingRight: 12,
                                             backgroundColor: isHovered
-                                                ? 'rgb(239 246 255 / 0.6)'
+                                                ? 'rgb(239 246 255)'
                                                 : isEven
                                                     ? 'white'
-                                                    : 'rgb(248 250 252 / 0.4)',
+                                                    : 'rgb(248 250 252)',
                                         }}
                                     >
                                         {/* Expand/collapse toggle */}

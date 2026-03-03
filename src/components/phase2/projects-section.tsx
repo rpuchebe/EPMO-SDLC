@@ -6,7 +6,7 @@ import { AlertTriangle, Calendar, Clock, Waypoints, Network, FileX, FileCheck, M
 import { InitiativeStatusGauge } from './charts/initiative-status-gauge'
 import { WorkstreamBarChart } from './charts/workstream-bar-chart'
 import { InvestmentCategoryDonut } from './charts/investment-category-donut'
-import { IssueListModal, ColumnDef } from './modals/issue-list-modal'
+import { IssueListModal, ColumnDef } from '@/components/shared/modals/issue-list-modal'
 import { AlertCard } from '@/components/ui/alert-card'
 import type { ProjectsDashboardData, ProjectRow } from '@/lib/server/projects'
 
@@ -416,6 +416,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
             )}
 
             <IssueListModal
+                key={modalData.title}
                 open={modalData.open}
                 onOpenChange={(op) => setModalData(prev => ({ ...prev, open: op }))}
                 title={modalData.title}

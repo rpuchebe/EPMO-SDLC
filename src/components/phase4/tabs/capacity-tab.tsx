@@ -41,13 +41,16 @@ function ConnectBanner({ title, description }: { title: string; description: str
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
+import { FilterRow } from '../phase4-ui'
+
 interface Props {
     dto: Phase4DTO
     filters: Phase4Filters
+    setFilter: <K extends keyof Phase4Filters>(key: K, value: Phase4Filters[K]) => void
     filteredIssues: Phase4Issue[]
 }
 
-export function CapacityTab({ dto, filteredIssues }: Props) {
+export function CapacityTab({ dto, filters, setFilter, filteredIssues }: Props) {
     const total = filteredIssues.length
 
     // Investment category distribution (real data)
@@ -109,6 +112,7 @@ export function CapacityTab({ dto, filteredIssues }: Props) {
 
     return (
         <div className="space-y-5">
+            <FilterRow filters={filters} setFilter={setFilter} />
 
             {/* ── Investment Allocation ─────────────────────────────────────── */}
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">

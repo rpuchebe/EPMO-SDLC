@@ -7,7 +7,20 @@ import { DashboardHeader } from '@/components/phase0/dashboard-header'
 import { TimelineChart, type Granularity } from '@/components/phase0/timeline-chart'
 import { StatusDistribution } from '@/components/phase0/status-distribution'
 import { CollaboratorsReport } from '@/components/phase0/collaborators-report'
-import { TicketListModal, type Ticket } from '@/components/phase0/ticket-list-modal'
+import { IssueListModal, ColumnDef } from '@/components/shared/modals/issue-list-modal'
+import { ExternalLink } from 'lucide-react'
+
+export interface Ticket {
+    jira_key: string
+    summary: string
+    status: string
+    status_category: string
+    workstream: string | null
+    roi_score: number | null
+    created_at: string
+    reporter_display_name: string | null
+    reporter_avatar_url: string | null
+}
 import { Loader2 } from 'lucide-react'
 import { KpiCards, type KPIs } from '@/components/phase0/kpi-cards'
 
@@ -56,6 +69,68 @@ const emptyKpis: KPIs = {
     completedIdeas: { ...emptyKpiBase, completionRate: 0, avgDaysToCompletion: 0 },
     avgRoiScoring: { ...emptyKpiBase, medianRoi: 0, top10Roi: 0 }
 }
+
+const statusColors: Record<string, string> = {
+    'To Do': 'bg-slate-100 text-slate-700',
+    'In Progress': 'bg-blue-50 text-blue-700',
+    'Done': 'bg-emerald-50 text-emerald-700',
+}
+
+function getStatusColor(category: string) {
+    return statusColors[category] || 'bg-slate-100 text-slate-600'
+}
+
+const JIRA_BASE = 'https://prioritycommerce.atlassian.net'
+
+const ticketColumns: ColumnDef<Ticket>[] = [
+    {
+        header: 'Key',
+        accessorKey: 'jira_key',
+        cell: (t) => (
+            <a
+                href={`${JIRA_BASE}/browse/${t.jira_key}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-medium text-xs transition-colors"
+                title={t.jira_key}
+            >
+                {t.jira_key}
+                <ExternalLink className="w-3 h-3" />
+            </a>
+        )
+    },
+    { header: 'Summary', cell: (t) => <span className="max-w-[300px] truncate block" title={t.summary}>{t.summary}</span>, accessorKey: 'summary' },
+    {
+        header: 'Status',
+        accessorKey: 'status',
+        cell: (t) => (
+            <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(t.status_category)}`} title={t.status}>
+                {t.status}
+            </span>
+        )
+    },
+    { header: 'ROI', accessorKey: 'roi_score', cell: (t) => <span className="font-medium text-xs text-slate-600">{t.roi_score !== null ? t.roi_score : '—'}</span> },
+    {
+        header: 'Reporter',
+        accessorKey: 'reporter_display_name',
+        cell: (t) => (
+            <div className="flex items-center gap-1.5">
+                {t.reporter_avatar_url && !t.reporter_avatar_url.startsWith('https://secure.gravatar.com/avatar/') ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={t.reporter_avatar_url} alt="" className="w-5 h-5 rounded-full" />
+                ) : (
+                    <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                        {(t.reporter_display_name || '?')[0]}
+                    </div>
+                )}
+                <span className="text-xs text-slate-600 truncate max-w-[90px]" title={t.reporter_display_name || 'Unknown'}>
+                    {t.reporter_display_name || 'Unknown'}
+                </span>
+            </div>
+        )
+    },
+    { header: 'Created', accessorKey: 'created_at', cell: (t) => <span className="text-xs text-slate-500">{new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span> },
+]
 
 // ── Helpers to filter tickets for drill-down ──
 
@@ -219,12 +294,16 @@ export default function Phase0Page() {
             </div>
 
             {/* Drill-down modal */}
-            <TicketListModal
-                open={drillDown !== null}
-                title={drillDown?.title || ''}
-                tickets={drillDown?.tickets || []}
-                onClose={() => setDrillDown(null)}
-            />
+            {drillDown && (
+                <IssueListModal
+                    key={drillDown.title}
+                    open
+                    onOpenChange={(op) => { if (!op) setDrillDown(null) }}
+                    title={drillDown.title}
+                    data={drillDown.tickets}
+                    columns={ticketColumns}
+                />
+            )}
         </div>
     )
 }

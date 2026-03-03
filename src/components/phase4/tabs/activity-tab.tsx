@@ -104,13 +104,16 @@ function ActivityCalendar({ issues }: { issues: Phase4Issue[] }) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
+import { FilterRow } from '../phase4-ui'
+
 interface Props {
     dto: Phase4DTO
     filters: Phase4Filters
+    setFilter: <K extends keyof Phase4Filters>(key: K, value: Phase4Filters[K]) => void
     filteredIssues: Phase4Issue[]
 }
 
-export function ActivityTab({ filteredIssues }: Props) {
+export function ActivityTab({ filters, setFilter, filteredIssues }: Props) {
     // Weekly activity (issues with start or due dates)
     const weeklyData = useMemo(() => {
         const weeks: Record<string, { opened: number; closed: number }> = {}
@@ -181,6 +184,7 @@ export function ActivityTab({ filteredIssues }: Props) {
 
     return (
         <div className="space-y-5">
+            <FilterRow filters={filters} setFilter={setFilter} />
 
             {/* ── Activity KPIs ─────────────────────────────────────────────── */}
             <div className="grid grid-cols-3 gap-4">

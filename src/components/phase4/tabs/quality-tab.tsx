@@ -50,13 +50,16 @@ function GateBadge({ pass }: { pass: boolean }) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
+import { FilterRow } from '../phase4-ui'
+
 interface Props {
     dto: Phase4DTO
     filters: Phase4Filters
+    setFilter: <K extends keyof Phase4Filters>(key: K, value: Phase4Filters[K]) => void
     filteredIssues: Phase4Issue[]
 }
 
-export function QualityTab({ filteredIssues }: Props) {
+export function QualityTab({ filters, setFilter, filteredIssues }: Props) {
     const total = filteredIssues.length
 
     // Bug metrics
@@ -154,6 +157,7 @@ export function QualityTab({ filteredIssues }: Props) {
 
     return (
         <div className="space-y-5">
+            <FilterRow filters={filters} setFilter={setFilter} />
 
             {/* ── Quality Gate Summary ──────────────────────────────────────── */}
             <div className="bg-slate-50 rounded-xl border border-slate-200 p-4">
@@ -162,13 +166,12 @@ export function QualityTab({ filteredIssues }: Props) {
                         <ShieldCheck className="w-4 h-4 text-indigo-500" />
                         Quality Gates
                     </SectionTitle>
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-full border ${
-                        passCount === gates.length
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                            : passCount >= gates.length / 2
-                                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                : 'bg-rose-50 text-rose-700 border-rose-200'
-                    }`}>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full border ${passCount === gates.length
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        : passCount >= gates.length / 2
+                            ? 'bg-amber-50 text-amber-700 border-amber-200'
+                            : 'bg-rose-50 text-rose-700 border-rose-200'
+                        }`}>
                         {passCount}/{gates.length} passing
                     </span>
                 </div>

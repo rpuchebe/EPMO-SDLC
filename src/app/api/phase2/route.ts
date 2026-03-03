@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const [initiativesResult, projectsResult, bwisResult] = await Promise.allSettled([
         getInitiativesDashboardData(workstream),
         getProjectsDashboardData(workstream),
-        getPhase2BwiSnapshotData()
+        getPhase2BwiSnapshotData(workstream, bwiSearch, bwiDateWindow, bwiHideClosed)
     ])
 
     if (initiativesResult.status === 'rejected') {

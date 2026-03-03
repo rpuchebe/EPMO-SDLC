@@ -7,7 +7,28 @@ import { KpiCards, type PCBs as KPIs } from '@/components/phase1/kpi-cards'
 import { TimelineChart, type Granularity } from '@/components/phase1/timeline-chart'
 import { StatusDistribution } from '@/components/phase1/status-distribution'
 import { CollaboratorsReport } from '@/components/phase1/collaborators-report'
-import { TicketListModal, type Phase1Ticket } from '@/components/phase1/ticket-list-modal'
+import { IssueListModal, ColumnDef } from '@/components/shared/modals/issue-list-modal'
+import { ExternalLink } from 'lucide-react'
+
+export interface Phase1Ticket {
+    id: string
+    jira_key: string
+    summary: string
+    status: string
+    status_category: string
+    workstream: string | null
+    team: string | null
+    ticket_type: string | null
+    created_at: string
+    completed_at: string | null
+    roi_score: number | null
+    reporter_display_name: string | null
+    reporter_avatar_url: string | null
+    assignee_display_name: string | null
+    assignee_avatar_url: string | null
+    linked_work_item_count: number | null
+    linked_work_items?: { key: string; status: string; issue_type: string; summary?: string }[] | null
+}
 import { BacklogDistribution } from '@/components/phase1/backlog-distribution'
 import { IncidentManagementTab } from '@/components/phase1/incident-management-tab'
 import { Loader2, ClipboardList, AlertTriangle } from 'lucide-react'
@@ -35,6 +56,81 @@ const emptyKpis: KPIs = {
     completedItems: { ...emptyKpiBase },
     linkedItemsBreakdown: []
 }
+
+const statusColors: Record<string, string> = {
+    'To Do': 'bg-slate-100 text-slate-700',
+    'In Progress': 'bg-blue-50 text-blue-700',
+    'Done': 'bg-emerald-50 text-emerald-700',
+}
+
+function getStatusColor(category: string) {
+    return statusColors[category] || 'bg-slate-100 text-slate-600'
+}
+
+const JIRA_BASE = 'https://prioritycommerce.atlassian.net'
+
+const ticketColumns: ColumnDef<Phase1Ticket>[] = [
+    {
+        header: 'Key',
+        accessorKey: 'jira_key',
+        cell: (t) => (
+            <a
+                href={`${JIRA_BASE}/browse/${t.jira_key}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-medium text-xs transition-colors"
+                title={t.jira_key}
+            >
+                {t.jira_key}
+                <ExternalLink className="w-3 h-3" />
+            </a>
+        )
+    },
+    { header: 'Summary', cell: (t) => <span className="max-w-[250px] truncate block" title={t.summary}>{t.summary}</span>, accessorKey: 'summary' },
+    { header: 'Type', accessorKey: 'ticket_type', cell: (t) => <span className="text-slate-600 text-xs">{t.ticket_type || '—'}</span> },
+    {
+        header: 'ROI',
+        accessorKey: 'roi_score',
+        cell: (t) => (
+            <span className="text-xs font-medium">
+                {t.roi_score !== null && t.roi_score !== undefined ? (
+                    <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full inline-block">
+                        {t.roi_score}
+                    </span>
+                ) : '—'}
+            </span>
+        )
+    },
+    {
+        header: 'Status',
+        accessorKey: 'status',
+        cell: (t) => (
+            <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(t.status_category)}`} title={t.status}>
+                <span className="max-w-[100px] truncate block">{t.status}</span>
+            </span>
+        )
+    },
+    {
+        header: 'Reporter',
+        accessorKey: 'reporter_display_name',
+        cell: (t) => (
+            <div className="flex items-center gap-1.5">
+                {t.reporter_avatar_url && !t.reporter_avatar_url.startsWith('https://secure.gravatar.com/avatar/') ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={t.reporter_avatar_url} alt="" className="w-5 h-5 rounded-full" />
+                ) : (
+                    <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500">
+                        {(t.reporter_display_name || '?')[0]}
+                    </div>
+                )}
+                <span className="text-xs text-slate-600 truncate max-w-[90px]" title={t.reporter_display_name || 'Unknown'}>
+                    {t.reporter_display_name || 'Unknown'}
+                </span>
+            </div>
+        )
+    },
+    { header: 'Created', accessorKey: 'created_at', cell: (t) => <span className="text-xs text-slate-500">{new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span> },
+]
 
 function filterByKpi(tickets: Phase1Ticket[], kpiKey: string): Phase1Ticket[] {
     switch (kpiKey) {
@@ -297,12 +393,16 @@ export default function Phase1Page() {
             )}
 
             {/* Drill-down modal */}
-            <TicketListModal
-                open={drillDown !== null}
-                title={drillDown?.title || ''}
-                tickets={drillDown?.tickets || []}
-                onClose={() => setDrillDown(null)}
-            />
+            {drillDown && (
+                <IssueListModal
+                    key={drillDown.title}
+                    open
+                    onOpenChange={(op) => { if (!op) setDrillDown(null) }}
+                    title={drillDown.title}
+                    data={drillDown.tickets}
+                    columns={ticketColumns}
+                />
+            )}
         </div>
     )
 }

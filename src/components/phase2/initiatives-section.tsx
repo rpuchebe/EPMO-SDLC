@@ -7,7 +7,7 @@ import { Activity, AlertTriangle, Calendar, AlertOctagon, Waypoints, Clock, Shie
 import { InvestmentCategoryDonut } from './charts/investment-category-donut'
 import { InitiativeStatusGauge } from './charts/initiative-status-gauge'
 import { WorkstreamBarChart } from './charts/workstream-bar-chart'
-import { IssueListModal, ColumnDef } from './modals/issue-list-modal'
+import { IssueListModal, ColumnDef } from '@/components/shared/modals/issue-list-modal'
 import { format } from 'date-fns'
 import { AlertCard } from '@/components/ui/alert-card'
 import type { Severity } from '@/lib/server/initiatives'
@@ -363,6 +363,7 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
             </div>
 
             <IssueListModal
+                key={modalData.title}
                 open={modalData.open}
                 onOpenChange={(op) => setModalData(prev => ({ ...prev, open: op }))}
                 title={modalData.title}

@@ -60,15 +60,16 @@ function downloadCSV(issues: Phase4Issue[]) {
 
 type SortKey = 'key' | 'summary' | 'issueType' | 'statusName' | 'investmentCategory'
 
-// ─── Main ─────────────────────────────────────────────────────────────────────
+import { FilterRow } from '../phase4-ui'
 
 interface Props {
     dto: Phase4DTO
     filters: Phase4Filters
+    setFilter: <K extends keyof Phase4Filters>(key: K, value: Phase4Filters[K]) => void
     filteredIssues: Phase4Issue[]
 }
 
-export function SprintHealthTab({ dto, filteredIssues }: Props) {
+export function SprintHealthTab({ dto, filters, setFilter, filteredIssues }: Props) {
     const [tableSearch, setTableSearch] = useState('')
     const [sortKey, setSortKey] = useState<SortKey>('key')
     const [sortAsc, setSortAsc] = useState(true)
@@ -119,6 +120,7 @@ export function SprintHealthTab({ dto, filteredIssues }: Props) {
 
     return (
         <div className="space-y-5">
+            <FilterRow filters={filters} setFilter={setFilter} />
 
             {/* ── Sprint Overview (placeholder) ──────────────────────────────── */}
             <div className="bg-slate-50 rounded-xl border border-slate-200 p-4">

@@ -4,6 +4,7 @@ import { Bell, GraduationCap, ChevronDown, User, LogOut, Settings, Check, X, Sea
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { RefreshProgressBar } from '../ui/refresh-progress-bar'
 
 // Custom hook to handle clicks outside of a component
 function useOnClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
@@ -133,16 +134,17 @@ export function Header({ user }: { user: any }) {
                 }
             )
             if (res.ok) {
-                setSyncToast({ type: 'success', message: 'Sync started successfully.' })
-                setTimeout(() => setSyncToast(null), 5000)
+                // Success toast removed as per user request (was "Sync started successfully")
             } else {
                 setSyncToast({ type: 'error', message: 'Failed to start sync. Please try again.' })
+                setSyncing(false) // clear if failed
             }
         } catch {
             setSyncToast({ type: 'error', message: 'Failed to start sync. Please try again.' })
-        } finally {
-            setSyncing(false)
+            setSyncing(false) // clear if failed
         }
+        // Duration of progress bar as requested by user
+        setTimeout(() => setSyncing(false), 80000)
     }
 
     const name = userProfile?.full_name || user?.user_metadata?.full_name || user?.email || 'User'
@@ -376,6 +378,8 @@ export function Header({ user }: { user: any }) {
                     </div>
                 </div>
             </div>
+
+            {syncing && <RefreshProgressBar />}
 
             {/* Sync toast */}
             {syncToast && (
