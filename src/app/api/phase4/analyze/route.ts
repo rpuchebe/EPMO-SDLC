@@ -11,6 +11,7 @@
  */
 
 import { NextResponse } from 'next/server'
+import { requireAuth } from '@/utils/supabase/auth-guard'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -123,6 +124,9 @@ Keep each section concise. Use plain English. Reference specific numbers from th
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
+    const auth = await requireAuth()
+    if (auth instanceof NextResponse) return auth
+
     const apiKey = process.env.ANTHROPIC_API_KEY
     if (!apiKey) {
         return NextResponse.json(

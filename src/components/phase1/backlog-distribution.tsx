@@ -115,12 +115,12 @@ export function BacklogDistribution({ data, onItemClick }: BacklogDistributionPr
                                             className="w-2 h-2 rounded-full shrink-0 group-hover:scale-125 transition-transform"
                                             style={{ backgroundColor: COLORS[idx % COLORS.length] }}
                                         />
-                                        <span className="text-[11px] text-slate-600 truncate group-hover:text-slate-900 transition-colors">
+                                        <span className="text-xs text-slate-600 truncate group-hover:text-slate-900 transition-colors">
                                             {item.type}
                                         </span>
                                     </div>
 
-                                    <span className="text-[11px] font-semibold text-slate-700 ml-2 tabular-nums">
+                                    <span className="text-xs font-semibold text-slate-700 ml-2 tabular-nums">
                                         {item.count}
                                     </span>
                                 </div>

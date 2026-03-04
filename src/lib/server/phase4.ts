@@ -64,6 +64,14 @@ export interface Phase4Issue {
     updatedAt: string | null
     /** Raw array of sprints this issue has been part of */
     sprintRaw: any | null
+    assigneeAccountId: string | null
+    assigneeDisplayName: string | null
+    assigneeAvatarUrl: string | null
+    storyPoints: number | null
+    devPrCount: number | null
+    devOpenPrCount: number | null
+    devMergedPrCount: number | null
+    devLastUpdated: string | null
 }
 
 export interface AggItem {
@@ -105,6 +113,8 @@ export interface OverviewKpis {
     inActiveSprintCount: number | null
     /** Average number of sprints to resolve a DEV issue (from snapshot). */
     avgSprintsToResolve: number | null
+    /** Global average age to complete for DEV_TYPES (days). */
+    avgAgeDays: number | null
 
     // ── Backlog (C) ──────────────────────────────────────────────────────────
     backlogCount: number
@@ -161,11 +171,13 @@ export interface ContributorRow {
     avatarUrl: string | null
     role: string
     ticketsCount: number
+    ticketsCompleted?: number
     storyPointsTotal: number
     /** Completion percentage, 0-100. */
     completionPct: number
     ticketsWithoutEstimation: number
     workstreamCode: string | null
+    storyPointsCompleted?: number
 }
 
 // ─── PR metric types ──────────────────────────────────────────────────────────
@@ -176,6 +188,16 @@ export interface PrMetrics {
     openCount: number
     mergedCount: number
     avgPrsPerTicket: number
+    avgCommitsPerTicket: number
+    wowDelta: number
+    wowPct: number
+}
+
+export interface SprintToSolve {
+    avgSprints: number
+    avgAgeDays: number
+    wowDelta: number
+    wowPct: number
 }
 
 // ─── Full DTO ─────────────────────────────────────────────────────────────────
@@ -206,8 +228,9 @@ export interface Phase4DTO {
 
     // ── Snapshot-sourced fields ───────────────────────────────────────────────
     sprintHealth: SprintHealthRow[]
-    contributors: ContributorRow[]
+    sprintToSolve: SprintToSolve
     prMetrics: PrMetrics
+    contributors: ContributorRow[]
 }
 
 // ─── Internal snapshot row shapes ─────────────────────────────────────────────
@@ -245,6 +268,7 @@ interface OverviewSnapshotRow {
     pr_open_count: number | null
     pr_merged_count: number | null
     avg_prs_per_ticket: number | null
+    avg_commits_per_ticket: number | null
 }
 
 interface SprintHealthSnapshotRow {
@@ -270,7 +294,9 @@ interface ContributorsSnapshotRow {
     avatar_url: string | null
     role: string | null
     tickets_count: number | null
+    tickets_completed: number | null
     story_points_total: number | null
+    story_points_completed: number | null
     completion_pct: number | null    // may be 0..1 or 0..100
     tickets_without_estimation: number | null
 }
@@ -292,6 +318,14 @@ const ISSUE_COLS = [
     'created_at_jira',
     'updated_at_jira',
     'sprint_raw',
+    'assignee_account_id',
+    'assignee_display_name',
+    'assignee_avatar_url',
+    'story_points',
+    'dev_pr_count',
+    'dev_open_pr_count',
+    'dev_merged_pr_count',
+    'dev_last_updated',
 ].join(', ')
 
 type RawRow = {
@@ -309,6 +343,14 @@ type RawRow = {
     created_at_jira: string | null
     updated_at_jira: string | null
     sprint_raw: any | null
+    assignee_account_id: string | null
+    assignee_display_name: string | null
+    assignee_avatar_url: string | null
+    story_points: number | null
+    dev_pr_count: number | null
+    dev_open_pr_count: number | null
+    dev_merged_pr_count: number | null
+    dev_last_updated: string | null
 }
 
 function toStatusCategory(raw: string | null): StatusCategory {
@@ -382,8 +424,8 @@ function countInWindow(
 }
 
 function calcWow(current: number, prev: number): { delta: number; pct: number } {
-    const delta = current - prev
-    const pct = prev > 0 ? Math.round((delta / prev) * 100) : (current > 0 ? 100 : 0)
+    const delta = parseFloat((current - prev).toFixed(1))
+    const pct = prev > 0 ? parseFloat(((delta / prev) * 100).toFixed(1)) : (current > 0 ? 100 : 0)
     return { delta, pct }
 }
 
@@ -404,7 +446,8 @@ function formatMonthLabel(key: string): string {
  */
 function normalizePct(v: number | null | undefined): number {
     if (v == null || isNaN(v)) return 0
-    return v <= 1 ? Math.round(v * 100) : Math.round(v)
+    const val = v <= 1 ? v * 100 : v
+    return parseFloat(val.toFixed(1))
 }
 
 /** Round a nullable number to 1 decimal place. Returns null for null/undefined. */
@@ -508,6 +551,8 @@ function computeOverviewKpis(issues: Phase4Issue[]): OverviewKpis {
         wowPct: otherWoWPct,
     }
 
+    const avgAgeDays = avgDays(doneDev.map(i => daysDiff(i.createdAt, i.updatedAt ?? i.dueDate)))
+
     return {
         completionRate,
         workItemsTotal: devTotal,
@@ -521,6 +566,7 @@ function computeOverviewKpis(issues: Phase4Issue[]): OverviewKpis {
         inProgressWoWPct: ipWoWPct,
         inActiveSprintCount: null,     // overridden from snapshot when available
         avgSprintsToResolve: null,     // overridden from snapshot when available
+        avgAgeDays,
         backlogCount: todoDev.length,
         backlogWoWDelta: todoWoWDelta,
         backlogWoWPct: todoWoWPct,
@@ -629,18 +675,18 @@ function mergeOverviewSnapshot(snap: OverviewSnapshotRow, computed: OverviewKpis
         backlogWoWPct: computed.backlogWoWPct,
 
         // Count-based fields: always use computed (DEV_TYPES-scoped).
-        // The snapshot may have been built with a different issue-type scope.
         completionRate: computed.completionRate,
         workItemsTotal: computed.workItemsTotal,
         workItemsDone: computed.workItemsDone,
         inProgressCount: computed.inProgressCount,
         backlogCount: computed.backlogCount,
         notInStandardStatusCount: computed.notInStandardStatusCount,
-        avgBacklogAgeDays: computed.avgBacklogAgeDays,
 
-        // Sprint fields come exclusively from snapshot (not derivable from jira_issues alone)
-        inActiveSprintCount: snap.in_active_sprint_count ?? computed.inActiveSprintCount,
-        avgSprintsToResolve: snap.avg_sprints_to_resolve ?? computed.avgSprintsToResolve,
+        // Sprint/Age fields come from snapshot when available
+        inActiveSprintCount: snap.in_active_sprint_count ?? 0,
+        avgSprintsToResolve: round1(snap.avg_sprints_to_resolve) ?? 0,
+        avgAgeDays: computed.avgAgeDays,
+        avgBacklogAgeDays: round1(snap.backlog_avg_age_days) ?? computed.avgBacklogAgeDays,
 
         // Type cards: snapshot provides accuracy; WoW stays computed
         stories: mergeTypeCard(snap, 'stories', computed.stories),
@@ -877,13 +923,32 @@ function mapContributors(rows: ContributorsSnapshotRow[]): ContributorRow[] {
     }))
 }
 
-function mapPrMetrics(snap: OverviewSnapshotRow | null): PrMetrics {
-    if (!snap) return { coveragePct: 0, openCount: 0, mergedCount: 0, avgPrsPerTicket: 0 }
+function mapSprintToSolve(snap: OverviewSnapshotRow | null, prevSnap: OverviewSnapshotRow | null, liveAvgAge: number | null): SprintToSolve {
+    const currentVal = snap?.avg_sprints_to_resolve ? Number(snap.avg_sprints_to_resolve) : 0
+    const prevVal = prevSnap?.avg_sprints_to_resolve ? Number(prevSnap.avg_sprints_to_resolve) : 0
+    const { delta, pct } = calcWow(currentVal, prevVal)
+
     return {
-        coveragePct: normalizePct(snap.pr_coverage_pct),
-        openCount: snap.pr_open_count ?? 0,
-        mergedCount: snap.pr_merged_count ?? 0,
-        avgPrsPerTicket: snap.avg_prs_per_ticket ?? 0,
+        avgSprints: round1(currentVal) ?? 0,
+        avgAgeDays: round1(liveAvgAge) ?? 0,
+        wowDelta: delta,
+        wowPct: pct,
+    }
+}
+
+function mapPrMetrics(snap: OverviewSnapshotRow | null, prevSnap: OverviewSnapshotRow | null): PrMetrics {
+    const currentPct = normalizePct(snap?.pr_coverage_pct)
+    const prevPct = normalizePct(prevSnap?.pr_coverage_pct)
+    const { delta, pct } = calcWow(currentPct, prevPct)
+
+    return {
+        coveragePct: currentPct,
+        openCount: snap?.pr_open_count ?? 0,
+        mergedCount: snap?.pr_merged_count ?? 0,
+        avgPrsPerTicket: round1(snap?.avg_prs_per_ticket) ?? 0,
+        avgCommitsPerTicket: round1(snap?.avg_commits_per_ticket) ?? 0,
+        wowDelta: delta,
+        wowPct: pct,
     }
 }
 
@@ -902,7 +967,7 @@ export async function getPhase4Data(workstream?: string, _team?: string): Promis
     while (hasMore) {
         let query = supabase
             .from('jira_issues')
-            .select(ISSUE_COLS)
+            .select('*')
             .in('issue_type', [...DEV_TYPES])
             .order('jira_key')
             .range(from, from + pageSize - 1)
@@ -914,6 +979,7 @@ export async function getPhase4Data(workstream?: string, _team?: string): Promis
         const { data, error } = await query
         if (error) throw new Error(`[phase4/issues] ${error.message}`)
 
+
         const rows = (data ?? []) as unknown as RawRow[]
         allIssues = [...allIssues, ...rows]
 
@@ -924,9 +990,12 @@ export async function getPhase4Data(workstream?: string, _team?: string): Promis
         }
     }
 
+    const lastWeek = daysAgoISO(7).split('T')[0]
+
     // ── Fetch other sources in parallel ───────────────────────────────────────
     const [
         overviewSnapResult,
+        prevOverviewSnapResult,
         sprintHealthResult,
         contributorsResult,
     ] = await Promise.all([
@@ -937,15 +1006,26 @@ export async function getPhase4Data(workstream?: string, _team?: string): Promis
             .eq('snapshot_date', today)
             .eq('period', 'daily')
             .maybeSingle(),
+        supabase
+            .from('phase4_overview_snapshot')
+            .select('*')
+            .eq('snapshot_date', lastWeek)
+            .eq('period', 'daily')
+            .maybeSingle(),
         // Sprint health — fetches from jira_sprints + snapshot (always global, sprints are shared)
         fetchSprintHealth(supabase, today),
-        // Contributors — global for now; add .eq('workstream_code', code) when available
-        supabase
-            .from('phase4_contributors_snapshot')
-            .select('*')
-            .eq('snapshot_date', today)
-            .eq('period', 'daily')
-            .order('tickets_count', { ascending: false }),
+        // Contributors — global or filtered by workstream_code
+        (() => {
+            let q = supabase
+                .from('phase4_contributors_snapshot')
+                .select('*')
+                .eq('snapshot_date', today)
+                .eq('period', 'daily')
+            if (workstream && workstream !== 'All Workstreams') {
+                q = q.eq('workstream_code', workstream)
+            }
+            return q.order('tickets_count', { ascending: false })
+        })(),
     ])
 
     // ── Process issues ────────────────────────────────────────────────────────
@@ -964,6 +1044,14 @@ export async function getPhase4Data(workstream?: string, _team?: string): Promis
         createdAt: r.created_at_jira ?? null,
         updatedAt: r.updated_at_jira ?? null,
         sprintRaw: r.sprint_raw ?? null,
+        assigneeAccountId: r.assignee_account_id ?? null,
+        assigneeDisplayName: r.assignee_display_name ?? null,
+        assigneeAvatarUrl: r.assignee_avatar_url ?? null,
+        storyPoints: r.story_points ?? null,
+        devPrCount: r.dev_pr_count ?? 0,
+        devOpenPrCount: r.dev_open_pr_count ?? 0,
+        devMergedPrCount: r.dev_merged_pr_count ?? 0,
+        devLastUpdated: r.dev_last_updated ?? null,
     }))
 
     const total = issues.length
@@ -1010,9 +1098,14 @@ export async function getPhase4Data(workstream?: string, _team?: string): Promis
     }
 
     const overviewSnap = overviewSnapResult.data as OverviewSnapshotRow | null
+    const prevOverviewSnap = prevOverviewSnapResult.data as OverviewSnapshotRow | null
 
     // Override: Use purely COMPUTED kpis. Snapshots are often stale and don't match the live frontend groupings.
-    const overviewKpis = computedKpis
+    const overviewKpis = {
+        ...computedKpis,
+        inActiveSprintCount: overviewSnap?.in_active_sprint_count ?? 0,
+        avgSprintsToResolve: round1(overviewSnap?.avg_sprints_to_resolve) ?? 0,
+    }
 
     // Override: Use computationally derived data instead of stale JSON from snapshots
     const notDoneByType = computedNotDoneByType
@@ -1023,11 +1116,122 @@ export async function getPhase4Data(workstream?: string, _team?: string): Promis
         computedInvestmentByMonth,
     )
 
-    const prMetrics = mapPrMetrics(overviewSnap)
+    // ── LIVE computation for Row 5 (ensures workstream accuracy) ─────────────
+    const nowISO = new Date().toISOString()
+    const weekAgoISO = daysAgoISO(7)
+
+    // A) Sprint to Solve (Live)
+    const solvedIssues = devIssues.filter(i => i.statusCategory === 'Done' || i.statusCategory === 'Descoped')
+    const solvedWithSprints = solvedIssues.filter(i => Array.isArray(i.sprintRaw) && i.sprintRaw.length > 0)
+    const liveAvgSprints = solvedWithSprints.length > 0
+        ? solvedWithSprints.reduce((acc, i) => acc + (i.sprintRaw.length), 0) / solvedWithSprints.length
+        : (overviewSnap?.avg_sprints_to_resolve ? Number(overviewSnap.avg_sprints_to_resolve) : 0)
+
+    const sprintToSolve: SprintToSolve = {
+        avgSprints: round1(liveAvgSprints) ?? 0,
+        avgAgeDays: round1(computedKpis.avgAgeDays) ?? 0,
+        wowDelta: mapSprintToSolve(overviewSnap, prevOverviewSnap, 0).wowDelta,
+        wowPct: mapSprintToSolve(overviewSnap, prevOverviewSnap, 0).wowPct,
+    }
+
+    // B) PR Metrics (Live)
+    const issuesWithPrs = devIssues.filter(i => (i.devPrCount ?? 0) > 0).length
+    const livePrCoveragePct = devTotal > 0 ? (issuesWithPrs / devTotal) * 100 : 0
+    const liveOpenPrCount = devIssues.reduce((sum, i) => sum + (i.devOpenPrCount ?? 0), 0)
+    const liveMergedPrCount = solvedIssues.reduce((sum, i) => sum + (i.devMergedPrCount ?? 0), 0)
+
+    const prMetrics: PrMetrics = {
+        coveragePct: normalizePct(livePrCoveragePct),
+        openCount: liveOpenPrCount,
+        mergedCount: liveMergedPrCount,
+        avgPrsPerTicket: round1(overviewSnap?.avg_prs_per_ticket) ?? 0,
+        avgCommitsPerTicket: round1(overviewSnap?.avg_commits_per_ticket) ?? 0,
+        wowDelta: mapPrMetrics(overviewSnap, prevOverviewSnap).wowDelta,
+        wowPct: mapPrMetrics(overviewSnap, prevOverviewSnap).wowPct,
+    }
+
     const sprintHealth = sprintHealthResult // already SprintHealthRow[] from fetchSprintHealth
-    const contributors = mapContributors(
-        (contributorsResult.data ?? []) as unknown as ContributorsSnapshotRow[],
-    )
+
+    // Process contributors from snapshot
+    const rawContributorRows = (contributorsResult.data ?? []) as unknown as ContributorsSnapshotRow[]
+
+    // Aggregation Map: ensure each person appears only once by summing their metrics 
+    // across different sprints or groupings in the snapshot.
+    const aggMap = new Map<string, ContributorRow>()
+
+    rawContributorRows.forEach(r => {
+        // If a workstream filter is active, only aggregate rows for that workstream
+        if (workstream && workstream !== 'All Workstreams' && r.workstream_code !== workstream) {
+            return
+        }
+
+        const key = r.account_id
+        if (!aggMap.has(key)) {
+            aggMap.set(key, {
+                accountId: r.account_id,
+                displayName: r.display_name,
+                avatarUrl: r.avatar_url,
+                role: r.role || 'Dev',
+                ticketsCount: 0,
+                ticketsCompleted: 0,
+                storyPointsTotal: 0,
+                storyPointsCompleted: 0,
+                ticketsWithoutEstimation: 0,
+                completionPct: 0,
+                workstreamCode: r.workstream_code,
+            })
+        }
+
+        const acc = aggMap.get(key)!
+        acc.ticketsCount += (r.tickets_count || 0)
+        acc.ticketsCompleted! += (r.tickets_completed || 0)
+        acc.storyPointsTotal += (r.story_points_total || 0)
+        acc.storyPointsCompleted! += (r.story_points_completed || 0)
+        acc.ticketsWithoutEstimation += (r.tickets_without_estimation || 0)
+
+        // Prefer rows that actually have name/avatar data
+        if (!acc.displayName || acc.displayName === 'Unknown') acc.displayName = r.display_name
+        if (!acc.avatarUrl) acc.avatarUrl = r.avatar_url
+    })
+
+    // Compute final percentage and enrich missing names from live issues
+    let contributors: ContributorRow[] = Array.from(aggMap.values())
+
+    const nameMap = new Map<string, { name: string, avatar: string | null }>()
+    issues.forEach(i => {
+        if (i.assigneeAccountId && i.assigneeDisplayName && i.assigneeDisplayName !== 'Unknown') {
+            nameMap.set(i.assigneeAccountId, {
+                name: i.assigneeDisplayName,
+                avatar: i.assigneeAvatarUrl
+            })
+        }
+    })
+
+    contributors = contributors.map(c => {
+        // Final % calculation based on TICKETS as requested
+        const tTotal = c.ticketsCount || 0
+        const tDone = c.ticketsCompleted || 0
+        const completionPct = tTotal > 0 ? Math.round((tDone / tTotal) * 100) : 0
+
+        // Enrichment
+        let displayName = c.displayName
+        let avatarUrl = c.avatarUrl
+
+        if (!displayName || displayName === 'Unknown') {
+            const match = nameMap.get(c.accountId)
+            if (match) {
+                displayName = match.name
+                avatarUrl = match.avatar || avatarUrl
+            }
+        }
+
+        return {
+            ...c,
+            displayName,
+            avatarUrl,
+            completionPct
+        }
+    }).sort((a, b) => b.ticketsCount - a.ticketsCount)
 
     const investmentCategories = [
         ...new Set(issues.map(i => i.investmentCategory || 'Unassigned')),
@@ -1058,7 +1262,8 @@ export async function getPhase4Data(workstream?: string, _team?: string): Promis
         allStatuses,
         investmentCategories,
         sprintHealth,
-        contributors,
+        sprintToSolve,
         prMetrics,
+        contributors,
     }
 }

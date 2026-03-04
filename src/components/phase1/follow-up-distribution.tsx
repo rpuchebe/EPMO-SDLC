@@ -84,7 +84,7 @@ export function FollowUpDistribution({ data }: FollowUpDistributionProps) {
                 {/* Center Label for Donut Chart */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10" style={{ paddingBottom: '36px' }}>
                     <span className="text-3xl font-bold text-slate-800 leading-none">{totalFollowUps}</span>
-                    <span className="text-[11px] font-semibold text-slate-400 mt-1 uppercase tracking-wider">Total</span>
+                    <span className="text-xs font-semibold text-slate-400 mt-1 uppercase tracking-wider">Total</span>
                 </div>
 
                 <ResponsiveContainer width="100%" height="100%">

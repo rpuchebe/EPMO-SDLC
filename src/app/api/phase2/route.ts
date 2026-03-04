@@ -2,8 +2,12 @@ import { NextResponse } from 'next/server'
 import { getInitiativesDashboardData } from '@/lib/server/initiatives'
 import { getProjectsDashboardData } from '@/lib/server/projects'
 import { getPhase2BwiSnapshotData } from '@/lib/server/bwis'
+import { requireAuth } from '@/utils/supabase/auth-guard'
 
 export async function GET(request: Request) {
+    const auth = await requireAuth()
+    if (auth instanceof NextResponse) return auth
+
     const { searchParams } = new URL(request.url)
     const workstream = searchParams.get('workstream') || 'All Workstreams'
     const period = searchParams.get('period') || '30'

@@ -112,7 +112,7 @@ function WeeklyUpdateItem({ item, defaultExpandedColor, dotColor, forceExpanded 
                         <input
                             type="text"
                             placeholder="+ badge"
-                            className="text-[11px] text-slate-500 bg-white border border-dashed border-slate-300 rounded-full px-2 py-0.5 w-20 focus:w-28 focus:border-blue-400 outline-none transition-all"
+                            className="text-xs text-slate-500 bg-white border border-dashed border-slate-300 rounded-full px-2 py-0.5 w-20 focus:w-28 focus:border-blue-400 outline-none transition-all"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     const val = (e.target as HTMLInputElement).value.trim()

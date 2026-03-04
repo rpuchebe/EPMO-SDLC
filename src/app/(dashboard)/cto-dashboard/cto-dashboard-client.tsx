@@ -84,13 +84,13 @@ function WorkstreamTable({ rows }: { rows: WorkstreamRow[] }) {
             <table className="w-full text-sm">
                 <thead>
                     <tr className="border-b border-slate-100">
-                        <th className="text-left py-3 px-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Workstream</th>
-                        <th className="text-right py-3 px-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Velocity (SP)</th>
-                        <th className="text-right py-3 px-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Predictability</th>
-                        <th className="text-right py-3 px-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">CFR</th>
-                        <th className="text-right py-3 px-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">MTTR</th>
-                        <th className="text-right py-3 px-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">I1a</th>
-                        <th className="text-right py-3 px-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Uptime</th>
+                        <th className="text-left py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Workstream</th>
+                        <th className="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Velocity (SP)</th>
+                        <th className="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Predictability</th>
+                        <th className="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">CFR</th>
+                        <th className="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">MTTR</th>
+                        <th className="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">I1a</th>
+                        <th className="text-right py-3 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Uptime</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -156,12 +156,12 @@ export function CtoDashboardClient() {
                         <h1 className="text-xl font-bold text-slate-900 tracking-tight">CTO Dashboard</h1>
                         <p className="text-sm text-slate-500 mt-0.5 font-medium">
                             Engineering &amp; Delivery Health
-                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+                            <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                                 Mock Data
                             </span>
                         </p>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[12px] text-slate-400 shrink-0">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400 shrink-0">
                         <CalendarClock className="w-3.5 h-3.5" />
                         <span>Last updated: <span className="font-medium text-slate-600">{formatLastUpdated(lastUpdated)}</span></span>
                     </div>
@@ -289,8 +289,8 @@ export function CtoDashboardClient() {
                 {/* Sprint Trend Chart */}
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
                     <div className="mb-4">
-                        <h2 className="text-[14px] font-semibold text-slate-800">Sprint Trend</h2>
-                        <p className="text-[12px] text-slate-400 mt-0.5">Velocity (SP) and Predictability (%) by sprint</p>
+                        <h2 className="text-sm font-semibold text-slate-800">Sprint Trend</h2>
+                        <p className="text-xs text-slate-400 mt-0.5">Velocity (SP) and Predictability (%) by sprint</p>
                     </div>
                     {sprintTrend.length === 0 ? <EmptyChart /> : (
                         <ResponsiveContainer width="100%" height={220}>
@@ -351,8 +351,8 @@ export function CtoDashboardClient() {
                 {/* Incidents Trend Chart */}
                 <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
                     <div className="mb-4">
-                        <h2 className="text-[14px] font-semibold text-slate-800">Incidents Trend</h2>
-                        <p className="text-[12px] text-slate-400 mt-0.5">MTTR (hrs) and I1a volume by week</p>
+                        <h2 className="text-sm font-semibold text-slate-800">Incidents Trend</h2>
+                        <p className="text-xs text-slate-400 mt-0.5">MTTR (hrs) and I1a volume by week</p>
                     </div>
                     {incidentsTrend.length === 0 ? <EmptyChart /> : (
                         <ResponsiveContainer width="100%" height={220}>
@@ -414,8 +414,8 @@ export function CtoDashboardClient() {
             {/* ── Row 3: Workstream Table ──────────────────────────────────── */}
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                 <div className="px-5 py-4 border-b border-slate-100">
-                    <h2 className="text-[14px] font-semibold text-slate-800">Workstream Summary</h2>
-                    <p className="text-[12px] text-slate-400 mt-0.5">Key metrics per engineering workstream</p>
+                    <h2 className="text-sm font-semibold text-slate-800">Workstream Summary</h2>
+                    <p className="text-xs text-slate-400 mt-0.5">Key metrics per engineering workstream</p>
                 </div>
                 <WorkstreamTable rows={workstreamSummary} />
             </div>

@@ -31,10 +31,11 @@ export async function updateSession(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    // Protect all routes except /login and static Next.js paths
+    // Protect all routes except /api, /login and static Next.js paths
     if (
         !user &&
-        !request.nextUrl.pathname.startsWith('/login')
+        !request.nextUrl.pathname.startsWith('/login') &&
+        !request.nextUrl.pathname.startsWith('/api')
     ) {
         const url = request.nextUrl.clone()
         url.pathname = '/login'

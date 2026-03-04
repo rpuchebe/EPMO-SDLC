@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { getPhase4Data } from '@/lib/server/phase4'
+import { requireAuth } from '@/utils/supabase/auth-guard'
 
 export async function GET(req: Request) {
+    const auth = await requireAuth()
+    if (auth instanceof NextResponse) return auth
+
     try {
         const { searchParams } = new URL(req.url)
         const workstream = searchParams.get('workstream') || 'All Workstreams'

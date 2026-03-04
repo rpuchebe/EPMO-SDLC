@@ -141,7 +141,7 @@ export function GovernanceScoreSection({ data }: GovernanceScoreSectionProps) {
                     {lowestDim && (
                         <div className="mt-3 p-2.5 bg-red-50 rounded-lg border border-red-100 flex items-start gap-2">
                             <AlertTriangle className="w-3.5 h-3.5 text-red-500 mt-0.5 shrink-0" />
-                            <p className="text-[11px] text-red-700 leading-relaxed">
+                            <p className="text-xs text-red-700 leading-relaxed">
                                 <span className="font-semibold">{lowestDim.name}</span> is the lowest-performing dimension at {lowestDim.score}%. Focus improvement efforts here to boost the overall governance score.
                             </p>
                         </div>

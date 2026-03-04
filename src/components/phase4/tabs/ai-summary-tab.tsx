@@ -366,17 +366,17 @@ export function AISummaryTab({ dto, filters, setFilter, filteredIssues }: Props)
                 {/* Alert summary */}
                 <div className="mt-4 flex items-center gap-3 flex-wrap">
                     {criticalCount > 0 && (
-                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-rose-500/30 text-rose-100 border border-rose-400/30">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-500/30 text-rose-100 border border-rose-400/30">
                             <TrendingDown className="w-3 h-3" /> {criticalCount} Critical
                         </span>
                     )}
                     {warningCount > 0 && (
-                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/30 text-amber-100 border border-amber-400/30">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/30 text-amber-100 border border-amber-400/30">
                             <AlertTriangle className="w-3 h-3" /> {warningCount} Warning
                         </span>
                     )}
                     {positiveCount > 0 && (
-                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/30 text-emerald-100 border border-emerald-400/30">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/30 text-emerald-100 border border-emerald-400/30">
                             <CheckCircle2 className="w-3 h-3" /> {positiveCount} Positive
                         </span>
                     )}
@@ -427,7 +427,7 @@ export function AISummaryTab({ dto, filters, setFilter, filteredIssues }: Props)
             {/* ── Disclaimer ────────────────────────────────────────────────── */}
             <div className="flex items-start gap-2.5 p-3 bg-slate-50 rounded-lg border border-slate-200">
                 <Sparkles className="w-3.5 h-3.5 text-indigo-400 mt-0.5 shrink-0" />
-                <p className="text-[11px] text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                     These insights are generated deterministically from your Jira issue data — no LLM is called.
                     Connect additional data sources (sprint history, GitHub, cycle-time data) to unlock deeper analysis,
                     true velocity trends, and predictive delivery forecasts.

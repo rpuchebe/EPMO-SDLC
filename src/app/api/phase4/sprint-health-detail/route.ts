@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { requireAuth } from '@/utils/supabase/auth-guard'
 
 /**
  * GET /api/phase4/sprint-health-detail?sprintLabel=Sprint+5+-+2026&category=committed
@@ -19,9 +20,12 @@ const ALLOWED_ISSUE_TYPES = [
 ]
 
 export async function GET(request: NextRequest) {
+    const auth = await requireAuth()
+    if (auth instanceof NextResponse) return auth
+
     const { searchParams } = new URL(request.url)
-    const sprintLabel = searchParams.get('sprintLabel')
-    const category = searchParams.get('category')
+    const sprintLabel = searchParams.get('sprintLabel')?.trim()
+    const category = searchParams.get('category')?.trim()
 
     if (!sprintLabel || !category) {
         return NextResponse.json({ error: 'sprintLabel and category are required' }, { status: 400 })

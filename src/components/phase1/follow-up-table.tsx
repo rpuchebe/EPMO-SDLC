@@ -51,7 +51,7 @@ export function FollowUpTable({ data }: FollowUpTableProps) {
             <div className="flex flex-col gap-4 mb-4">
                 <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-slate-900">Postmortem list</h3>
-                    <label className="flex items-center gap-2 text-[11px] font-medium text-slate-600 cursor-pointer bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200">
+                    <label className="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200">
                         <input
                             type="checkbox"
                             checked={removeComplete}

@@ -348,7 +348,7 @@ export default function LoginClient({
                         )}
 
                         {/* Footer inside card */}
-                        <p className="text-center text-[11px] text-slate-300 mt-5">
+                        <p className="text-center text-xs text-slate-300 mt-5">
                             EPMO · SDLC Central Hub · Priority Software
                         </p>
                     </div>

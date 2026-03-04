@@ -109,7 +109,7 @@ export function ProgressCircle({
                         return (
                             <div
                                 key={i}
-                                className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${colorCls}`}
+                                className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${colorCls}`}
                             >
                                 <Icon className="w-3 h-3" />
                                 <span>{t.label}: {sign}{t.deltaPct.toFixed(1)}%</span>

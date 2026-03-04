@@ -26,7 +26,7 @@ function ConnectBanner({ title, description }: { title: string; description: str
             </div>
             <div className="min-w-0">
                 <p className="text-xs font-medium text-slate-600">{title}</p>
-                <p className="text-[11px] text-slate-400">{description}</p>
+                <p className="text-xs text-slate-400">{description}</p>
             </div>
         </div>
     )
@@ -228,7 +228,7 @@ export function ActivityTab({ filters, setFilter, filteredIssues }: Props) {
                         <XAxis dataKey="week" tick={{ fontSize: 10 }} interval={1} />
                         <YAxis tick={{ fontSize: 10 }} />
                         <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #e2e8f0' }} />
-                        <Legend formatter={v => <span className="text-[11px] text-slate-600">{v}</span>} />
+                        <Legend formatter={v => <span className="text-xs text-slate-600">{v}</span>} />
                         <Line type="monotone" dataKey="opened" name="Opened" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} />
                         <Line type="monotone" dataKey="closed" name="Closed" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} />
                     </LineChart>

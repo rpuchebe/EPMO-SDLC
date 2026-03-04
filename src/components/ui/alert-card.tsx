@@ -32,7 +32,7 @@ export function AlertCard({ title, count, severity, icon, onClick, weeklyTrend, 
                 <div className={`w-[22px] h-[22px] flex-shrink-0 flex items-center justify-center rounded-lg ${colors.icon}`}>
                     {icon}
                 </div>
-                <span className="text-[12px] font-medium text-slate-600 truncate">{title}</span>
+                <span className="text-xs font-medium text-slate-600 truncate">{title}</span>
             </div>
 
             {/* Main value & Weekly Trend */}

@@ -305,7 +305,7 @@ function Tooltip({ node }: { node: RoadmapNode }) {
                     <div className="font-semibold text-white leading-tight mt-0.5">{node.summary}</div>
                 </div>
             </div>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] text-slate-300">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-slate-300">
                 <span className="text-slate-500">Status</span>
                 <span className="flex items-center gap-1">
                     {STATUS_ICON[node.statusCategory]}
@@ -637,7 +637,7 @@ export function RoadmapClient({ isAdmin = false, workstream = 'All Workstreams' 
                             className="sticky left-0 z-30 bg-slate-50 border-r border-slate-200 flex items-center px-4"
                             style={{ width: SIDEBAR_WIDTH, minWidth: SIDEBAR_WIDTH }}
                         >
-                            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Issue
                             </span>
                         </div>
@@ -650,7 +650,7 @@ export function RoadmapClient({ isAdmin = false, workstream = 'All Workstreams' 
                                     className="flex flex-col items-center justify-center border-r border-slate-200 last:border-r-0 shrink-0"
                                     style={{ width: col.width, minWidth: col.width }}
                                 >
-                                    <span className="text-[11px] font-semibold text-slate-700 leading-none">
+                                    <span className="text-xs font-semibold text-slate-700 leading-none">
                                         {col.label}
                                     </span>
                                     {col.subLabel && (

@@ -117,7 +117,7 @@ function RiskCard({
 
             {showTooltip && (
                 <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-56
-                                bg-slate-900 text-slate-200 text-[11px] rounded-xl p-3 shadow-xl
+                                bg-slate-900 text-slate-200 text-xs rounded-xl p-3 shadow-xl
                                 leading-relaxed pointer-events-none">
                     {tooltip}
                     <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1

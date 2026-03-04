@@ -78,7 +78,7 @@ export function IssueListModal<T extends Record<string, any>>({ open, onOpenChan
                         <h2 className="text-lg font-bold text-white whitespace-nowrap">
                             {title}
                         </h2>
-                        <span className="bg-white/10 text-[#8dd4b0] text-[11px] py-0.5 px-2 rounded-full font-bold border border-white/10 backdrop-blur-md">
+                        <span className="bg-white/10 text-[#8dd4b0] text-xs py-0.5 px-2 rounded-full font-bold border border-white/10 backdrop-blur-md">
                             {filteredData.length}
                         </span>
                     </div>
@@ -155,7 +155,7 @@ export function IssueListModal<T extends Record<string, any>>({ open, onOpenChan
                 <div className="flex-1 overflow-auto px-6 py-4 bg-slate-50/50">
                     <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
                         <table className="w-full text-sm text-left text-slate-600 border-collapse">
-                            <thead className="text-[11px] text-slate-500 bg-slate-50/80 uppercase sticky top-0 z-10 backdrop-blur-md">
+                            <thead className="text-xs text-slate-500 bg-slate-50/80 uppercase sticky top-0 z-10 backdrop-blur-md">
                                 <tr className="border-b border-slate-200">
                                     {columns.map((col, i) => (
                                         <th key={i} className="px-5 py-4 font-bold tracking-wider">

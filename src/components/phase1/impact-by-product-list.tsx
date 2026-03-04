@@ -35,7 +35,7 @@ export function ImpactByProductList({ data, selectedProduct = 'all', onProductSe
                 {selectedProduct !== 'all' && onProductSelect && (
                     <button
                         onClick={() => onProductSelect('all')}
-                        className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-800 transition-colors bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-md"
+                        className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 transition-colors bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-md"
                     >
                         <X className="w-3 h-3" />
                         Clear filter

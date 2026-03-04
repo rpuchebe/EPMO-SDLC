@@ -50,7 +50,7 @@ export function PhaseHeader({ icon: Icon, title, description, lastSync, workstre
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">
                     <span
-                        className="inline-flex items-center gap-1.5 text-[11px] rounded-md px-2 py-0.5"
+                        className="inline-flex items-center gap-1.5 text-xs rounded-md px-2 py-0.5"
                         style={{ background: 'rgba(166, 215, 195, 0.06)', color: '#6b9e8a' }}
                     >
                         <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#5ec492' }} />

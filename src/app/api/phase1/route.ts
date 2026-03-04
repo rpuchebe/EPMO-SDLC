@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { requireAuth } from '@/utils/supabase/auth-guard'
 
 interface Phase1TicketRow {
     id: string
@@ -72,6 +73,9 @@ async function safeQuery<T>(result: { data: unknown | null; error: { message: st
 }
 
 export async function GET(request: NextRequest) {
+    const auth = await requireAuth()
+    if (auth instanceof NextResponse) return auth
+
     const supabase = await createClient()
     const { searchParams } = new URL(request.url)
 

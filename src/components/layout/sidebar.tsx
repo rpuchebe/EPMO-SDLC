@@ -146,7 +146,7 @@ export function Sidebar({
                                     {/* Flyout Menu */}
                                     <div className="absolute left-[52px] top-0 hidden group-hover/section:flex flex-col bg-white border border-slate-200 shadow-sm rounded-xl min-w-[200px] py-1.5 z-50">
                                         <div className="px-3 py-2 border-b border-slate-100 mb-1">
-                                            <span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">{section.title}</span>
+                                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{section.title}</span>
                                         </div>
                                         {section.items.map(item => {
                                             const isActive = pathname === item.href || (pathname.startsWith(item.href) && item.href !== '/home')
@@ -154,7 +154,7 @@ export function Sidebar({
                                                 <Link
                                                     key={item.name}
                                                     href={item.href}
-                                                    className={`mx-1.5 px-3 py-2 text-[14px] rounded-lg transition-colors my-0.5 ${isActive
+                                                    className={`mx-1.5 px-3 py-2 text-sm rounded-lg transition-colors my-0.5 ${isActive
                                                         ? 'bg-slate-100/80 text-slate-900 font-semibold'
                                                         : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                                                         }`}
@@ -181,7 +181,7 @@ export function Sidebar({
                                                 {section.icon && (
                                                     <section.icon className="w-[18px] h-[18px] text-slate-500 group-hover:text-slate-800 transition-colors" />
                                                 )}
-                                                <h3 className="text-[14px] font-semibold text-slate-800 transition-colors">
+                                                <h3 className="text-sm font-semibold text-slate-800 transition-colors">
                                                     {section.title}
                                                 </h3>
                                             </div>
@@ -192,7 +192,7 @@ export function Sidebar({
                                             {section.icon && (
                                                 <section.icon className="w-[18px] h-[18px] text-slate-500" />
                                             )}
-                                            <h3 className="text-[14px] font-semibold text-slate-500">
+                                            <h3 className="text-sm font-semibold text-slate-500">
                                                 {section.title}
                                             </h3>
                                         </div>
@@ -213,7 +213,7 @@ export function Sidebar({
                                                         } pl-[42px] pr-4 mx-1`}
                                                 >
                                                     {/* Label */}
-                                                    <span className="text-[14px] tracking-wide whitespace-nowrap transition-opacity duration-300 opacity-100 block">
+                                                    <span className="text-sm tracking-wide whitespace-nowrap transition-opacity duration-300 opacity-100 block">
                                                         {item.name}
                                                     </span>
                                                 </Link>

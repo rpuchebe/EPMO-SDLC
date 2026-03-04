@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
+import { requireAuth } from '@/utils/supabase/auth-guard'
 
 // MOCK DATA for Phase 2 Detail Endpoint
 
@@ -25,6 +26,9 @@ const mockBWIs = [
 ]
 
 export async function GET(request: Request) {
+    const auth = await requireAuth()
+    if (auth instanceof NextResponse) return auth
+
     const { searchParams } = new URL(request.url)
     const workstream = searchParams.get('workstream') || 'All Workstreams'
     const team = searchParams.get('team') || 'All Teams'

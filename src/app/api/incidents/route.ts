@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { Incident, FollowUpTicket, WorkstreamIncidentTicket, IncidentSyncLog } from '@/types/incidents'
+import { requireAuth } from '@/utils/supabase/auth-guard'
 
 async function fetchAll<T>(supabase: any, table: string): Promise<T[]> {
     let allData: T[] = []
@@ -27,6 +28,9 @@ async function fetchAll<T>(supabase: any, table: string): Promise<T[]> {
 }
 
 export async function GET(request: NextRequest) {
+    const auth = await requireAuth()
+    if (auth instanceof NextResponse) return auth
+
     const supabase = await createClient()
 
     try {

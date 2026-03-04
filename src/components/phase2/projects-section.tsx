@@ -103,7 +103,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
                 </span>
             )
         },
-        { header: 'Workstream', cell: (p) => <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[11px] font-bold uppercase whitespace-nowrap">{p.workstream || 'N/A'}</span> },
+        { header: 'Workstream', cell: (p) => <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold uppercase whitespace-nowrap">{p.workstream || 'N/A'}</span> },
         {
             header: 'Assignee',
             cell: (p) => <span className="text-slate-500 text-xs italic">{p.assignee || 'Unassigned'}</span>
@@ -133,7 +133,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
         {
             header: 'Start Date',
             cell: (p) => (
-                <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${!p.start_date ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'text-slate-600'}`}>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded ${!p.start_date ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'text-slate-600'}`}>
                     {p.start_date ? new Date(p.start_date).toLocaleDateString() : 'MISSING'}
                 </span>
             )
@@ -141,7 +141,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
         {
             header: 'Due Date',
             cell: (p) => (
-                <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${!p.due_date ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'text-slate-600'}`}>
+                <span className={`text-xs font-medium px-2 py-0.5 rounded ${!p.due_date ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'text-slate-600'}`}>
                     {p.due_date ? new Date(p.due_date).toLocaleDateString() : 'MISSING'}
                 </span>
             )
@@ -157,7 +157,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
         {
             header: 'Start Date',
             cell: (p) => (
-                <span className="text-[11px] font-medium px-2 py-0.5 rounded text-slate-600">
+                <span className="text-xs font-medium px-2 py-0.5 rounded text-slate-600">
                     {p.start_date ? new Date(p.start_date).toLocaleDateString() : 'N/A'}
                 </span>
             )
@@ -167,7 +167,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
             cell: (p) => {
                 const isPastDue = p.due_date && new Date(p.due_date) < new Date() && !isCompleted(p.status)
                 return (
-                    <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${isPastDue ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'text-slate-600'}`}>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded ${isPastDue ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'text-slate-600'}`}>
                         {p.due_date ? new Date(p.due_date).toLocaleDateString() : 'N/A'}
                         {isPastDue && ' (Past Due)'}
                     </span>
@@ -205,7 +205,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
             }
 
             return (
-                <span className="text-amber-700 font-medium text-[11px] bg-amber-50 px-2 py-1 rounded-md border border-amber-100 shadow-sm leading-tight inline-block">
+                <span className="text-amber-700 font-medium text-xs bg-amber-50 px-2 py-1 rounded-md border border-amber-100 shadow-sm leading-tight inline-block">
                     {display}
                 </span>
             )
@@ -274,7 +274,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
                             onClick={() => openModal('All Projects', projects, progressColumns)}
                             className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all group flex flex-col"
                         >
-                            <h3 className="text-[12px] font-medium text-slate-600 mb-1">Project Progress</h3>
+                            <h3 className="text-xs font-medium text-slate-600 mb-1">Project Progress</h3>
                             <div className="flex-1 flex flex-col justify-end">
                                 <InitiativeStatusGauge data={gaugeData} total={total} />
                             </div>
@@ -282,7 +282,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
 
                         {/* 2. By Workstream */}
                         <div className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all flex flex-col">
-                            <h3 className="text-[12px] font-medium text-slate-600 mb-1">By Workstream</h3>
+                            <h3 className="text-xs font-medium text-slate-600 mb-1">By Workstream</h3>
                             <div className="flex-1 min-h-0">
                                 <WorkstreamBarChart
                                     data={workstreamData}
@@ -297,7 +297,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
                                 className="flex justify-between items-center mb-1 cursor-pointer hover:opacity-80 group/title transition-all"
                                 onClick={() => openModal('Investment Categories', projects, progressColumns)}
                             >
-                                <h3 className="text-[12px] font-medium text-slate-600 underline underline-offset-4 decoration-slate-200 group-hover/title:decoration-slate-400">Investment Category</h3>
+                                <h3 className="text-xs font-medium text-slate-600 underline underline-offset-4 decoration-slate-200 group-hover/title:decoration-slate-400">Investment Category</h3>
                                 {trendBadge}
                             </div>
                             <div className="flex-1 min-h-0">
@@ -323,7 +323,7 @@ export function ProjectsSection({ data, workstream }: ProjectsSectionProps) {
 
                         {/* 4. Child Issue Type Distribution */}
                         <div className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col">
-                            <h3 className="text-[12px] font-medium text-slate-600 mb-1">Child Issue Types</h3>
+                            <h3 className="text-xs font-medium text-slate-600 mb-1">Child Issue Types</h3>
                             <div className="flex-1 min-h-0">
                                 {childTotal > 0 ? (
                                     <InvestmentCategoryDonut
@@ -457,7 +457,7 @@ function StatCard({ title, subtitle, count, total, icon, iconClass, accentColor,
                     <div className={`w-[22px] h-[22px] flex-shrink-0 flex items-center justify-center rounded-lg ${iconClass}`}>
                         {icon}
                     </div>
-                    <span className="text-[12px] font-medium text-slate-600 truncate">{title}</span>
+                    <span className="text-xs font-medium text-slate-600 truncate">{title}</span>
                 </div>
 
                 {weeklyTrend !== null && (

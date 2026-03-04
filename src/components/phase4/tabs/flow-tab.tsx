@@ -39,7 +39,7 @@ function ConnectBanner({ title, description }: { title: string; description: str
             </div>
             <div className="min-w-0">
                 <p className="text-xs font-medium text-slate-600">{title}</p>
-                <p className="text-[11px] text-slate-400">{description}</p>
+                <p className="text-xs text-slate-400">{description}</p>
             </div>
         </div>
     )
@@ -219,7 +219,7 @@ export function FlowTab({ filters, setFilter, filteredIssues }: Props) {
                             <XAxis dataKey="month" tick={{ fontSize: 10 }} />
                             <YAxis tick={{ fontSize: 10 }} />
                             <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #e2e8f0' }} />
-                            <Legend formatter={v => <span className="text-[11px] text-slate-600">{v}</span>} />
+                            <Legend formatter={v => <span className="text-xs text-slate-600">{v}</span>} />
                             <Line type="monotone" dataKey="total" name="Total" stroke="#6366f1" strokeWidth={2} dot={{ r: 3 }} />
                             <Line type="monotone" dataKey="done" name="Done" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} />
                         </LineChart>
@@ -272,7 +272,7 @@ export function FlowTab({ filters, setFilter, filteredIssues }: Props) {
                             <XAxis type="number" tick={{ fontSize: 10 }} />
                             <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 10 }} />
                             <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #e2e8f0' }} />
-                            <Legend formatter={v => <span className="text-[11px] text-slate-600">{v}</span>} />
+                            <Legend formatter={v => <span className="text-xs text-slate-600">{v}</span>} />
                             <Bar dataKey="done" name="Done" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} maxBarSize={14} />
                             <Bar dataKey="inProgress" name="In Progress" stackId="a" fill="#6366f1" maxBarSize={14} />
                             <Bar dataKey="toDo" name="To Do" stackId="a" fill="#94a3b8" radius={[0, 4, 4, 0]} maxBarSize={14} />
@@ -301,7 +301,7 @@ export function FlowTab({ filters, setFilter, filteredIssues }: Props) {
                 <div className="mt-3">
                     <div className="flex items-start gap-2 p-3 bg-white rounded-lg border border-slate-200">
                         <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
-                        <p className="text-[11px] text-slate-500 leading-relaxed">
+                        <p className="text-xs text-slate-500 leading-relaxed">
                             Cycle time is estimated using issue start/due dates where available. True cycle time requires Jira status change history.
                         </p>
                     </div>

@@ -184,7 +184,7 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
                 </span>
             )
         },
-        { header: 'Workstream', cell: (i) => <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[11px] font-bold uppercase whitespace-nowrap">{i.workstream}</span> },
+        { header: 'Workstream', cell: (i) => <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold uppercase whitespace-nowrap">{i.workstream}</span> },
         {
             header: 'Created',
             cell: (i) => <span className="text-slate-500 whitespace-nowrap tabular-nums">{format(new Date(i.created_at), 'MMM dd, yyyy')}</span>
@@ -232,7 +232,7 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
 
     const categoryColumn: ColumnDef<Initiative> = {
         header: 'Investment Category', cell: (i) => (
-            <span className="bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded text-[11px] uppercase">{i.investment_category || 'Unassigned'}</span>
+            <span className="bg-indigo-50 text-indigo-700 font-bold px-2 py-0.5 rounded text-xs uppercase">{i.investment_category || 'Unassigned'}</span>
         )
     }
 
@@ -270,7 +270,7 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
                         onClick={() => openModal('All Initiatives', initiatives, [...baseColumns, childsColumn])}
                         className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all group flex flex-col"
                     >
-                        <h3 className="text-[12px] font-medium text-slate-600 mb-1">Initiative Progress</h3>
+                        <h3 className="text-xs font-medium text-slate-600 mb-1">Initiative Progress</h3>
                         <div className="flex-1 flex flex-col justify-end">
                             <InitiativeStatusGauge data={gaugeData} total={createdCount} />
                         </div>
@@ -281,7 +281,7 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
                         onClick={() => openModal('All Initiatives by Workstream', initiatives, [...baseColumns, childsColumn])}
                         className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all flex flex-col"
                     >
-                        <h3 className="text-[12px] font-medium text-slate-600 mb-1">By Workstream</h3>
+                        <h3 className="text-xs font-medium text-slate-600 mb-1">By Workstream</h3>
                         <div className="flex-1 min-h-0">
                             <WorkstreamBarChart
                                 data={workstreamData}
@@ -293,7 +293,7 @@ export function InitiativesSection({ data }: InitiativesSectionProps) {
                     {/* 3. Investment Category */}
                     <div className="col-span-1 relative group flex flex-col h-full rounded-2xl bg-white border border-slate-200 shadow-sm p-4 hover:border-slate-300 hover:shadow-md transition-all">
                         <div className="flex justify-between items-center mb-1 z-10 relative">
-                            <h3 className="text-[12px] font-medium text-slate-600">Investment Category</h3>
+                            <h3 className="text-xs font-medium text-slate-600">Investment Category</h3>
                             {trendBadge}
                         </div>
                         <div className="absolute inset-0 z-0 bg-transparent rounded-2xl"

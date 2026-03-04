@@ -33,7 +33,7 @@ function ConnectBanner({ title, description }: { title: string; description: str
             </div>
             <div className="min-w-0">
                 <p className="text-xs font-medium text-slate-600">{title}</p>
-                <p className="text-[11px] text-slate-400">{description}</p>
+                <p className="text-xs text-slate-400">{description}</p>
             </div>
         </div>
     )
@@ -146,7 +146,7 @@ export function CapacityTab({ dto, filters, setFilter, filteredIssues }: Props) 
                                     ]}
                                     contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #e2e8f0' }}
                                 />
-                                <Legend formatter={v => <span className="text-[11px] text-slate-600">{v}</span>} />
+                                <Legend formatter={v => <span className="text-xs text-slate-600">{v}</span>} />
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
@@ -207,7 +207,7 @@ export function CapacityTab({ dto, filters, setFilter, filteredIssues }: Props) 
                                     formatter={(v: number | undefined, name: string | undefined) => [v ?? 0, name ?? '']}
                                     contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #e2e8f0' }}
                                 />
-                                <Legend formatter={v => <span className="text-[11px] text-slate-600">{v}</span>} />
+                                <Legend formatter={v => <span className="text-xs text-slate-600">{v}</span>} />
                                 <Bar dataKey="done" name="Done" stackId="a" fill="#10b981" maxBarSize={14} />
                                 <Bar dataKey="inProgress" name="In Progress" stackId="a" fill="#6366f1" maxBarSize={14} />
                                 <Bar dataKey="toDo" name="To Do" stackId="a" fill="#94a3b8" radius={[0, 4, 4, 0]} maxBarSize={14} />
@@ -267,7 +267,7 @@ export function CapacityTab({ dto, filters, setFilter, filteredIssues }: Props) 
                             <XAxis type="number" tick={{ fontSize: 10 }} />
                             <YAxis type="category" dataKey="type" width={110} tick={{ fontSize: 10 }} />
                             <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #e2e8f0' }} />
-                            <Legend formatter={v => <span className="text-[11px] text-slate-600">{v}</span>} />
+                            <Legend formatter={v => <span className="text-xs text-slate-600">{v}</span>} />
                             {topCategories.map((cat, idx) => (
                                 <Bar
                                     key={cat}

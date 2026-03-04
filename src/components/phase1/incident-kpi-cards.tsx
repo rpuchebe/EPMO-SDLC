@@ -112,7 +112,7 @@ export function IncidentKpiCards({ kpis, activeFilter = 'total', onFilterChange 
                             <div className={`flex items-center justify-center w-[22px] h-[22px] rounded-lg ${bgClass} ${textClass}`}>
                                 <IconOption className="w-3.5 h-3.5 stroke-[2.5]" />
                             </div>
-                            <span className="text-[12px] font-medium text-slate-600 truncate">{card.label}</span>
+                            <span className="text-xs font-medium text-slate-600 truncate">{card.label}</span>
                         </div>
 
                         {/* Main KPI Value & WoW */}

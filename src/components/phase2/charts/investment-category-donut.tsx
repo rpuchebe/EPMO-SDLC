@@ -68,11 +68,11 @@ export function InvestmentCategoryDonut({ data, total, trendPercentage = 0, onCl
                                     className="w-2.5 h-2.5 rounded-full shrink-0 group-hover:scale-125 transition-transform"
                                     style={{ backgroundColor: item.color }}
                                 />
-                                <span className="text-[11px] text-slate-600 whitespace-nowrap group-hover:text-slate-900 transition-colors">
+                                <span className="text-xs text-slate-600 whitespace-nowrap group-hover:text-slate-900 transition-colors">
                                     {item.name}
                                 </span>
                             </div>
-                            <span className="text-[11px] font-semibold text-slate-700 ml-auto pl-2">
+                            <span className="text-xs font-semibold text-slate-700 ml-auto pl-2">
                                 {item.value}
                             </span>
                         </div>

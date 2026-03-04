@@ -74,7 +74,7 @@ const colStatus: ColumnDef<BwiRow> = {
 const colWorkstream: ColumnDef<BwiRow> = {
     header: 'Workstream',
     cell: (r) => (
-        <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[11px] font-bold uppercase whitespace-nowrap">
+        <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-xs font-bold uppercase whitespace-nowrap">
             {r.workstream || 'N/A'}
         </span>
     ),
@@ -109,7 +109,7 @@ const colChildren: ColumnDef<BwiRow> = {
 const colOpenChildren: ColumnDef<BwiRow> = {
     header: 'Open Children',
     cell: (r) => (
-        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${r.open_children_count > 0 ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'text-slate-400'}`}>
+        <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${r.open_children_count > 0 ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'text-slate-400'}`}>
             {r.open_children_count}
         </span>
     ),
@@ -120,7 +120,7 @@ const colDueDate: ColumnDef<BwiRow> = {
     cell: (r) => {
         const formatted = fmtDate(r.due_date)
         return (
-            <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${!formatted ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'text-slate-600'}`}>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded ${!formatted ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'text-slate-600'}`}>
                 {formatted ?? 'MISSING'}
             </span>
         )
@@ -132,7 +132,7 @@ const colStartDate: ColumnDef<BwiRow> = {
     cell: (r) => {
         const formatted = fmtDate(r.start_date)
         return (
-            <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${!formatted ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'text-slate-600'}`}>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded ${!formatted ? 'bg-rose-50 text-rose-600 border border-rose-100' : 'text-slate-600'}`}>
                 {formatted ?? 'MISSING'}
             </span>
         )
@@ -145,7 +145,7 @@ const colDueDateBehind: ColumnDef<BwiRow> = {
         const isPast = r.due_date && new Date(r.due_date) < new Date() && r.status_category !== 'Done'
         const formatted = fmtDate(r.due_date)
         return (
-            <span className={`text-[11px] font-medium px-2 py-0.5 rounded ${isPast ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'text-slate-600'}`}>
+            <span className={`text-xs font-medium px-2 py-0.5 rounded ${isPast ? 'bg-orange-50 text-orange-600 border border-orange-100' : 'text-slate-600'}`}>
                 {formatted ?? 'N/A'}{isPast ? ' ⚠' : ''}
             </span>
         )
@@ -173,7 +173,7 @@ const colInconsistencyReason: ColumnDef<BwiRow> = {
             reason = 'Status / children mismatch'
         }
         return (
-            <span className="text-amber-700 font-medium text-[11px] bg-amber-50 px-2 py-1 rounded-md border border-amber-100 leading-tight inline-block">
+            <span className="text-amber-700 font-medium text-xs bg-amber-50 px-2 py-1 rounded-md border border-amber-100 leading-tight inline-block">
                 {reason}
             </span>
         )
@@ -287,7 +287,7 @@ export function BwisSection({ data }: BwisSectionProps) {
                         onClick={() => openModal('All Business Work Items', raw, COL_PROGRESS)}
                         className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all flex flex-col group"
                     >
-                        <h3 className="text-[12px] font-medium text-slate-600 mb-1">BWI Progress</h3>
+                        <h3 className="text-xs font-medium text-slate-600 mb-1">BWI Progress</h3>
                         <div className="flex-1 relative z-10 flex flex-col justify-end">
                             {total > 0 ? (
                                 <InitiativeStatusGauge data={gaugeData} total={total} />
@@ -299,7 +299,7 @@ export function BwisSection({ data }: BwisSectionProps) {
 
                     {/* By Workstream */}
                     <div className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all flex flex-col group">
-                        <h3 className="text-[12px] font-medium text-slate-600 mb-1">By Workstream</h3>
+                        <h3 className="text-xs font-medium text-slate-600 mb-1">By Workstream</h3>
                         <div className="flex-1 min-h-0 relative z-10">
                             {data.byWorkstream.length > 0 ? (
                                 <WorkstreamBarChart
@@ -320,7 +320,7 @@ export function BwisSection({ data }: BwisSectionProps) {
 
                     {/* Investment Category */}
                     <div className="col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-4 cursor-pointer hover:border-slate-300 hover:shadow-md transition-all flex flex-col group">
-                        <h3 className="text-[12px] font-medium text-slate-600 mb-1">Investment Category</h3>
+                        <h3 className="text-xs font-medium text-slate-600 mb-1">Investment Category</h3>
                         <div className="flex-1 relative z-10 min-h-0">
                             {data.byInvestmentCategory.length > 0 ? (
                                 <InvestmentCategoryDonut
@@ -346,7 +346,7 @@ export function BwisSection({ data }: BwisSectionProps) {
 
                     {/* Child Issue Distribution */}
                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col h-full overflow-hidden">
-                        <h3 className="text-[12px] font-medium text-slate-600 mb-1">Child Issue Distribution</h3>
+                        <h3 className="text-xs font-medium text-slate-600 mb-1">Child Issue Distribution</h3>
                         <div className="flex-1 min-h-0 overflow-auto">
                             {data.childDistribution.length > 0 ? (
                                 <InvestmentCategoryDonut
@@ -364,7 +364,7 @@ export function BwisSection({ data }: BwisSectionProps) {
                     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 flex flex-col h-full relative overflow-hidden">
                         <div className="flex items-center justify-between mb-3 shrink-0">
                             <div className="flex items-center gap-1.5">
-                                <h3 className="text-[12px] font-medium text-slate-600 flex items-center gap-1.5">
+                                <h3 className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
                                     <AlertTriangle className="w-3.5 h-3.5 text-rose-500" /> Top BWIs at Risk
                                 </h3>
                                 {/* Score tooltip */}
@@ -398,7 +398,7 @@ export function BwisSection({ data }: BwisSectionProps) {
 
                         <div className="flex-1 overflow-auto pr-1 min-h-0">
                             {topAtRisk.length > 0 ? (
-                                <table className="w-full text-left text-[11px] text-slate-600">
+                                <table className="w-full text-left text-xs text-slate-600">
                                     <thead className="text-[10px] uppercase font-bold text-slate-400 border-b border-slate-100 sticky top-0 bg-white">
                                         <tr>
                                             <th className="pb-2 font-semibold font-mono">Key</th>

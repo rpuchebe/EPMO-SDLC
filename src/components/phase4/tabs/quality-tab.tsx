@@ -30,7 +30,7 @@ function ConnectBanner({ title, description }: { title: string; description: str
             </div>
             <div className="min-w-0">
                 <p className="text-xs font-medium text-slate-600">{title}</p>
-                <p className="text-[11px] text-slate-400">{description}</p>
+                <p className="text-xs text-slate-400">{description}</p>
             </div>
         </div>
     )
@@ -242,7 +242,7 @@ export function QualityTab({ filters, setFilter, filteredIssues }: Props) {
                                     ]}
                                     contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #e2e8f0' }}
                                 />
-                                <Legend formatter={v => <span className="text-[11px] text-slate-600">{v}</span>} />
+                                <Legend formatter={v => <span className="text-xs text-slate-600">{v}</span>} />
                             </PieChart>
                         </ResponsiveContainer>
                     ) : (
@@ -267,7 +267,7 @@ export function QualityTab({ filters, setFilter, filteredIssues }: Props) {
                                 <XAxis type="number" tick={{ fontSize: 10 }} />
                                 <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 10 }} />
                                 <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #e2e8f0' }} />
-                                <Legend formatter={v => <span className="text-[11px] text-slate-600">{v}</span>} />
+                                <Legend formatter={v => <span className="text-xs text-slate-600">{v}</span>} />
                                 <Bar dataKey="open" name="Open" stackId="a" fill="#ef4444" maxBarSize={14} />
                                 <Bar dataKey="closed" name="Resolved" stackId="a" fill="#10b981" radius={[0, 4, 4, 0]} maxBarSize={14} />
                             </BarChart>

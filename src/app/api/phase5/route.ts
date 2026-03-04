@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { requireAuth } from '@/utils/supabase/auth-guard'
 
 // ──── MOCK DATA for Phase 5 – Deployment & Release Governance ────
 
@@ -39,6 +40,9 @@ const mockIncidents = [
 ]
 
 export async function GET(request: Request) {
+    const auth = await requireAuth()
+    if (auth instanceof NextResponse) return auth
+
     const { searchParams } = new URL(request.url)
     const workstream = searchParams.get('workstream') || 'All'
     const product = searchParams.get('product') || 'All'

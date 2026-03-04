@@ -106,7 +106,7 @@ export function DashboardCard({
                 <div className={`flex items-center justify-center w-[22px] h-[22px] rounded-lg ${iconBg} ${iconColor}`}>
                     <CardIcon className="w-3.5 h-3.5 stroke-[2.5]" />
                 </div>
-                <span className="text-[12px] font-medium text-slate-600 truncate">{label}</span>
+                <span className="text-xs font-medium text-slate-600 truncate">{label}</span>
             </div>
 
             {/* Row 2 — Main Value + Trend */}
@@ -114,8 +114,10 @@ export function DashboardCard({
                 <div className="text-[28px] leading-none font-bold text-slate-800 tracking-tight flex items-baseline gap-1">
                     {value}
                     {valueSuffix !== undefined && (
-                        <span className="text-[14px] font-semibold text-slate-400">
-                            ({valueSuffix}%)
+                        <span className="text-sm font-semibold text-slate-400">
+                            {typeof valueSuffix === 'number' || (typeof valueSuffix === 'string' && !isNaN(Number(valueSuffix)))
+                                ? `(${valueSuffix}%)`
+                                : valueSuffix}
                         </span>
                     )}
                 </div>

@@ -268,7 +268,7 @@ export function SprintHealthTab({ dto, filters, setFilter, filteredIssues }: Pro
                                         className={`border-b border-slate-100 hover:bg-indigo-50/30 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}`}
                                     >
                                         <td className="px-3 py-2">
-                                            <span className="font-mono text-[11px] text-indigo-600 font-semibold">{issue.key}</span>
+                                            <span className="font-mono text-xs text-indigo-600 font-semibold">{issue.key}</span>
                                         </td>
                                         <td className="px-3 py-2">
                                             <span className="text-slate-700 line-clamp-1" title={issue.summary}>{issue.summary}</span>
