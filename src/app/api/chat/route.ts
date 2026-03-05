@@ -1,5 +1,7 @@
 import { openai } from '@ai-sdk/openai';
-import { streamText } from 'ai';
+import { streamText, tool } from 'ai';
+import { z } from 'zod';
+import { createClient } from '@/utils/supabase/server';
 
 // Construct the system prompt using context about the SDLC (Software Development Life Cycle) Central Hub
 const systemPrompt = `
@@ -53,10 +55,71 @@ CRITICAL INSTRUCTIONS:
         `;
 
         const result = await streamText({
-            model: openai('gpt-4o-mini'), // Providing a highly capable but fast model
+            model: openai('gpt-4o-mini'),
             system: dynamicSystemPrompt,
             messages,
             temperature: 0.7,
+            // @ts-ignore
+            maxSteps: 5,
+            tools: {
+                getPhaseSummary: tool({
+                    description: 'Busca el resumen de datos (KPIs y métricas) para una fase específica del SDLC (0-5). Fase 0 es para "Ideas" y "BPI".',
+                    parameters: z.object({
+                        phase: z.number().min(0).max(5).describe('El número de la fase a consultar'),
+                        workstream: z.string().optional().describe('Opcional: Filtrar por el nombre del workstream mencionado (ej. "Enterprise Governance")')
+                    }),
+                    execute: async ({ phase, workstream }) => {
+                        try {
+                            const supabase = await createClient();
+
+                            if (phase === 0) {
+                                let query = supabase.from('bpi_tickets').select('status, jira_key');
+                                if (workstream) {
+                                    query = query.ilike('workstream', `%${workstream}%`);
+                                }
+                                const { data: tickets } = await query;
+                                if (!tickets || tickets.length === 0) return { error: `No se encontraron ideas para ${workstream || 'todos los workstreams'}` };
+
+                                const total = tickets.length;
+                                const distribution = tickets.reduce((acc: any, t) => {
+                                    acc[t.status] = (acc[t.status] || 0) + 1;
+                                    return acc;
+                                }, {});
+
+                                return {
+                                    title: "Phase 0 - Ideation (Ideas/BPI)",
+                                    total_ideas_submitted: total,
+                                    status_distribution: distribution,
+                                    workstream_filter: workstream || 'All'
+                                };
+                            }
+
+                            // Fallback para otras fases
+                            const tableMap: Record<number, string> = {
+                                1: 'planning_tickets',
+                                2: 'development_tickets',
+                                3: 'testing_tickets',
+                                4: 'closure_tickets',
+                                5: 'governance_data'
+                            };
+
+                            const tableName = tableMap[phase as keyof typeof tableMap];
+                            if (!tableName) return { error: "Fase no soportada para consulta directa aún." };
+
+                            const { count, error } = await supabase.from(tableName).select('*', { count: 'exact', head: true });
+                            if (error) return { error: `Error consultando base de datos: ${error.message}` };
+
+                            return {
+                                phase: phase,
+                                status: "Connected",
+                                total_items_tracked: count || 0
+                            };
+                        } catch (e) {
+                            return { error: "Failed to connect to data storage." };
+                        }
+                    }
+                })
+            }
         });
 
         return result.toAIStreamResponse();
