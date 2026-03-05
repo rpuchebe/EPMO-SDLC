@@ -28,6 +28,7 @@ Rules for responding:
 4. Keep the tone helpful and authoritative but friendly.
 `;
 
+export const runtime = 'edge';
 export const maxDuration = 30; // Max execution time for Vercel
 
 export async function POST(req: Request) {
