@@ -11,13 +11,27 @@ export function RayBot() {
     const pathname = usePathname();
     const [pageContext, setPageContext] = useState("");
 
+    const updateContext = () => {
+        const mainEl = document.querySelector('main') || document.body;
+        const textContext = mainEl?.innerText?.replace(/\n+/g, ' ').substring(0, 5000) || "";
+        setPageContext(textContext);
+    };
+
     useEffect(() => {
         if (!isOpen) return;
-        // Obtenemos contexto del DOM cuando se abre el chat o cambia la ruta
-        const mainEl = document.querySelector('main') || document.body;
-        const textContext = mainEl?.innerText?.replace(/\n+/g, ' ').substring(0, 4000) || "";
-        setPageContext(textContext);
+
+        // Primera carga del contexto
+        updateContext();
+
+        // Actualizamos cada 5 segundos por si los datos asíncronos terminaron de cargar
+        const interval = setInterval(updateContext, 5000);
+        return () => clearInterval(interval);
     }, [pathname, isOpen]);
+
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        updateContext(); // Forzamos actualización justo antes de enviar
+        handleSubmit(e);
+    };
 
     const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
         api: "/api/chat",
@@ -102,15 +116,15 @@ export function RayBot() {
                     >
                         <div className={`flex max-w-[88%] gap-3 ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                             <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl mt-1.5 transition-all ${message.role === "user"
-                                    ? "bg-slate-100 text-slate-500 border border-slate-200"
-                                    : "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+                                ? "bg-slate-100 text-slate-500 border border-slate-200"
+                                : "bg-indigo-600 text-white shadow-md shadow-indigo-100"
                                 }`}>
                                 {message.role === "user" ? <User size={14} /> : <Bot size={14} />}
                             </div>
                             <div
                                 className={`rounded-2xl px-5 py-4 text-[14px] leading-relaxed relative border ${message.role === "user"
-                                        ? "bg-slate-50 border-slate-200 text-slate-800 rounded-tr-sm"
-                                        : "bg-white border-slate-100 shadow-sm text-slate-700 rounded-tl-sm"
+                                    ? "bg-slate-50 border-slate-200 text-slate-800 rounded-tr-sm"
+                                    : "bg-white border-slate-100 shadow-sm text-slate-700 rounded-tl-sm"
                                     }`}
                             >
                                 <div className={`prose prose-slate prose-sm max-w-none ${message.role === "user" ? "text-slate-800" : "text-slate-700"}`}>
@@ -155,11 +169,12 @@ export function RayBot() {
 
             {/* Light Futuristic Input Area */}
             <div className="p-4 bg-white border-t border-slate-100">
-                <form onSubmit={handleSubmit} className="flex gap-2.5 items-center">
+                <form onSubmit={handleFormSubmit} className="flex gap-2.5 items-center">
                     <div className="flex-1 relative group">
                         <input
                             value={input}
                             onChange={handleInputChange}
+                            onFocus={updateContext}
                             placeholder="Type a message..."
                             className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 px-5 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all shadow-inner"
                             disabled={isLoading}
