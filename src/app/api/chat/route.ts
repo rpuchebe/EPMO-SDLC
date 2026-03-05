@@ -8,7 +8,7 @@ Your goal is to assist users with questions about the SDLC portal, the reports t
 
 Here is the context about this SDLC Portal platform:
 - The platform tracks IT and Engineering Projects through different Phases.
-- **Phase 0 (Ideation & Discovery):** Focuses on business case, high-level sizing, aligning with strategic goals, and securing initial approval.
+- **Phase 0 (Ideation & Discovery - BPI Items):** This is where "Ideas" are born. It focuses on the business case, high-level sizing, and BPI (Business Process Improvement) tracking. If a user asks for "Ideas" or "BPIs", they refer to Phase 0 data.
 - **Phase 1 (Planning):** Detailed planning, resource allocation, finalizing the scope, and establishing baselines for schedule and cost.
 - **Phase 2 (Design & Build):** Actual development, UI/UX design, architecture, and coding the solution.
 - **Phase 3 (Testing & Deployment):** QA, UAT (User Acceptance Testing), security reviews, and pushing the code to production.
