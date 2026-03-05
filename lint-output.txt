@@ -1,0 +1,557 @@
+
+> sdlc-central-hub@0.1.0 lint
+> eslint
+
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/create-user.js
+   1:26  error    A `require()` style import is forbidden    @typescript-eslint/no-require-imports
+   2:1   error    A `require()` style import is forbidden    @typescript-eslint/no-require-imports
+  14:13  warning  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/puppeteer_test.js
+  1:19  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/run-insert-user.js
+   1:20  error    A `require()` style import is forbidden    @typescript-eslint/no-require-imports
+  14:11  warning  'hash' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/run-migration.js
+  1:20  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:12  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  3:14  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/(dashboard)/cto-dashboard/cto-dashboard-client.tsx
+   10:5   warning  'TrendingUp' is defined but never used    @typescript-eslint/no-unused-vars
+   11:5   warning  'TrendingDown' is defined but never used  @typescript-eslint/no-unused-vars
+   12:5   warning  'Minus' is defined but never used         @typescript-eslint/no-unused-vars
+  130:51  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  135:30  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/(dashboard)/phase-2/bwi/detail/page.tsx
+  11:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  25:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/(dashboard)/phase-2/initiatives/detail/page.tsx
+  11:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  25:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/(dashboard)/phase-2/page.tsx
+  17:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  35:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/(dashboard)/phase-2/projects/detail/page.tsx
+  11:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  25:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/(dashboard)/phase-5/page.tsx
+  22:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/(dashboard)/rollout-overview/page.tsx
+  40:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/(dashboard)/stability-overview/page.tsx
+    7:32  warning  'BarChart3' is defined but never used                                                                         @typescript-eslint/no-unused-vars
+    7:43  warning  'Clock' is defined but never used                                                                             @typescript-eslint/no-unused-vars
+   13:18  warning  'startOfWeek' is defined but never used                                                                       @typescript-eslint/no-unused-vars
+   13:31  warning  'isAfter' is defined but never used                                                                           @typescript-eslint/no-unused-vars
+   30:12  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   50:19  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   65:12  warning  'error' is assigned a value but never used                                                                    @typescript-eslint/no-unused-vars
+   82:21  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  101:23  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  110:8   warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  117:11  warning  'filteredProjects' is assigned a value but never used                                                         @typescript-eslint/no-unused-vars
+  261:23  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  268:11  warning  'renderSparkline' is assigned a value but never used                                                          @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/api/chat/route.ts
+   62:13  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   84:75  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  117:34  warning  'e' is defined but never used                                                                                        @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/api/incidents/route.ts
+   3:62  warning  'IncidentSyncLog' is defined but never used  @typescript-eslint/no-unused-vars
+   6:38  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  30:27  warning  'request' is defined but never used          @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/api/phase0/route.ts
+   19:11  warning  'StatusHistoryRow' is defined but never used  @typescript-eslint/no-unused-vars
+  190:51  error    Unexpected any. Specify a different type      @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/api/phase2/detail/route.ts
+   2:10  warning  'createClient' is defined but never used  @typescript-eslint/no-unused-vars
+  54:18  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/api/phase2/route.ts
+   13:11  warning  'period' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  108:32  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/api/phase5/route.ts
+   7:36  warning  '_' is defined but never used                  @typescript-eslint/no-unused-vars
+   7:39  warning  'i' is defined but never used                  @typescript-eslint/no-unused-vars
+  61:11  warning  'hotfixes' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/api/stability/route.ts
+    5:27  warning  'request' is defined but never used               @typescript-eslint/no-unused-vars
+   12:40  warning  'weeklyError' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   44:41  warning  'manualError' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   52:42  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   68:37  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   85:25  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+   98:18  warning  'e' is defined but never used                     @typescript-eslint/no-unused-vars
+  110:45  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  117:26  warning  'e' is defined but never used                     @typescript-eslint/no-unused-vars
+  182:21  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/login/LoginClient.tsx
+  48:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/app/login/LoginClient.tsx:48:13
+  46 |         const saved = localStorage.getItem('epmo_remembered_email')
+  47 |         if (saved) {
+> 48 |             setEmail(saved)
+     |             ^^^^^^^^ Avoid calling setState() directly within an effect
+  49 |             setRememberMe(true)
+  50 |         }
+  51 |     }, [])  react-hooks/set-state-in-effect
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/chat/raybot.tsx
+    5:10  warning  'MessageSquare' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+    5:53  warning  'Loader2' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   24:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/chat/raybot.tsx:24:9
+  22 |
+  23 |         // Primera carga del contexto
+> 24 |         updateContext();
+     |         ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  25 |
+  26 |         // Actualizamos cada 5 segundos por si los datos asíncronos terminaron de cargar
+  27 |         const interval = setInterval(updateContext, 5000);  react-hooks/set-state-in-effect
+  105:79  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react/no-unescaped-entities
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/home/add-update-modal.tsx
+  205:23   error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  253:109  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/home/resource-hub.tsx
+  13:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:57  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:74  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/home/rollout-progress.tsx
+  11:55  error    Unexpected any. Specify a different type               @typescript-eslint/no-explicit-any
+  41:11  warning  'programStartDate' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  42:11  warning  'programEndDate' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/home/weekly-updates.tsx
+    5:90   warning  'Plus' is defined but never used          @typescript-eslint/no-unused-vars
+    5:124  warning  'Save' is defined but never used          @typescript-eslint/no-unused-vars
+   11:127  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   55:23   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:23   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  204:26   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  204:38   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  229:68   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  269:55   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  302:71   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  378:39   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  379:38   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  380:36   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  381:35   error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/layout/header.tsx
+   27:42  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+   94:17  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/layout/header.tsx:94:17
+  92 |     useEffect(() => {
+  93 |         const ws = searchParams?.get('workstream')
+> 94 |         if (ws) setWorkstream(ws)
+     |                 ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  95 |         else setWorkstream('All Workstreams')
+  96 |
+  97 |         const t = searchParams?.get('team')  react-hooks/set-state-in-effect
+  341:37  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       @next/next/no-img-element
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/layout/sidebar-wrapper.tsx
+  18:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/layout/sidebar-wrapper.tsx:18:9
+  16 |     // persist collapsed state to localStorage
+  17 |     useEffect(() => {
+> 18 |         setMounted(true)
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  19 |     }, [])
+  20 |
+  21 |     // Auto-collapse when navigating to routes that need full width  react-hooks/set-state-in-effect
+  24:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/layout/sidebar-wrapper.tsx:24:13
+  22 |     useEffect(() => {
+  23 |         if (AUTO_COLLAPSE_ROUTES.includes(pathname)) {
+> 24 |             setIsCollapsed(true)
+     |             ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  25 |         }
+  26 |     }, [pathname])
+  27 |                           react-hooks/set-state-in-effect
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/layout/sidebar.tsx
+   3:20  warning  'useEffect' is defined but never used   @typescript-eslint/no-unused-vars
+   9:5   warning  'Lightbulb' is defined but never used   @typescript-eslint/no-unused-vars
+  10:5   warning  'Compass' is defined but never used     @typescript-eslint/no-unused-vars
+  11:5   warning  'ListTodo' is defined but never used    @typescript-eslint/no-unused-vars
+  12:5   warning  'PenTool' is defined but never used     @typescript-eslint/no-unused-vars
+  13:5   warning  'Code' is defined but never used        @typescript-eslint/no-unused-vars
+  14:5   warning  'Rocket' is defined but never used      @typescript-eslint/no-unused-vars
+  16:5   warning  'HelpCircle' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase0/collaborators-report.tsx
+  52:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase0/dashboard-header.tsx
+  4:21  warning  'Info' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase0/info-modal.tsx
+  21:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase0/info-modal.tsx:21:13
+  19 |     useEffect(() => {
+  20 |         if (!open) {
+> 21 |             setShowVideo(false)
+     |             ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  22 |             return
+  23 |         }
+  24 |         const handler = (e: KeyboardEvent) => {  react-hooks/set-state-in-effect
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase1/backlog-distribution.tsx
+  1:80  warning  'Legend' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase1/collaborators-report.tsx
+  79:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase1/dashboard-header.tsx
+  4:19  warning  'Info' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase1/follow-up-distribution.tsx
+   45:49  error  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  107:44  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase1/follow-up-distribution.tsx:107:44
+  105 |                             ))}
+  106 |                         </Pie>
+> 107 |                         <Tooltip content={<CustomTooltip />} allowEscapeViewBox={{ x: true, y: true }} />
+      |                                            ^^^^^^^^^^^^^ This component is created during render
+  108 |                         <Legend
+  109 |                             verticalAlign="bottom"
+  110 |                             height={36}
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase1/follow-up-distribution.tsx:45:27
+  43 |     }, [chartData])
+  44 |
+> 45 |     const CustomTooltip = ({ active, payload }: any) => {
+     |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |         if (active && payload && payload.length) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |             const data = payload[0].payload
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 65 |         return null
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 66 |     }
+     | ^^^^^^ The component is created during render here
+  67 |
+  68 |     if (chartData.length === 0) {
+  69 |         return (  react-hooks/static-components
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase1/follow-up-table.tsx
+   25:66  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  131:69  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase1/incident-management-tab.tsx
+  4:10  warning  'Filter' is defined but never used  @typescript-eslint/no-unused-vars
+  4:27  warning  'Info' is defined but never used    @typescript-eslint/no-unused-vars
+  4:33  warning  'Layers' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase1/workstream-incident-distribution.tsx
+  75:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/bwis-section.tsx
+  210:11  warning  The 'raw' logical expression could make the dependencies of useMemo Hook (at line 223) change on every render. To fix this, wrap the initialization of 'raw' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  210:11  warning  The 'raw' logical expression could make the dependencies of useMemo Hook (at line 242) change on every render. To fix this, wrap the initialization of 'raw' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  226:11  warning  'alerts' is assigned a value but never used                                                                                                                                             @typescript-eslint/no-unused-vars
+  452:72  error    Unexpected any. Specify a different type                                                                                                                                                @typescript-eslint/no-explicit-any
+  465:74  error    Unexpected any. Specify a different type                                                                                                                                                @typescript-eslint/no-explicit-any
+  478:73  error    Unexpected any. Specify a different type                                                                                                                                                @typescript-eslint/no-explicit-any
+  491:78  error    Unexpected any. Specify a different type                                                                                                                                                @typescript-eslint/no-explicit-any
+  504:79  error    Unexpected any. Specify a different type                                                                                                                                                @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/charts/initiative-status-gauge.tsx
+  17:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/charts/investment-category-donut.tsx
+   5:10  warning  'TrendingUp' is defined but never used                @typescript-eslint/no-unused-vars
+   5:22  warning  'TrendingDown' is defined but never used              @typescript-eslint/no-unused-vars
+   5:36  warning  'Minus' is defined but never used                     @typescript-eslint/no-unused-vars
+  20:56  warning  'trendPercentage' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/charts/mini-bar-chart.tsx
+  14:11  warning  'maxVal' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/charts/stacked-bar-chart.tsx
+  16:20  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  51:31  warning  'radius' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/charts/workstream-bar-chart.tsx
+  22:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  63:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/detail-list.tsx
+   43:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   43:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   74:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  167:94  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/initiatives-section.tsx
+    6:77   warning  'ShieldAlert' is defined but never used                                                                                                                                                                 @typescript-eslint/no-unused-vars
+    6:90   warning  'CheckCircle2' is defined but never used                                                                                                                                                                @typescript-eslint/no-unused-vars
+    6:104  warning  'CircleDashed' is defined but never used                                                                                                                                                                @typescript-eslint/no-unused-vars
+   50:24   error    Unexpected any. Specify a different type                                                                                                                                                                @typescript-eslint/no-explicit-any
+   67:11   warning  The 'initiatives' logical expression could make the dependencies of useMemo Hook (at line 99) change on every render. To fix this, wrap the initialization of 'initiatives' in its own useMemo() Hook   react-hooks/exhaustive-deps
+   67:11   warning  The 'initiatives' logical expression could make the dependencies of useMemo Hook (at line 136) change on every render. To fix this, wrap the initialization of 'initiatives' in its own useMemo() Hook  react-hooks/exhaustive-deps
+  112:8    warning  React Hook useMemo has a missing dependency: 'WORKSTREAM_COLORS'. Either include it or remove the dependency array                                                                                      react-hooks/exhaustive-deps
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/kpi-cards.tsx
+  19:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase2/projects-section.tsx
+    5:69   warning  'FileCheck' is defined but never used                                                                               @typescript-eslint/no-unused-vars
+   13:6    warning  'Severity' is defined but never used                                                                                @typescript-eslint/no-unused-vars
+   45:8    warning  React Hook useMemo has a missing dependency: 'WORKSTREAM_COLORS'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   56:11   warning  'invCategoryData' is assigned a value but never used                                                                @typescript-eslint/no-unused-vars
+   69:8    warning  React Hook useMemo has a missing dependency: 'INV_CATEGORIES'. Either include it or remove the dependency array     react-hooks/exhaustive-deps
+  432:104  warning  'monthlyTrend' is defined but never used                                                                            @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase4/phase4-content.tsx
+   5:16  warning  'Search' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   5:27  warning  'ChevronDown' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+  99:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase4/phase4-content.tsx:99:9
+   97 |     // ── Fetch ──────────────────────────────────────────────────────────────────
+   98 |     useEffect(() => {
+>  99 |         setLoading(true)
+      |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  100 |         setError(null)
+  101 |         const qs = new URLSearchParams()
+  102 |         if (workstream) qs.set('workstream', workstream)  react-hooks/set-state-in-effect
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase4/phase4-ui.tsx
+  44:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase4/tabs/activity-tab.tsx
+  166:21  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase4/tabs/activity-tab.tsx:166:21
+  164 |     // Issues with activity in last 7/30/90 days
+  165 |     const activityWindow = useMemo(() => {
+> 166 |         const now = Date.now()
+      |                     ^^^^^^^^^^ Cannot call impure function
+  167 |         const d7 = now - 7 * 86400000
+  168 |         const d30 = now - 30 * 86400000
+  169 |         const d90 = now - 90 * 86400000  react-hooks/purity
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase4/tabs/capacity-tab.tsx
+  53:31  warning  'dto' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase4/tabs/flow-tab.tsx
+  19:7  warning  'INV_COLORS' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase4/tabs/overview-tab.tsx
+    23:5   warning  'AlertTriangle' is defined but never used                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+    23:26  warning  'Maximize2' is defined but never used                                                                                                                                                                                                                                                    @typescript-eslint/no-unused-vars
+    36:5   warning  'Dialog' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+    36:13  warning  'DialogContent' is defined but never used                                                                                                                                                                                                                                                @typescript-eslint/no-unused-vars
+    36:28  warning  'DialogHeader' is defined but never used                                                                                                                                                                                                                                                 @typescript-eslint/no-unused-vars
+    36:42  warning  'DialogTitle' is defined but never used                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+    36:55  warning  'DialogDescription' is defined but never used                                                                                                                                                                                                                                            @typescript-eslint/no-unused-vars
+   307:24  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   381:59  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   448:11  warning  'wsBreakdown' is assigned a value but never used                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   886:57  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  1008:58  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  1021:58  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  1034:58  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  1047:58  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  1062:58  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  1075:58  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  1088:58  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  1200:61  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase4/tabs/quality-tab.tsx
+  13:7  warning  'BUG_COLORS' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase5/dashboard-header.tsx
+  12:45  warning  'onRefresh' is defined but never used     @typescript-eslint/no-unused-vars
+  12:56  warning  'isRefreshing' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/phase5/release-volume-cards.tsx
+  51:36  warning  'i' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/shared/modals/issue-list-modal.tsx
+   4:33  warning  'DialogHeader' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+   4:47  warning  'DialogTitle' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              @typescript-eslint/no-unused-vars
+   6:10  warning  'ExternalLink' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-unused-vars
+  25:57  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+  33:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/components/shared/modals/issue-list-modal.tsx:33:13
+  31 |     useEffect(() => {
+  32 |         if (open) {
+> 33 |             setStatusFilter('all')
+     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  34 |             setWorkstreamFilter('all')
+  35 |         }
+  36 |     }, [open])  react-hooks/set-state-in-effect
+  50:24  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/lib/server/bwis.ts
+  124:33  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  166:5   warning  '_dateWindow' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  185:5   warning  '_dateWindow' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  218:32  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  288:17  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/lib/server/initiatives.ts
+  161:11  warning  'healthMap' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/lib/server/phase4.ts
+    33:7   warning  'EXCLUDED_TYPES_LOWER' is assigned a value but never used  @typescript-eslint/no-unused-vars
+    66:16  error    Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+   306:7   warning  'ISSUE_COLS' is assigned a value but never used            @typescript-eslint/no-unused-vars
+   345:17  error    Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+   590:59  error    Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+   665:10  warning  'mergeOverviewSnapshot' is defined but never used          @typescript-eslint/no-unused-vars
+   701:10  warning  'parseNotCompletedByType' is defined but never used        @typescript-eslint/no-unused-vars
+   725:10  warning  'parseStatusBreakdown' is defined but never used           @typescript-eslint/no-unused-vars
+   912:10  warning  'mapContributors' is defined but never used                @typescript-eslint/no-unused-vars
+  1120:11  warning  'nowISO' is assigned a value but never used                @typescript-eslint/no-unused-vars
+  1121:11  warning  'weekAgoISO' is assigned a value but never used            @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/lib/server/projects.ts
+   60:34  error    Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+   90:34  error    Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+  356:11  warning  'byWorkstream' is assigned a value but never used          @typescript-eslint/no-unused-vars
+  357:11  warning  'byInvestmentCategory' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  380:11  warning  'initiativeIds' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  403:39  error    Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/types/incidents.ts
+  7:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/src/utils/supabase/middleware.ts
+  18:58  warning  'options' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/test-bwi-prod.js
+  1:26  error    A `require()` style import is forbidden     @typescript-eslint/no-require-imports
+  2:16  error    A `require()` style import is forbidden     @typescript-eslint/no-require-imports
+  8:17  warning  'error' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/test-bwi.js
+  1:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:16  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/test-bwi2.js
+   1:26  error    A `require()` style import is forbidden     @typescript-eslint/no-require-imports
+   2:16  error    A `require()` style import is forbidden     @typescript-eslint/no-require-imports
+  11:17  warning  'error' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/test-db.js
+  1:1   error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/test-db2.js
+   1:1   error    A `require()` style import is forbidden           @typescript-eslint/no-require-imports
+   2:26  error    A `require()` style import is forbidden           @typescript-eslint/no-require-imports
+  11:35  warning  'sprintError' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/test-exact.js
+  1:1   error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+  2:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/test-network.js
+  1:19  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/test-page.js
+  1:19  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+/Users/raimundo/Documents/EPMO - SDLC Page/sdlc-central-hub/test-sprint-api.js
+   1:1   error    A `require()` style import is forbidden          @typescript-eslint/no-require-imports
+   2:26  error    A `require()` style import is forbidden          @typescript-eslint/no-require-imports
+   6:46  warning  'category' is defined but never used             @typescript-eslint/no-unused-vars
+  32:16  warning  'testRechartsPayload' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 244 problems (133 errors, 111 warnings)
+

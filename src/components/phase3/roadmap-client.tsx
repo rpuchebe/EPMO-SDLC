@@ -395,7 +395,7 @@ export function RoadmapClient({ isAdmin = false, workstream = 'All Workstreams' 
     // ── Timeline ──────────────────────────────────────────────────────────────
     const { columns, start: timelineStart, end: timelineEnd } = useMemo(
         () => generateTimeline(dto?.minDate ?? null, dto?.maxDate ?? null, timeframe),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
         [dto?.minDate, dto?.maxDate, timeframe],
     )
 

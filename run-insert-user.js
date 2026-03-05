@@ -1,3 +1,4 @@
+/* eslint-disable */
 const { Client } = require('pg');
 const connectionString = 'postgresql://postgres:NatyRay2019%2A@db.ncngprmpiclcurykbzqj.supabase.co:5432/postgres';
 

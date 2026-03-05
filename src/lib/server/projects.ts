@@ -462,8 +462,8 @@ export async function getProjectsDashboardData(
         invCounts[inv] = (invCounts[inv] || 0) + 1
     })
 
-    let finalByWorkstream = toWorkstreamArray(wsCounts)
-    let finalByInvestmentCategory = toValueArray(invCounts, INV_CAT_COLORS, WS_COLORS)
+    const finalByWorkstream = toWorkstreamArray(wsCounts)
+    const finalByInvestmentCategory = toValueArray(invCounts, INV_CAT_COLORS, WS_COLORS)
     let finalChildDistribution = childDistribution.filter(d =>
         d.name.toLowerCase() !== 'sub-task' &&
         d.name.toLowerCase() !== 'sub task' &&

@@ -42,8 +42,8 @@ export function DetailList<T>({ title, backUrl, data, columns, searchFields }: D
         if (!sortKey) return filteredData
         return [...filteredData].sort((a: any, b: any) => {
             const col = columns.find(c => c.key === sortKey)
-            let valA = col?.sortAccessor ? col.sortAccessor(a) : a[sortKey]
-            let valB = col?.sortAccessor ? col.sortAccessor(b) : b[sortKey]
+            const valA = col?.sortAccessor ? col.sortAccessor(a) : a[sortKey]
+            const valB = col?.sortAccessor ? col.sortAccessor(b) : b[sortKey]
 
             if (valA === valB) return 0
             if (valA == null) return 1

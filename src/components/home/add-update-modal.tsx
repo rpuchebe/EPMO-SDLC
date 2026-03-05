@@ -180,7 +180,7 @@ export function AddUpdateModal({ updates, defaultWeeklyUpdateId }: { updates: We
                 .order('order_index', { ascending: false })
                 .limit(1)
 
-            let startingIndex = (existingItems && existingItems.length > 0) ? (existingItems[0].order_index || 0) + 1 : 1
+            const startingIndex = (existingItems && existingItems.length > 0) ? (existingItems[0].order_index || 0) + 1 : 1
 
             const itemsToInsert = parsedItems.map((item, idx) => ({
                 weekly_update_id: selectedWeekId,
